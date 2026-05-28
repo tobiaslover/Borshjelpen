@@ -22,14 +22,25 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      return res.status(404).json({ error: `Aksje "${upper}" ikke funnet på Oslo Børs. Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI.` });
+      return res.status(404).json({ 
+        error: `Aksje "${upper}" ikke funnet på Oslo Børs.`,
+        debug: { status: response.status, symbol }
+      });
     }
 
     const data = await response.json();
     const r = data?.quoteSummary?.result?.[0];
 
     if (!r || !r.price) {
-      return res.status(404).json({ error: `Aksje "${upper}" ikke funnet. Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI.` });
+      return res.status(404).json({ 
+        error: `Aksje "${upper}" ikke funnet.`,
+        debug: {
+          symbol,
+          yahooStatus: data?.quoteSummary?.error || 'ingen feil',
+          hasResult: !!data?.quoteSummary?.result,
+          resultCount: data?.quoteSummary?.result?.length || 0
+        }
+      });
     }
 
     const p = r.price;
