@@ -121,3 +121,5 @@ i <head> for å vise riktig navbar basert på innloggingsstatus:
 ### Filer
 - auth.html   → logg inn / registrer deg
 - profil.html → brukerside etter innlogging
+
+#oppdatert
