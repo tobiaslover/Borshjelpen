@@ -102,8 +102,9 @@ export default async function handler(req, res) {
     const price = p.regularMarketPrice?.raw || 0;
     const prevClose = p.regularMarketPreviousClose?.raw || price;
     const change = p.regularMarketChange?.raw || (price - prevClose);
+    // Yahoo returnerer f.eks. 0.0009 for 0.09% — ikke gang med 100
     const changePct = p.regularMarketChangePercent?.raw != null
-      ? p.regularMarketChangePercent.raw * 100
+      ? p.regularMarketChangePercent.raw
       : (prevClose ? (change / prevClose) * 100 : 0);
 
     res.status(200).json({
