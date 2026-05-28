@@ -1,57 +1,50 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Kun POST støttes' });
+  const { ticker, range } = req.query;
+  if (!ticker) return res.status(400).json({ error: 'Ticker mangler' });
 
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY mangler i Vercel Environment Variables.' });
+  const upper = ticker.toUpperCase().replace('.OL','').replace(':OSE','');
+  const symbol = upper + '.OL';
 
-  const { messages, context } = req.body;
-  if (!messages || !Array.isArray(messages)) return res.status(400).json({ error: 'messages mangler' });
+  const ranges = {
+    '1d': { interval: '1m', range: '1d' },
+    '1w': { interval: '15m', range: '5d' },
+    '1m': { interval: '1d', range: '1mo' },
+    '1y': { interval: '1d', range: '1y' },
+  };
 
-  const systemPrompt = `Du er Børshjelpen AI — en vennlig og nøytral finansassistent som hjelper nybegynnere forstå aksjer og børsen.
-
-${context ? `Brukeren ser på: ${context.name} (${context.ticker}), pris ${context.price} ${context.currency}, endring ${context.up ? '+' : ''}${context.changePct}%, sektor: ${context.sector || 'ukjent'}, P/E: ${context.pe || 'ukjent'}, beta: ${context.beta || 'ukjent'}.` : 'Ingen spesifikk aksje valgt.'}
-
-REGLER:
-1. Gi ALDRI kjøpsanbefalinger eller råd om å kjøpe/selge/holde
-2. Anbefal alltid å snakke med en finansrådgiver for personlige råd
-3. Forklar alltid risiko ved siden av potensielle gevinster
-4. Presenter alltid begge sider
-5. Svar på norsk bokmål
-6. Enkelt språk — forklar faguttrykk
-7. Maks 3-4 avsnitt per svar
-8. Du er en lærer, ikke en rådgiver`;
+  const { interval, range: r } = ranges[range] || ranges['1d'];
 
   try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
+    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${r}`;
+    const response = await fetch(url, {
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 600,
-        temperature: 0.5,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages
-        ]
-      })
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Referer': 'https://finance.yahoo.com/',
+      }
     });
 
-    if (!response.ok) {
-      const err = await response.json();
-      return res.status(500).json({ error: 'Groq API feil', detail: err });
-    }
+    if (!response.ok) return res.status(404).json({ error: 'Data ikke funnet' });
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || '';
-    res.status(200).json({ reply });
+    const result = data?.chart?.result?.[0];
+    const timestamps = result?.timestamp || [];
+    const closes = result?.indicators?.quote?.[0]?.close || [];
+    const meta = result?.meta;
+
+    const points = timestamps
+      .map((t, i) => ({ t: t * 1000, p: closes[i] }))
+      .filter(d => d.p !== null && d.p !== undefined);
+
+    res.status(200).json({
+      ticker: upper,
+      currency: 'NOK',
+      currentPrice: meta?.regularMarketPrice,
+      previousClose: points.length > 1 ? points[0].p : meta?.chartPreviousClose,
+      points,
+    });
 
   } catch (err) {
     res.status(500).json({ error: 'Serverfeil', detail: err.message });
