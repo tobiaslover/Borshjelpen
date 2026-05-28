@@ -104,6 +104,22 @@ export default async function handler(req, res) {
     const change = price - openPrice;
     const changePct = openPrice ? (change / openPrice) * 100 : 0;
 
+    // DEBUG — midlertidig for å se alle felter
+    return res.status(200).json({
+      debug: true,
+      price,
+      openPrice,
+      change,
+      changePct,
+      raw_regularMarketPrice: p.regularMarketPrice?.raw,
+      raw_regularMarketOpen: p.regularMarketOpen?.raw,
+      raw_regularMarketChange: p.regularMarketChange?.raw,
+      raw_regularMarketChangePercent: p.regularMarketChangePercent?.raw,
+      raw_regularMarketPreviousClose: p.regularMarketPreviousClose?.raw,
+      raw_previousClose: p.previousClose?.raw,
+      currency: p.currency,
+    });
+
     res.status(200).json({
       ticker: upper,
       name: p.longName || p.shortName || upper,
