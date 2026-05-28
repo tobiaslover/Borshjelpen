@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Min profil — Børshjelpen</title>
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; min-height: 100vh; }
+
+nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: white; border-bottom: 1px solid #e8e8e8; position: relative; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
+.logo span { color: #C8A96E; }
+.nav-tabs { display: flex; }
+.ntab { font-size: 13px; padding: 6px 14px; color: #666; background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
+.ntab.active { color: #1B3A5C; border-bottom: 2px solid #1B3A5C; font-weight: 500; }
+.user-pill { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border-radius: 100px; border: 1px solid #e8e8e8; cursor: pointer; background: white; }
+.user-pill:hover { border-color: #1B3A5C; }
+.user-av { width: 30px; height: 30px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #C8A96E; font-weight: 500; font-family: 'Tenor Sans', sans-serif; }
+.user-name { font-size: 13px; font-weight: 500; }
+
+.dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 2rem; background: white; border: 1px solid #e8e8e8; border-radius: 12px; padding: .5rem 0; width: 220px; z-index: 100; }
+.dropdown.open { display: block; }
+.dd-header { padding: .75rem 1rem .5rem; border-bottom: 1px solid #f0f0f0; margin-bottom: .25rem; }
+.dd-name { font-size: 13px; font-weight: 500; }
+.dd-email { font-size: 11px; color: #888; margin-top: 1px; }
+.dd-plan { font-size: 10px; background: #EEE8DA; color: #8B6E3A; padding: 2px 8px; border-radius: 100px; display: inline-block; margin-top: 4px; }
+.dd-item { display: flex; align-items: center; gap: 10px; padding: 8px 1rem; font-size: 13px; color: #1a1a1a; cursor: pointer; text-decoration: none; }
+.dd-item:hover { background: #f8f7f4; }
+.dd-item.danger { color: #A32D2D; }
+.dd-sep { height: 1px; background: #f0f0f0; margin: .25rem 0; }
+
+.page { max-width: 800px; margin: 0 auto; padding: 2rem; }
+
+.profile-hero { display: flex; align-items: center; gap: 18px; padding: 1.5rem; background: white; border-radius: 14px; border: 1px solid #e8e8e8; margin-bottom: 1.5rem; }
+.profile-av-lg { width: 64px; height: 64px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #C8A96E; font-family: 'Tenor Sans', sans-serif; flex-shrink: 0; }
+.profile-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+.profile-email { font-size: 13px; color: #888; margin-top: 3px; }
+.profile-plan { display: inline-flex; align-items: center; gap: 5px; background: #EEE8DA; color: #8B6E3A; font-size: 11px; padding: 3px 10px; border-radius: 100px; margin-top: 6px; }
+.edit-btn { margin-left: auto; padding: 8px 16px; border-radius: 100px; border: 1px solid #e8e8e8; background: none; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; color: #666; }
+
+.section-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .75rem; margin-top: 1.5rem; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: .5rem; }
+.stat-card { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1rem; text-align: center; }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #1B3A5C; }
+.stat-num.gold { color: #C8A96E; }
+.stat-lbl { font-size: 11px; color: #888; margin-top: 3px; }
+
+.watch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.wcard { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1rem; cursor: pointer; transition: border-color .15s; }
+.wcard:hover { border-color: #1B3A5C; }
+.wcard.add { border-style: dashed; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; color: #aaa; }
+.wcard.add:hover { border-color: #1B3A5C; color: #1B3A5C; }
+.wt { font-size: 10px; color: #888; }
+.wn { font-size: 13px; font-weight: 500; margin: 2px 0 8px; }
+.wrow { display: flex; justify-content: space-between; align-items: center; }
+.wp { font-size: 14px; font-weight: 500; }
+.badge-up { font-size: 11px; background: #1A5C3A; color: #6ECFA0; padding: 2px 7px; border-radius: 100px; font-weight: 500; }
+.badge-down { font-size: 11px; background: #5C1B1B; color: #F09595; padding: 2px 7px; border-radius: 100px; font-weight: 500; }
+
+.activity-list { background: white; border: 1px solid #e8e8e8; border-radius: 12px; overflow: hidden; }
+.act-row { display: flex; align-items: center; gap: 12px; padding: 12px 1.25rem; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+.act-row:last-child { border-bottom: none; }
+.act-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+.act-text { flex: 1; }
+.act-time { font-size: 11px; color: #aaa; }
+
+.upgrade-card { background: #1B3A5C; border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.uc-title { font-family: 'Playfair Display', serif; font-size: 18px; color: white; margin-bottom: 4px; }
+.uc-sub { font-size: 13px; color: rgba(255,255,255,.6); }
+.uc-features { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.uc-feat { font-size: 12px; color: rgba(255,255,255,.7); display: flex; align-items: center; gap: 6px; }
+.uc-btn { background: #C8A96E; color: #1B3A5C; border: none; border-radius: 100px; padding: 10px 22px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <div class="nav-tabs">
+    <a href="borshjelpen.html" class="ntab">Hjem</a>
+    <a href="aksjer.html" class="ntab">Aksjer</a>
+    <a href="#" class="ntab">Lær</a>
+    <a href="#" class="ntab">Nyhetsbrev</a>
+  </div>
+  <div class="user-pill" onclick="toggleDropdown()">
+    <div class="user-av" id="navAv">?</div>
+    <span class="user-name" id="navName">Min side</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="dropdown" id="dropdown">
+    <div class="dd-header">
+      <div class="dd-name" id="ddName">Laster...</div>
+      <div class="dd-email" id="ddEmail"></div>
+      <span class="dd-plan">Gratis plan</span>
+    </div>
+    <a href="profil.html" class="dd-item">👤 Min profil</a>
+    <a href="aksjer.html" class="dd-item">📈 Aksjer</a>
+    <div class="dd-item">🔔 Varsler</div>
+    <div class="dd-item">⚙️ Innstillinger</div>
+    <div class="dd-sep"></div>
+    <div class="dd-item danger" onclick="doLogout()">🚪 Logg ut</div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="profile-hero">
+    <div class="profile-av-lg" id="profileAv">?</div>
+    <div>
+      <div class="profile-name" id="profileName">Laster...</div>
+      <div class="profile-email" id="profileEmail"></div>
+      <div class="profile-plan">⭐ Gratis plan</div>
+    </div>
+    <button class="edit-btn">Rediger profil</button>
+  </div>
+
+  <div class="section-label">Aktivitet</div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num">14</div><div class="stat-lbl">Aksjer søkt</div></div>
+    <div class="stat-card"><div class="stat-num">28</div><div class="stat-lbl">AI-spørsmål</div></div>
+    <div class="stat-card"><div class="stat-num">7</div><div class="stat-lbl">Nyhetsbrev lest</div></div>
+    <div class="stat-card"><div class="stat-num gold">340</div><div class="stat-lbl">XP opptjent</div></div>
+  </div>
+
+  <div class="section-label">Overvåkningsliste</div>
+  <div class="watch-grid">
+    <div class="wcard" onclick="location.href='aksjer.html'">
+      <div class="wt">EQNR.OL</div>
+      <div class="wn">Equinor</div>
+      <div class="wrow"><span class="wp">274,50 kr</span><span class="badge-up">+2,1%</span></div>
+    </div>
+    <div class="wcard" onclick="location.href='aksjer.html'">
+      <div class="wt">DNB.OL</div>
+      <div class="wn">DNB Bank</div>
+      <div class="wrow"><span class="wp">228,30 kr</span><span class="badge-down">-0,8%</span></div>
+    </div>
+    <div class="wcard" onclick="location.href='aksjer.html'">
+      <div class="wt">MOWI.OL</div>
+      <div class="wn">Mowi</div>
+      <div class="wrow"><span class="wp">186,40 kr</span><span class="badge-up">+1,7%</span></div>
+    </div>
+    <div class="wcard add" onclick="location.href='aksjer.html'">
+      <span style="font-size:22px">+</span>
+      <span style="font-size:12px">Legg til aksje</span>
+    </div>
+  </div>
+
+  <div class="section-label">Siste aktivitet</div>
+  <div class="activity-list">
+    <div class="act-row">
+      <div class="act-icon" style="background:#E1F5EE">📊</div>
+      <div class="act-text">Søkte opp <strong>Equinor (EQNR)</strong></div>
+      <div class="act-time">I dag 09:14</div>
+    </div>
+    <div class="act-row">
+      <div class="act-icon" style="background:#EEE8DA">💬</div>
+      <div class="act-text">Stilte spørsmål om <strong>P/E-tall</strong></div>
+      <div class="act-time">I dag 09:11</div>
+    </div>
+    <div class="act-row">
+      <div class="act-icon" style="background:#E6EEF5">📰</div>
+      <div class="act-text">Leste nyhetsbrev <strong>Torsdag 29. mai</strong></div>
+      <div class="act-time">I dag 07:32</div>
+    </div>
+    <div class="act-row">
+      <div class="act-icon" style="background:#E1F5EE">📊</div>
+      <div class="act-text">Søkte opp <strong>Mowi (MOWI)</strong></div>
+      <div class="act-time">I går 16:45</div>
+    </div>
+  </div>
+
+  <div class="upgrade-card">
+    <div>
+      <div class="uc-title">Oppgrader til Premium</div>
+      <div class="uc-sub">Lås opp alle funksjoner</div>
+      <div class="uc-features">
+        <div class="uc-feat">✓ Ubegrenset AI-chat</div>
+        <div class="uc-feat">✓ Alle aksjer — Oslo Børs + internasjonale</div>
+        <div class="uc-feat">✓ Daglig nyhetsbrev med kvartalsrapporter</div>
+        <div class="uc-feat">✓ Prisvarsel når aksjer beveger seg</div>
+      </div>
+    </div>
+    <button class="uc-btn">99 kr/mnd →</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'DIN_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'DIN_SUPABASE_ANON_KEY';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function getInitials(name) {
+  if (!name) return '?';
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+async function loadUser() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'auth.html'; return; }
+  const user = session.user;
+  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  const initials = getInitials(name);
+  document.getElementById('navAv').textContent = initials;
+  document.getElementById('navName').textContent = name.split(' ')[0];
+  document.getElementById('ddName').textContent = name;
+  document.getElementById('ddEmail').textContent = user.email;
+  document.getElementById('profileAv').textContent = initials;
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('profileEmail').textContent = user.email;
+}
+
+function toggleDropdown() {
+  document.getElementById('dropdown').classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.user-pill') && !e.target.closest('.dropdown')) {
+    document.getElementById('dropdown').classList.remove('open');
+  }
+});
+
+async function doLogout() {
+  await sb.auth.signOut();
+  window.location.href = 'auth.html';
+}
+
+loadUser();
+</script>
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aksjer — Børshjelpen</title>
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+
+nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid #e8e8e8; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
+.logo span { color: #C8A96E; }
+.nav-tabs { display: flex; }
+.nav-tab { font-size: 13px; padding: 6px 16px; color: #666; background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
+.nav-tab.active { color: #1B3A5C; border-bottom: 2px solid #1B3A5C; font-weight: 500; }
+
+.search-hero { background: #1B3A5C; padding: 2.5rem 2rem; text-align: center; }
+.search-title { font-family: 'Playfair Display', serif; font-size: 28px; color: white; margin-bottom: 6px; }
+.search-sub { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; }
+.search-bar { display: flex; gap: 8px; max-width: 520px; margin: 0 auto; }
+.search-input { flex: 1; padding: 11px 16px; border-radius: 100px; border: none; font-size: 14px; outline: none; font-family: 'DM Sans', sans-serif; }
+.search-btn { background: #C8A96E; color: #1B3A5C; padding: 11px 22px; border-radius: 100px; border: none; font-weight: 500; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.search-hint { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 10px; }
+.suggestions { display: flex; gap: 8px; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+.suggest-pill { font-size: 12px; padding: 4px 12px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); cursor: pointer; background: none; font-family: 'DM Sans', sans-serif; }
+.suggest-pill:hover { background: rgba(255,255,255,0.1); color: white; }
+
+.content { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+.loading { text-align: center; padding: 3rem; color: #888; }
+.loading-spinner { width: 32px; height: 32px; border: 2px solid #e8e8e8; border-top-color: #1B3A5C; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-step { font-size: 13px; color: #aaa; margin-top: 6px; }
+
+.result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e8e8e8; }
+.result-company { display: flex; align-items: center; gap: 14px; }
+.company-logo { width: 52px; height: 52px; border-radius: 12px; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-family: 'Tenor Sans', sans-serif; font-size: 12px; color: #C8A96E; letter-spacing: 1px; flex-shrink: 0; }
+.company-name { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+.company-meta { font-size: 13px; color: #888; margin-top: 3px; }
+.price-block { text-align: right; }
+.price-main { font-size: 28px; font-weight: 500; }
+.badge-up { font-size: 13px; background: #1A5C3A; color: #6ECFA0; padding: 4px 10px; border-radius: 100px; font-weight: 500; display: inline-block; margin-top: 5px; }
+.badge-down { font-size: 13px; background: #5C1B1B; color: #F09595; padding: 4px 10px; border-radius: 100px; font-weight: 500; display: inline-block; margin-top: 5px; }
+
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.metric { background: #f8f7f4; border-radius: 10px; padding: 12px 14px; }
+.metric-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.metric-val { font-size: 18px; font-weight: 500; }
+.metric-val.na { color: #ccc; font-size: 14px; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.card { background: #fff; border: 1px solid #e8e8e8; border-radius: 14px; padding: 1.25rem; }
+.card-title { font-size: 11px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.card p { font-size: 13px; line-height: 1.7; color: #1a1a1a; }
+
+.ai-loading { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #f8f7f4; border-radius: 10px; margin-bottom: 1rem; }
+.ai-spinner { width: 18px; height: 18px; border: 2px solid #e8e8e8; border-top-color: #C8A96E; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+.ai-loading p { font-size: 13px; color: #888; }
+
+.bull-bear { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.bull { border-left: 3px solid #1A5C3A; border-radius: 0 14px 14px 0; }
+.bear { border-left: 3px solid #5C1B1B; border-radius: 0 14px 14px 0; }
+.bull .card-title { color: #2C7A5C; }
+.bear .card-title { color: #A32D2D; }
+.point { display: flex; gap: 8px; margin-bottom: 6px; font-size: 13px; color: #1a1a1a; line-height: 1.5; }
+.dot-up { width: 6px; height: 6px; border-radius: 50%; background: #2C7A5C; margin-top: 6px; flex-shrink: 0; }
+.dot-down { width: 6px; height: 6px; border-radius: 50%; background: #A32D2D; margin-top: 6px; flex-shrink: 0; }
+
+.scenario-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.scenario-label { font-size: 13px; min-width: 160px; }
+.scenario-prob { font-size: 11px; color: #888; min-width: 36px; }
+.scenario-bar-bg { flex: 1; height: 8px; background: #e8e8e8; border-radius: 4px; }
+.scenario-bar-fill { height: 100%; border-radius: 4px; }
+.scenario-return { font-size: 13px; font-weight: 500; min-width: 100px; text-align: right; }
+
+.stat-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: #888; }
+.stat-val { font-weight: 500; }
+
+.tip-box { background: #EEE8DA; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; gap: 10px; align-items: flex-start; }
+.tip-icon { font-size: 18px; flex-shrink: 0; }
+.tip-text { font-size: 13px; line-height: 1.6; color: #5a4520; }
+
+.disclaimer { font-size: 11px; color: #aaa; font-style: italic; text-align: center; padding: 1.5rem 1rem 0; border-top: 1px solid #e8e8e8; margin-top: 1rem; }
+
+.trending { margin-top: 2rem; }
+.trending-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+.trending-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.trending-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1rem; cursor: pointer; transition: border-color 0.15s; }
+.trending-card:hover { border-color: #1B3A5C; }
+.t-ticker { font-size: 11px; color: #888; margin-bottom: 2px; }
+.t-name { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+.t-price-row { display: flex; justify-content: space-between; align-items: center; }
+
+.error-box { text-align: center; padding: 3rem; color: #888; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <div class="nav-tabs">
+    <a href="borshjelpen.html" class="nav-tab">Hjem</a>
+    <a href="aksjer.html" class="nav-tab active">Aksjer</a>
+    <a href="#" class="nav-tab">Lær</a>
+    <a href="#" class="nav-tab">Nyhetsbrev</a>
+  </div>
+</nav>
+
+<div class="search-hero">
+  <div class="search-title">Søk opp en aksje</div>
+  <div class="search-sub">Alle aksjer på Oslo Børs — AI forklarer alt på norsk</div>
+  <div class="search-bar">
+    <input id="searchInput" class="search-input" type="text" placeholder="F.eks. Equinor, EQNR, DNB, Aker BP ..." autofocus />
+    <button class="search-btn" onclick="doSearch()">Søk</button>
+  </div>
+  <div class="search-hint">Skriv ticker direkte — EQNR, DNB, TEL, AKRBP, MOWI, YAR, NHY</div>
+  <div class="suggestions">
+    <button class="suggest-pill" onclick="search('EQNR')">Equinor</button>
+    <button class="suggest-pill" onclick="search('DNB')">DNB</button>
+    <button class="suggest-pill" onclick="search('AKRBP')">Aker BP</button>
+    <button class="suggest-pill" onclick="search('TEL')">Telenor</button>
+    <button class="suggest-pill" onclick="search('MOWI')">Mowi</button>
+    <button class="suggest-pill" onclick="search('YAR')">Yara</button>
+    <button class="suggest-pill" onclick="search('NHY')">Norsk Hydro</button>
+    <button class="suggest-pill" onclick="search('KAHOT')">Kahoot</button>
+  </div>
+</div>
+
+<div class="content">
+  <div id="result"></div>
+  <div id="trending"></div>
+</div>
+
+<script>
+function fmt(val) { return (val === null || val === undefined) ? '—' : val; }
+
+function showLoading(step) {
+  document.getElementById('result').innerHTML = `
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>Henter data fra Oslo Børs...</p>
+      <p class="loading-step">${step || ''}</p>
+    </div>`;
+  document.getElementById('trending').innerHTML = '';
+}
+
+function showError(msg) {
+  document.getElementById('result').innerHTML = `
+    <div class="error-box">
+      <p style="font-size:32px; margin-bottom:1rem">🔍</p>
+      <p style="font-size:15px; font-weight:500; margin-bottom:6px">${msg}</p>
+      <p style="font-size:13px; color:#aaa">Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI</p>
+    </div>`;
+}
+
+async function search(ticker) {
+  document.getElementById('searchInput').value = ticker;
+  showLoading('Kobler til Twelve Data...');
+
+  let stockData;
+  try {
+    const res = await fetch(`/api/stock?ticker=${encodeURIComponent(ticker)}`);
+    stockData = await res.json();
+    if (!res.ok || stockData.error) { showError(stockData.error || 'Aksje ikke funnet'); return; }
+  } catch(e) {
+    showError('Kunne ikke koble til server. Er du på Vercel?'); return;
+  }
+
+  renderStockShell(stockData);
+  generateAISummary(stockData);
+}
+
+function renderStockShell(s) {
+  const priceStr = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const sign = s.up ? '+' : '';
+  const changeStr = sign + parseFloat(s.change).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const pctStr = sign + parseFloat(s.changePct).toFixed(2) + '%';
+
+  document.getElementById('result').innerHTML = `
+    <div class="result-header">
+      <div class="result-company">
+        <div class="company-logo">${s.ticker.replace('.OL','').slice(0,4)}</div>
+        <div>
+          <div class="company-name">${s.name}</div>
+          <div class="company-meta">${s.exchange} · ${s.ticker}${s.sector ? ' · ' + s.sector : ''}</div>
+        </div>
+      </div>
+      <div class="price-block">
+        <div class="price-main">${priceStr} ${s.currency}</div>
+        <span class="${s.up ? 'badge-up' : 'badge-down'}">${changeStr} &nbsp; ${pctStr}</span>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">P/E</div><div class="metric-val ${!s.pe?'na':''}">${fmt(s.pe)}</div></div>
+      <div class="metric"><div class="metric-label">Utbytte</div><div class="metric-val ${!s.dividendYield?'na':''}">${fmt(s.dividendYield)}</div></div>
+      <div class="metric"><div class="metric-label">Markedsverdi</div><div class="metric-val ${!s.marketCap?'na':''}">${fmt(s.marketCap)}</div></div>
+      <div class="metric"><div class="metric-label">Beta</div><div class="metric-val ${!s.beta?'na':''}">${fmt(s.beta)}</div></div>
+    </div>
+
+    <div id="ai-section">
+      <div class="ai-loading">
+        <div class="ai-spinner"></div>
+        <p>AI analyserer selskapet og genererer norsk sammendrag...</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-title">Nøkkeltall</div>
+      <div class="stat-row"><span class="stat-label">52 ukers høy</span><span class="stat-val">${fmt(s.fiftyTwoWeekHigh)} ${s.currency}</span></div>
+      <div class="stat-row"><span class="stat-label">52 ukers lav</span><span class="stat-val">${fmt(s.fiftyTwoWeekLow)} ${s.currency}</span></div>
+      <div class="stat-row"><span class="stat-label">Fremtidig P/E</span><span class="stat-val">${fmt(s.forwardPE)}</span></div>
+      <div class="stat-row"><span class="stat-label">Profittmargin</span><span class="stat-val">${fmt(s.profitMargin)}</span></div>
+      <div class="stat-row"><span class="stat-label">Egenkapitalavkastning</span><span class="stat-val">${fmt(s.returnOnEquity)}</span></div>
+      <div class="stat-row"><span class="stat-label">Inntjeningsvekst</span><span class="stat-val">${fmt(s.revenueGrowth)}</span></div>
+      ${s.employees ? `<div class="stat-row"><span class="stat-label">Ansatte</span><span class="stat-val">${parseInt(s.employees).toLocaleString('nb-NO')}</span></div>` : ''}
+      ${s.industry ? `<div class="stat-row"><span class="stat-label">Bransje</span><span class="stat-val">${s.industry}</span></div>` : ''}
+      ${s.volume ? `<div class="stat-row"><span class="stat-label">Volum i dag</span><span class="stat-val">${s.volume}</span></div>` : ''}
+    </div>
+
+    <div class="disclaimer">
+      Data fra Twelve Data · Kan være forsinket · Dette er ikke finansiell rådgivning. Gjør egne vurderinger eller snakk med en finansrådgiver.
+    </div>`;
+
+  document.getElementById('trending').innerHTML = '';
+  showChat(s);
+}
+
+async function generateAISummary(s) {
+  try {
+    const res = await fetch('/api/summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(s)
+    });
+
+    const ai = await res.json();
+    if (!res.ok || ai.error) {
+      document.getElementById('ai-section').innerHTML = `
+        <div style="padding:1rem; background:#fff8f0; border-radius:10px; font-size:13px; color:#888; margin-bottom:1rem;">
+          AI-sammendrag ikke tilgjengelig. Sjekk at ANTHROPIC_API_KEY er satt i Vercel.
+        </div>`;
+      return;
+    }
+
+    const scenariosHtml = (ai.scenarios || []).map(sc => `
+      <div class="scenario-row">
+        <span class="scenario-label" style="color:${sc.color}">${sc.label}</span>
+        <span class="scenario-prob">${sc.prob}%</span>
+        <div class="scenario-bar-bg"><div class="scenario-bar-fill" style="width:${sc.prob * 2.5}%;background:${sc.barColor}"></div></div>
+        <span class="scenario-return" style="color:${sc.color}">${sc.return}</span>
+      </div>`).join('');
+
+    const bullHtml = (ai.bull || []).map(p => `
+      <div class="point"><div class="dot-up"></div><span>${p}</span></div>`).join('');
+
+    const bearHtml = (ai.bear || []).map(p => `
+      <div class="point"><div class="dot-down"></div><span>${p}</span></div>`).join('');
+
+    document.getElementById('ai-section').innerHTML = `
+      <div class="card" style="margin-bottom:1rem">
+        <div class="card-title">Hva gjør selskapet?</div>
+        <p>${ai.hva || '—'}</p>
+      </div>
+
+      <div class="bull-bear">
+        <div class="card bull">
+          <div class="card-title">Bull-case — argumenter for</div>
+          ${bullHtml}
+        </div>
+        <div class="card bear">
+          <div class="card-title">Bear-case — argumenter mot</div>
+          ${bearHtml}
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1rem">
+        <div class="card-title">Scenarioer neste 12 måneder</div>
+        ${scenariosHtml}
+      </div>
+
+      <div class="card" style="margin-bottom:1rem">
+        <div class="card-title">Risiko</div>
+        <p style="font-size:13px; line-height:1.7">${ai.risiko || '—'}</p>
+      </div>
+
+      ${ai.nybegynner_tips ? `
+      <div class="tip-box">
+        <div class="tip-icon">💡</div>
+        <div class="tip-text"><strong>Tips til nybegynnere:</strong> ${ai.nybegynner_tips}</div>
+      </div>` : ''}`;
+
+  } catch(e) {
+    document.getElementById('ai-section').innerHTML = `
+      <div style="padding:1rem; background:#fff8f0; border-radius:10px; font-size:13px; color:#888; margin-bottom:1rem;">
+        Kunne ikke generere AI-sammendrag.
+      </div>`;
+  }
+}
+
+function doSearch() {
+  const val = document.getElementById('searchInput').value.trim();
+  if (val) search(val);
+}
+
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+const popular = [
+  {ticker:'EQNR', name:'Equinor'},
+  {ticker:'DNB', name:'DNB Bank'},
+  {ticker:'AKRBP', name:'Aker BP'},
+  {ticker:'TEL', name:'Telenor'},
+  {ticker:'MOWI', name:'Mowi'},
+  {ticker:'YAR', name:'Yara International'},
+];
+
+document.getElementById('trending').innerHTML = `
+  <div class="trending">
+    <div class="trending-label">Populære aksjer på Oslo Børs</div>
+    <div class="trending-grid">
+      ${popular.map(s => `
+        <div class="trending-card" onclick="search('${s.ticker}')">
+          <div class="t-ticker">${s.ticker}.OL</div>
+          <div class="t-name">${s.name}</div>
+          <div class="t-price-row">
+            <span style="font-size:12px;color:#aaa">Klikk for live data + AI</span>
+            <span style="font-size:11px;color:#C8A96E">→</span>
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+</script>
+</body>
+</html>
+<!-- CHAT WIDGET - appended -->
+<style>
+.chat-widget {
+  max-width: 900px; margin: 0 auto 3rem;
+  padding: 0 2rem;
+}
+.chat-container {
+  border: 1px solid #e8e8e8; border-radius: 16px; overflow: hidden;
+}
+.chat-header {
+  background: #1B3A5C; padding: 1rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.chat-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #C8A96E; display: flex; align-items: center;
+  justify-content: center; font-family: 'Tenor Sans', sans-serif;
+  font-size: 13px; color: #1B3A5C; letter-spacing: 1px; flex-shrink: 0;
+}
+.chat-header-info { flex: 1; }
+.chat-header-name { font-size: 14px; color: white; font-weight: 500; }
+.chat-header-status { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 1px; }
+.chat-header-badge {
+  font-size: 10px; background: rgba(200,169,110,0.2);
+  color: #C8A96E; padding: 3px 10px; border-radius: 100px;
+  border: 1px solid rgba(200,169,110,0.3);
+}
+.chat-messages {
+  height: 340px; overflow-y: auto; padding: 1.25rem;
+  display: flex; flex-direction: column; gap: 12px;
+  background: #fff;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: #e8e8e8; border-radius: 2px; }
+.msg-wrap { display: flex; flex-direction: column; }
+.msg-wrap.user { align-items: flex-end; }
+.msg-wrap.ai { align-items: flex-start; }
+.msg-bubble {
+  max-width: 78%; padding: 10px 14px; border-radius: 16px;
+  font-size: 13px; line-height: 1.65;
+}
+.msg-bubble.user {
+  background: #1B3A5C; color: white;
+  border-radius: 16px 16px 4px 16px;
+}
+.msg-bubble.ai {
+  background: #f8f7f4; color: #1a1a1a;
+  border-radius: 16px 16px 16px 4px;
+}
+.msg-bubble.typing {
+  background: #f8f7f4; color: #aaa;
+  border-radius: 16px 16px 16px 4px;
+}
+.msg-time { font-size: 10px; color: #bbb; margin-top: 3px; padding: 0 4px; }
+.chat-disclaimer {
+  font-size: 11px; color: #bbb; font-style: italic;
+  padding: 8px 1.25rem; border-top: 1px solid #f0f0f0;
+  background: #fff; text-align: center;
+}
+.chat-input-row {
+  display: flex; gap: 8px; padding: 1rem 1.25rem;
+  border-top: 1px solid #e8e8e8; background: #fff;
+}
+.chat-input {
+  flex: 1; padding: 10px 14px; border-radius: 100px;
+  border: 1px solid #e8e8e8; font-size: 13px;
+  font-family: 'DM Sans', sans-serif; outline: none;
+  transition: border-color 0.15s;
+}
+.chat-input:focus { border-color: #1B3A5C; }
+.chat-send {
+  background: #1B3A5C; color: white; border: none;
+  border-radius: 100px; padding: 10px 18px; font-size: 13px;
+  font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  white-space: nowrap; transition: background 0.15s;
+}
+.chat-send:hover { background: #2a5070; }
+.chat-send:disabled { background: #ccc; cursor: not-allowed; }
+.chat-suggestions {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  padding: 0 1.25rem 0.75rem; background: #fff;
+}
+.chat-sug {
+  font-size: 11px; padding: 4px 10px; border-radius: 100px;
+  border: 1px solid #e8e8e8; color: #666; cursor: pointer;
+  background: none; font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.15s, color 0.15s;
+}
+.chat-sug:hover { border-color: #1B3A5C; color: #1B3A5C; }
+</style>
+
+<div class="chat-widget" id="chatWidget" style="display:none">
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="chat-avatar">BH</div>
+      <div class="chat-header-info">
+        <div class="chat-header-name">Børshjelpen AI</div>
+        <div class="chat-header-status">Stiller spørsmål? Jeg hjelper deg forstå.</div>
+      </div>
+      <div class="chat-header-badge">Ingen finansiell rådgivning</div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg-wrap ai">
+        <div class="msg-bubble ai" id="welcomeMsg">
+          Hei! Jeg er Børshjelpen AI. Still meg spørsmål om aksjer og børsen — jeg forklarer alt på vanlig norsk. Husk at jeg ikke gir kjøpsanbefalinger eller finansiell rådgivning. 😊
+        </div>
+      </div>
+    </div>
+    <div class="chat-disclaimer">
+      Ikke finansiell rådgivning · Snakk med en rådgiver for personlige investeringsbeslutninger
+    </div>
+    <div class="chat-suggestions" id="chatSuggestions">
+      <button class="chat-sug" onclick="sendSuggestion(this)">Hva er P/E?</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">Hva betyr beta?</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">Hva er utbytte?</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">Hvordan lese en kvartalsrapport?</button>
+    </div>
+    <div class="chat-input-row">
+      <input id="chatInput" class="chat-input" type="text" placeholder="Still et spørsmål..." />
+      <button id="chatSendBtn" class="chat-send" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let chatHistory = [];
+let currentStockContext = null;
+
+function showChat(context) {
+  currentStockContext = context || null;
+  const widget = document.getElementById('chatWidget');
+  widget.style.display = 'block';
+
+  const welcomeMsg = document.getElementById('welcomeMsg');
+  if (context) {
+    welcomeMsg.textContent = `Hei! Jeg ser du ser på ${context.name}. Still meg spørsmål om denne aksjen eller om børsen generelt — jeg forklarer alt på vanlig norsk. Husk at jeg ikke gir kjøpsanbefalinger. 😊`;
+
+    const sugs = document.getElementById('chatSuggestions');
+    sugs.innerHTML = `
+      <button class="chat-sug" onclick="sendSuggestion(this)">Hva gjør ${context.name}?</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">Hva betyr P/E på ${context.pe || '?'}?</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">Hva er risikoen?</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">Hva er beta ${context.beta || ''}?</button>
+    `;
+  }
+
+  widget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function sendSuggestion(btn) {
+  document.getElementById('chatInput').value = btn.textContent;
+  sendMessage();
+}
+
+function addMessage(role, text) {
+  const container = document.getElementById('chatMessages');
+  const now = new Date().toLocaleTimeString('nb-NO', {hour:'2-digit', minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = `msg-wrap ${role}`;
+  div.innerHTML = `
+    <div class="msg-bubble ${role}">${text.replace(/\n/g, '<br>')}</div>
+    <div class="msg-time">${now}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function addTyping() {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg-wrap ai';
+  div.id = 'typingIndicator';
+  div.innerHTML = `<div class="msg-bubble typing">Skriver...</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const btn = document.getElementById('chatSendBtn');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  btn.disabled = true;
+  document.getElementById('chatSuggestions').style.display = 'none';
+
+  addMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+
+  addTyping();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: chatHistory,
+        context: currentStockContext
+      })
+    });
+
+    removeTyping();
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      addMessage('ai', 'Beklager, jeg kunne ikke svare akkurat nå. Prøv igjen.');
+    } else {
+      addMessage('ai', data.reply);
+      chatHistory.push({ role: 'assistant', content: data.reply });
+      if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+    }
+  } catch(e) {
+    removeTyping();
+    addMessage('ai', 'Noe gikk galt. Sjekk at ANTHROPIC_API_KEY er satt i Vercel.');
+  }
+
+  btn.disabled = false;
+  input.focus();
+}
+
+document.getElementById('chatInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+const _origRenderStockShell = window.renderStockShell;
+</script>

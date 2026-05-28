@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Børshjelpen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; }
+.logo span { color: #C8A96E; }
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #666; text-decoration: none; }
+.nav-links a:hover { color: #1B3A5C; }
+.nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+.hero { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; padding: 4rem 2rem 3rem; max-width: 1000px; margin: 0 auto; }
+.hero-left { display: flex; flex-direction: column; justify-content: center; gap: 1.5rem; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; background: #EEE8DA; color: #8B6E3A; font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 100px; width: fit-content; }
+.hero-title { font-family: 'Playfair Display', serif; font-size: 42px; line-height: 1.15; font-weight: 700; letter-spacing: -1px; }
+.hero-title em { font-style: normal; color: #C8A96E; }
+.hero-sub { font-size: 16px; color: #555; line-height: 1.7; font-weight: 300; }
+.hero-actions { display: flex; gap: 12px; align-items: center; margin-top: 0.5rem; }
+.btn-primary { background: #1B3A5C; color: white; padding: 12px 24px; border-radius: 100px; font-size: 15px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-secondary { font-size: 14px; color: #666; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'DM Sans', sans-serif; }
+
+.hero-right { display: flex; align-items: center; justify-content: center; }
+.phone-mock { width: 240px; background: #fff; border: 1px solid #e8e8e8; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
+.phone-top { background: #1B3A5C; padding: 1.2rem 1rem 1rem; color: white; }
+.phone-ticker { font-size: 11px; opacity: 0.6; margin-bottom: 2px; }
+.phone-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
+.phone-price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.phone-price { font-size: 22px; font-weight: 500; }
+.badge-up { font-size: 12px; background: #1A5C3A; color: #6ECFA0; padding: 3px 8px; border-radius: 100px; font-weight: 500; }
+.badge-down { font-size: 12px; background: #5C1B1B; color: #F09595; padding: 3px 8px; border-radius: 100px; font-weight: 500; }
+.phone-body { padding: 1rem; }
+.phone-section { margin-bottom: 1rem; }
+.phone-section-title { font-size: 10px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.phone-explain { font-size: 12px; line-height: 1.6; color: #1a1a1a; }
+.risk-bars { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.risk-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
+.risk-bar-bg { flex: 1; height: 4px; background: #e8e8e8; border-radius: 2px; }
+.risk-bar-fill { height: 100%; border-radius: 2px; }
+.pill-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.pill { font-size: 10px; padding: 3px 8px; border-radius: 100px; border: 1px solid #e8e8e8; color: #888; }
+.risk-note { font-size: 10px; color: #999; font-style: italic; margin-top: 8px; line-height: 1.5; border-top: 1px solid #e8e8e8; padding-top: 8px; }
+
+.stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #e8e8e8; border-bottom: 1px solid #e8e8e8; max-width: 1000px; margin: 0 auto; }
+.stat-item { padding: 1.5rem 2rem; text-align: center; }
+.stat-item:not(:last-child) { border-right: 1px solid #e8e8e8; }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #C8A96E; }
+.stat-label { font-size: 13px; color: #888; margin-top: 2px; }
+
+.features { padding: 3rem 2rem; max-width: 1000px; margin: 0 auto; }
+.section-label { font-size: 11px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; margin-bottom: 2rem; letter-spacing: -0.5px; }
+.feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.feature-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 16px; padding: 1.5rem; }
+.feature-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; font-size: 20px; }
+.feature-card h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+.feature-card p { font-size: 13px; color: #666; line-height: 1.6; }
+
+.coach-section { background: #f8f7f4; border-top: 1px solid #e8e8e8; border-bottom: 1px solid #e8e8e8; padding: 3rem 2rem; }
+.coach-inner { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+.coach-chat { background: #fff; border: 1px solid #e8e8e8; border-radius: 16px; overflow: hidden; }
+.chat-header { background: #1B3A5C; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 10px; }
+.chat-avatar { width: 32px; height: 32px; border-radius: 50%; background: #C8A96E; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #1B3A5C; font-weight: 500; }
+.chat-name { font-size: 14px; color: white; font-weight: 500; }
+.chat-status { font-size: 11px; color: rgba(255,255,255,0.5); }
+.chat-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 12px; }
+.msg { font-size: 12px; line-height: 1.6; max-width: 85%; }
+.msg-user { align-self: flex-end; background: #1B3A5C; color: white; padding: 8px 12px; border-radius: 12px 12px 2px 12px; }
+.msg-ai { align-self: flex-start; background: #f8f7f4; color: #1a1a1a; padding: 8px 12px; border-radius: 12px 12px 12px 2px; }
+.msg-disclaimer { font-size: 10px; color: #999; font-style: italic; border-top: 1px solid #e8e8e8; padding-top: 8px; margin-top: 4px; }
+.guidelines { display: flex; flex-direction: column; gap: 12px; }
+.guideline-item { display: flex; gap: 12px; align-items: flex-start; padding: 1rem; background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; }
+.guideline-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+.guideline-text h4 { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+.guideline-text p { font-size: 12px; color: #666; line-height: 1.5; }
+
+.newsletter { padding: 3rem 2rem; max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+.newsletter-preview { background: #fff; border: 1px solid #e8e8e8; border-radius: 16px; overflow: hidden; }
+.nl-header { background: #1B3A5C; padding: 1rem 1.25rem; }
+.nl-header-top { display: flex; justify-content: space-between; align-items: center; }
+.nl-logo { font-family: 'Tenor Sans', sans-serif; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: #C8A96E; }
+.nl-date { font-size: 11px; color: rgba(255,255,255,0.5); }
+.nl-title-main { font-family: 'Playfair Display', serif; font-size: 16px; color: white; margin-top: 6px; }
+.nl-body { padding: 1.25rem; }
+.nl-story { padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #e8e8e8; }
+.nl-story:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+.nl-story-tag { font-size: 10px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.nl-story-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.nl-story-text { font-size: 12px; color: #666; line-height: 1.6; }
+
+.cta-section { background: #1B3A5C; padding: 3rem 2rem; text-align: center; }
+.cta-title { font-family: 'Playfair Display', serif; font-size: 32px; color: white; margin-bottom: 1rem; }
+.cta-sub { color: rgba(255,255,255,0.65); font-size: 15px; margin-bottom: 2rem; }
+.cta-input-row { display: flex; gap: 8px; justify-content: center; max-width: 420px; margin: 0 auto; }
+.cta-input { flex: 1; padding: 12px 16px; border-radius: 100px; border: none; font-size: 14px; outline: none; font-family: 'DM Sans', sans-serif; }
+.cta-btn { background: #C8A96E; color: #1B3A5C; padding: 12px 20px; border-radius: 100px; border: none; font-weight: 500; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.footer-note { color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 1rem; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">Børs<span>hjelpen</span></div>
+  <div class="nav-links">
+    <a href="#">Aksjer</a>
+    <a href="#">Lær</a>
+    <a href="#">Nyhetsbrev</a>
+    <button class="nav-cta">Kom i gang gratis</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-badge">📈 Børsen — endelig forståelig</div>
+    <h1 class="hero-title">Forstå aksjer.<br><em>Uten å være</em><br>analytiker.</h1>
+    <p class="hero-sub">Kvartalsrapporter forklart på 5 setninger. Daglige børsoppdateringer du faktisk forstår. En AI-coach som alltid viser begge sider — og aldri gir deg enkle kjøpstips.</p>
+    <div class="hero-actions">
+      <button class="btn-primary">Start gratis →</button>
+      <button class="btn-secondary">▶ Se demo</button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="phone-mock">
+      <div class="phone-top">
+        <div class="phone-ticker">EQNR · Oslo Børs</div>
+        <div class="phone-name">Equinor</div>
+        <div class="phone-price-row">
+          <span class="phone-price">274,50 kr</span>
+          <span class="badge-up">+2,1% i dag</span>
+        </div>
+      </div>
+      <div class="phone-body">
+        <div class="phone-section">
+          <div class="phone-section-title">Hva gjør de?</div>
+          <div class="phone-explain">Norges største oljeselskap. De henter opp olje og gass fra havet og selger det til land over hele verden. Mesteparten av inntektene kommer fra råoljeprisen.</div>
+        </div>
+        <div class="phone-section">
+          <div class="phone-section-title">Hvorfor gikk den opp i dag?</div>
+          <div class="phone-explain">Oljeprisen steg 1,8% etter at OPEC kunngjorde kutt i produksjon. Equinor følger alltid oljeprisen tett.</div>
+        </div>
+        <div class="phone-section">
+          <div class="phone-section-title">Risiko</div>
+          <div class="risk-bars">
+            <div class="risk-row">
+              <span style="min-width:80px">Oljepris</span>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:85%;background:#E24B4A"></div></div>
+              <span>Høy</span>
+            </div>
+            <div class="risk-row">
+              <span style="min-width:80px">Valuta</span>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:55%;background:#EF9F27"></div></div>
+              <span>Middels</span>
+            </div>
+            <div class="risk-row">
+              <span style="min-width:80px">Politisk</span>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:40%;background:#C8A96E"></div></div>
+              <span>Lav</span>
+            </div>
+          </div>
+        </div>
+        <div class="pill-row">
+          <span class="pill">Energi</span>
+          <span class="pill">Utbytte</span>
+          <span class="pill">Statseiet 67%</span>
+        </div>
+        <div class="risk-note">Dette er ikke finansiell rådgivning. Gjør egne vurderinger eller snakk med en finansrådgiver.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num">500+</div><div class="stat-label">Aksjer forklart på norsk</div></div>
+  <div class="stat-item"><div class="stat-num">Alltid</div><div class="stat-label">Begge sider presentert</div></div>
+  <div class="stat-item"><div class="stat-num">Gratis</div><div class="stat-label">Å komme i gang</div></div>
+</div>
+
+<section class="features">
+  <div class="section-label">Hva du får</div>
+  <div class="section-title">Alt du trenger. Ingenting du ikke forstår.</div>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#EEE8DA;">📄</div>
+      <h3>Kvartalsrapporter på 5 setninger</h3>
+      <p>AI leser de lange rapportene og gir deg det viktigste — hva gikk bra, hva gikk dårlig, og hvilke risikoer ledelsen selv advarer om.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#E6EEF5;">⚖️</div>
+      <h3>Alltid begge sider</h3>
+      <p>For hvert selskap ser du bull-caset og bear-caset side om side. Du bestemmer selv — vi hjelper deg å forstå hva som kan gå galt.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#EEE8DA;">📊</div>
+      <h3>Scenarioer og sannsynlighet</h3>
+      <p>Ingen spår fremtiden — men vi viser deg realistiske utfall med sannsynligheter, slik at du forstår risikoen før du handler.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#E6EEF5;">💬</div>
+      <h3>AI-coach — still alt</h3>
+      <p>Stiller du spørsmål om en aksje, får du alltid en balansert analyse — med risiko, usikkerhet og alternative perspektiver inkludert.</p>
+    </div>
+  </div>
+</section>
+
+<section class="coach-section">
+  <div class="coach-inner">
+    <div>
+      <div class="section-label">AI-coach</div>
+      <h2 class="section-title" style="font-family:'Playfair Display',serif; font-size:28px; margin-bottom:1rem;">Ærlig. Balansert. Aldri overfladisk.</h2>
+      <p style="font-size:14px; color:#666; line-height:1.7; margin-bottom:1.5rem;">Vår AI følger strenge retningslinjer for å gi deg informasjon — ikke falsk trygghet.</p>
+      <div class="guidelines">
+        <div class="guideline-item">
+          <div class="guideline-icon" style="background:#EEE8DA;">🚫</div>
+          <div class="guideline-text"><h4>Ingen kjøpsanbefalinger</h4><p>AI-en sier aldri "kjøp" eller "selg". Den hjelper deg forstå — du bestemmer.</p></div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-icon" style="background:#E6EEF5;">🛡️</div>
+          <div class="guideline-text"><h4>Risiko alltid inkludert</h4><p>Hver analyse inneholder konkrete risikoer — ikke bare oppsiden.</p></div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-icon" style="background:#EEE8DA;">⚖️</div>
+          <div class="guideline-text"><h4>Begge sider presentert</h4><p>Bull-case og bear-case side om side. Alltid.</p></div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-icon" style="background:#E6EEF5;">📊</div>
+          <div class="guideline-text"><h4>Scenarioer med sannsynlighet</h4><p>Fremtiden er usikker — vi viser deg flere utfall, ikke ett.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="coach-chat">
+      <div class="chat-header">
+        <div class="chat-avatar">B</div>
+        <div><div class="chat-name">Børshjelpen AI</div><div class="chat-status">Alltid balansert</div></div>
+      </div>
+      <div class="chat-body">
+        <div class="msg msg-user">Er Equinor verdt å kjøpe nå?</div>
+        <div class="msg msg-ai">
+          Det avhenger av din tidshorisont og risikotoleranse.<br><br>
+          <strong>Argumenter for:</strong> Høyt utbytte (~8%), sterk balanse, oljepris på høye nivåer.<br><br>
+          <strong>Argumenter mot:</strong> Eksponert mot oljeprisfall, energiomstilling på lang sikt, politisk risiko.<br><br>
+          Realistiske scenarioer: 40% sjanse oppgang, 35% flat, 25% nedgang — avhengig av oljeprisen.
+          <div class="msg-disclaimer">Dette er ikke finansiell rådgivning. Vurder din egen situasjon eller snakk med en rådgiver.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="newsletter">
+  <div>
+    <div class="section-label">Daglig nyhetsbrev</div>
+    <h2 class="section-title" style="font-family:'Playfair Display',serif; font-size:28px; margin-bottom:1rem;">Børsen forklart. Hver morgen.</h2>
+    <p style="font-size:14px; color:#666; line-height:1.7; margin-bottom:1.5rem;">Dagens viktigste børsnyheter forklart på 2 minutter — med risiko, kontekst og begge sider av saken.</p>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px; font-size:14px; color:#666;">✓ Hvorfor Oslo Børs gikk opp eller ned</div>
+      <div style="display:flex; align-items:center; gap:10px; font-size:14px; color:#666;">✓ Kvartalsrapport med bull- og bear-case</div>
+      <div style="display:flex; align-items:center; gap:10px; font-size:14px; color:#666;">✓ Risikoene du bør kjenne til i dag</div>
+    </div>
+  </div>
+  <div class="newsletter-preview">
+    <div class="nl-header">
+      <div class="nl-header-top">
+        <span class="nl-logo">Børshjelpen</span>
+        <span class="nl-date">Torsdag 29. mai 2026</span>
+      </div>
+      <div class="nl-title-main">Equinor slo forventningene — men er det hele bildet?</div>
+    </div>
+    <div class="nl-body">
+      <div class="nl-story">
+        <div class="nl-story-tag">Oslo Børs i dag</div>
+        <div class="nl-story-title">Børsen opp 0,8% — men vær obs på dette</div>
+        <div class="nl-story-text">Olje dro opp. Men rentefrykten er ikke borte — og det kan snu raskt hvis inflasjonsdataene skuffer fredag.</div>
+      </div>
+      <div class="nl-story">
+        <div class="nl-story-tag">Bull vs. Bear</div>
+        <div class="nl-story-title">Equinor: To scenarioer</div>
+        <div class="nl-story-text">Bull: høy oljepris + utbytte = god avkastning. Bear: energiomstilling + prisfall kan halvere inntjeningen innen 2030.</div>
+      </div>
+      <div class="nl-story">
+        <div class="nl-story-tag">Risiko i dag</div>
+        <div class="nl-story-title">Tre ting som kan snu markedet</div>
+        <div class="nl-story-text">1) Fed-tale kl. 16. 2) Kinesiske importtall. 3) OPEC-møte neste uke. Hold øye med disse.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-title">Klar til å forstå børsen?</div>
+  <p class="cta-sub">Gratis å starte. Ingen finansbakgrunn nødvendig. Alltid balansert.</p>
+  <div class="cta-input-row">
+    <input class="cta-input" type="email" placeholder="Din e-postadresse" />
+    <button class="cta-btn">Kom i gang →</button>
+  </div>
+  <p class="footer-note">Ingen spam. Avslutt når som helst.</p>
+</section>
+
+</body>
+</html>
