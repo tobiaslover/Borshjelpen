@@ -14,7 +14,6 @@ export default async function handler(req, res) {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
         'Accept': 'application/json',
-        'Accept-Language': 'en-US,en;q=0.9',
       }
     });
 
@@ -31,7 +30,13 @@ export default async function handler(req, res) {
     }
 
     const price = meta.regularMarketPrice;
-    const prevClose = meta.chartPreviousClose || meta.previousClose || price;
+    
+    // Bruk regularMarketPreviousClose som er gårsdagens sluttkurs — mest pålitelig
+    const prevClose = meta.regularMarketPreviousClose 
+      || meta.previousClose 
+      || meta.chartPreviousClose 
+      || price;
+    
     const change = price - prevClose;
     const changePct = prevClose ? (change / prevClose) * 100 : 0;
 
@@ -80,7 +85,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       ticker: upper,
-      name: profile.name || meta.instrumentType || upper,
+      name: profile.name || upper,
       price: price.toFixed(2),
       currency: 'NOK',
       change: change.toFixed(2),
