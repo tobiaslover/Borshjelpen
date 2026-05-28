@@ -143,6 +143,8 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 canvas#priceChart { width: 100% !important; height: 180px !important; }
 .chart-loading { display: flex; align-items: center; justify-content: center; height: 180px; color: #aaa; font-size: 13px; gap: 8px; }
 </style>
+<!-- Chart.js i head -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -275,8 +277,8 @@ function renderStockShell(s) {
 
   document.getElementById('trending').innerHTML = '';
   showChat(s);
-  // Last kursgraf automatisk
-  setTimeout(() => loadChart(s.ticker, '1d', null), 100);
+  // Last kursgraf automatisk — vent litt på DOM
+  setTimeout(() => loadChart(s.ticker, '1d', document.querySelector('.chart-tab')), 300);
 }
 
 async function generateAISummary(s) {
@@ -386,8 +388,6 @@ document.getElementById('trending').innerHTML = `
   </div>`;
 </script>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 let priceChartInstance = null;
 let currentChartTicker = null;
@@ -426,6 +426,7 @@ async function loadChart(ticker, range, btnEl) {
 
     document.getElementById('chartLoading').style.display = 'none';
     const canvas = document.getElementById('priceChart');
+    if (!canvas) return;
     canvas.style.display = 'block';
 
     if (priceChartInstance) priceChartInstance.destroy();
