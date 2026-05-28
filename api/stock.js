@@ -9,55 +9,42 @@ export default async function handler(req, res) {
   const symbol = upper + '.OL';
 
   try {
-    // Bruk chart API med 1-dags data — gir oss åpning og nåværende kurs
-    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d`;
-    
+    // Hent 5-dagers chart med daglig intervall — gir navn og pålitelige tall
+    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`;
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'application/json, */*',
-        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept': 'application/json',
         'Referer': 'https://finance.yahoo.com/',
-        'Origin': 'https://finance.yahoo.com',
       }
     });
 
     if (!response.ok) {
-      return res.status(response.status).json({ 
-        error: `Aksje "${upper}" ikke funnet. Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI.`
-      });
+      return res.status(404).json({ error: `Aksje "${upper}" ikke funnet. Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI.` });
     }
 
     const data = await response.json();
     const result = data?.chart?.result?.[0];
     const meta = result?.meta;
 
-    if (!meta) {
+    if (!meta?.regularMarketPrice) {
       return res.status(404).json({ error: `Ingen data funnet for "${upper}".` });
     }
 
-    // Hent alle kursdata fra meta
-    const price = meta.regularMarketPrice || 0;
-    const openPrice = meta.regularMarketDayHigh && meta.regularMarketDayLow
-      ? null // bruker første datapunkt i stedet
-      : null;
+    const price = meta.regularMarketPrice;
+    
+    // Bruk regularMarketPreviousClose for endring — dette er gårsdagens sluttkurs
+    // og er det alle finanssider bruker for daglig endring
+    const prevClose = meta.regularMarketPreviousClose || meta.chartPreviousClose || price;
+    const change = price - prevClose;
+    const changePct = prevClose ? (change / prevClose) * 100 : 0;
 
-    // Første datapunkt i serien = åpningskurs
-    const closes = result?.indicators?.quote?.[0]?.close || [];
-    const firstClose = closes.find(v => v !== null && v !== undefined);
-    const lastClose = [...closes].reverse().find(v => v !== null && v !== undefined);
+    // Hent selskapsnavn fra longName i meta
+    const name = meta.longName || meta.shortName || meta.symbol || upper;
 
-    const open = meta.chartPreviousClose
-      ? firstClose || price
-      : firstClose || price;
-
-    // Bruk første gyldige kurs som åpning, siste som nåværende
-    const change = lastClose && firstClose ? lastClose - firstClose : 0;
-    const changePct = firstClose && firstClose !== 0 ? (change / firstClose) * 100 : 0;
-
-    // Hent selskapsnavn og mer info
+    // Hent ekstra detaljer
     const profileUrl = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=assetProfile,summaryDetail,financialData,price`;
-    let profile = {};
+    let extra = {};
     try {
       const pRes = await fetch(profileUrl, {
         headers: {
@@ -69,8 +56,8 @@ export default async function handler(req, res) {
         const pData = await pRes.json();
         const r = pData?.quoteSummary?.result?.[0];
         if (r) {
-          profile = {
-            name: r.price?.longName || r.price?.shortName || upper,
+          extra = {
+            name: r.price?.longName || r.price?.shortName || name,
             sector: r.assetProfile?.sector || null,
             industry: r.assetProfile?.industry || null,
             description: r.assetProfile?.longBusinessSummary || null,
@@ -98,30 +85,30 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       ticker: upper,
-      name: profile.name || meta.instrumentType || upper,
+      name: extra.name || name,
       price: price.toFixed(2),
       currency: 'NOK',
       change: change.toFixed(2),
       changePct: changePct.toFixed(2),
       up: change >= 0,
       exchange: 'Oslo Børs',
-      marketCap: profile.marketCap || null,
-      pe: profile.pe || null,
-      forwardPE: profile.forwardPE || null,
-      dividendYield: profile.dividendYield || null,
-      beta: profile.beta || null,
-      fiftyTwoWeekHigh: profile.fiftyTwoWeekHigh || null,
-      fiftyTwoWeekLow: profile.fiftyTwoWeekLow || null,
+      marketCap: extra.marketCap || null,
+      pe: extra.pe || null,
+      forwardPE: extra.forwardPE || null,
+      dividendYield: extra.dividendYield || null,
+      beta: extra.beta || null,
+      fiftyTwoWeekHigh: extra.fiftyTwoWeekHigh || null,
+      fiftyTwoWeekLow: extra.fiftyTwoWeekLow || null,
       volume: meta.regularMarketVolume?.toLocaleString('nb-NO') || null,
-      sector: profile.sector || null,
-      industry: profile.industry || null,
-      description: profile.description || null,
-      website: profile.website || null,
-      employees: profile.employees || null,
+      sector: extra.sector || null,
+      industry: extra.industry || null,
+      description: extra.description || null,
+      website: extra.website || null,
+      employees: extra.employees || null,
       country: 'Norge',
-      profitMargin: profile.profitMargin || null,
-      returnOnEquity: profile.returnOnEquity || null,
-      revenueGrowth: profile.revenueGrowth || null,
+      profitMargin: extra.profitMargin || null,
+      returnOnEquity: extra.returnOnEquity || null,
+      revenueGrowth: extra.revenueGrowth || null,
     });
 
   } catch (err) {
