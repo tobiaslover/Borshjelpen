@@ -96,6 +96,42 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .t-price-row { display: flex; justify-content: space-between; align-items: center; }
 
 .error-box { text-align: center; padding: 3rem; color: #888; }
+
+/* ===== MOBILVISNING ===== */
+@media (max-width: 768px) {
+  nav { padding: .9rem 1rem; }
+  .nav-tabs { display: none; }
+  .logo { font-size: 15px; }
+
+  .search-hero { padding: 1.5rem 1rem; }
+  .search-title { font-size: 20px; }
+  .search-bar { flex-direction: column; border-radius: 12px; }
+  .si { border-radius: 100px !important; }
+  .sb { border-radius: 100px !important; }
+  .pills { gap: 5px; }
+
+  .content { padding: 1rem; }
+
+  .result-header { flex-direction: column; gap: 1rem; }
+  .price-block { text-align: left; }
+
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .grid2 { grid-template-columns: 1fr; }
+  .bull-bear { grid-template-columns: 1fr; }
+  .scenario-row { flex-wrap: wrap; gap: 6px; }
+  .scenario-label { min-width: unset; font-size: 12px; }
+  .scenario-return { min-width: unset; }
+
+  .trending-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .quarterly-body { grid-template-columns: 1fr; }
+  .quarterly-header { flex-direction: column; gap: 8px; align-items: flex-start; }
+
+  .chat-widget { padding: 0 1rem; }
+  .quarterly-box { padding: 0 1rem; }
+  .chat-header { flex-wrap: wrap; gap: 6px; }
+  .chat-badge { margin-left: 0; }
+}
 </style>
 </head>
 <body>
