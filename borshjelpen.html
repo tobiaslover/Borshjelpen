@@ -128,50 +128,37 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
     </div>
   </div>
   <div class="hero-right">
-    <div class="phone-mock">
+    <div class="phone-mock" id="heroMock">
       <div class="phone-top">
-        <div class="phone-ticker">EQNR · Oslo Børs</div>
-        <div class="phone-name">Equinor</div>
+        <div class="phone-ticker" id="heroTicker">Laster...</div>
+        <div class="phone-name" id="heroName">—</div>
         <div class="phone-price-row">
-          <span class="phone-price">274,50 kr</span>
-          <span class="badge-up">+2,1% i dag</span>
+          <span class="phone-price" id="heroPrice">—</span>
+          <span id="heroBadge" class="badge-up">—</span>
         </div>
       </div>
       <div class="phone-body">
         <div class="phone-section">
-          <div class="phone-section-title">Hva gjør de?</div>
-          <div class="phone-explain">Norges største oljeselskap. De henter opp olje og gass fra havet og selger det til land over hele verden. Mesteparten av inntektene kommer fra råoljeprisen.</div>
+          <div class="phone-section-title">Om selskapet</div>
+          <div class="phone-explain" id="heroDesc">Henter live data...</div>
         </div>
         <div class="phone-section">
-          <div class="phone-section-title">Hvorfor gikk den opp i dag?</div>
-          <div class="phone-explain">Oljeprisen steg 1,8% etter at OPEC kunngjorde kutt i produksjon. Equinor følger alltid oljeprisen tett.</div>
-        </div>
-        <div class="phone-section">
-          <div class="phone-section-title">Risiko</div>
+          <div class="phone-section-title">52-ukers kurs</div>
           <div class="risk-bars">
             <div class="risk-row">
-              <span style="min-width:80px">Oljepris</span>
-              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:85%;background:#E24B4A"></div></div>
-              <span>Høy</span>
+              <span style="min-width:40px">Høy</span>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:80%;background:#2C7A5C"></div></div>
+              <span id="heroHigh">—</span>
             </div>
             <div class="risk-row">
-              <span style="min-width:80px">Valuta</span>
-              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:55%;background:#EF9F27"></div></div>
-              <span>Middels</span>
-            </div>
-            <div class="risk-row">
-              <span style="min-width:80px">Politisk</span>
-              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:40%;background:#C8A96E"></div></div>
-              <span>Lav</span>
+              <span style="min-width:40px">Lav</span>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:30%;background:#E24B4A"></div></div>
+              <span id="heroLow">—</span>
             </div>
           </div>
         </div>
-        <div class="pill-row">
-          <span class="pill">Energi</span>
-          <span class="pill">Utbytte</span>
-          <span class="pill">Statseiet 67%</span>
-        </div>
-        <div class="risk-note">Dette er ikke finansiell rådgivning. Gjør egne vurderinger eller snakk med en finansrådgiver.</div>
+        <div class="pill-row" id="heroPills"></div>
+        <div class="risk-note">Data fra Yahoo Finance · Ikke finansiell rådgivning.</div>
       </div>
     </div>
   </div>
@@ -303,5 +290,51 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <p class="footer-note">Ingen spam. Avslutt når som helst.</p>
 </section>
 
+
+<script>
+const heroTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
+const descriptions = {
+  'EQNR': 'Norges største oljeselskap. Henter opp olje og gass fra Nordsjøen og selger globalt.',
+  'DNB': 'Norges største bank. Tjener penger på renter fra lån og finansielle tjenester.',
+  'AKRBP': 'Et av Norges største uavhengige oljeselskaper. Fokuserer på Nordsjøen.',
+  'TEL': 'Nordens største telekomselskap. Selger mobil og bredbånd i Norge og Asia.',
+  'MOWI': 'Verdens største lakseoppdrettselskap. Produserer atlantisk laks globalt.',
+  'YAR': 'Verdens største produsent av kunstgjødsel. Gjør naturgass om til nitrogengjødsel.',
+  'NHY': 'Globalt aluminium- og energiselskap. Produserer aluminium fra råvare til ferdigprodukt.',
+  'KAHOT': 'Norsk ed-tech selskap. Driver quiz-plattformen Kahoot med 350+ millioner brukere.',
+};
+const sectors = {
+  'EQNR': ['Energi','Olje & gass','Oslo Børs'],
+  'DNB': ['Finans','Bank','Oslo Børs'],
+  'AKRBP': ['Energi','Olje','Oslo Børs'],
+  'TEL': ['Telekom','Mobil','Oslo Børs'],
+  'MOWI': ['Sjømat','Laks','Oslo Børs'],
+  'YAR': ['Kjemikalier','Gjødsel','Oslo Børs'],
+  'NHY': ['Industri','Aluminium','Oslo Børs'],
+  'KAHOT': ['Teknologi','Ed-tech','Oslo Børs'],
+};
+
+async function loadHeroStock() {
+  const ticker = heroTickers[Math.floor(Math.random() * heroTickers.length)];
+  try {
+    const res = await fetch('/api/stock?ticker=' + ticker);
+    const s = await res.json();
+    if (s.error) return;
+    document.getElementById('heroTicker').textContent = s.ticker + ' · Oslo Børs';
+    document.getElementById('heroName').textContent = s.name;
+    document.getElementById('heroPrice').textContent = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
+    const sign = s.up ? '+' : '';
+    const badge = document.getElementById('heroBadge');
+    badge.textContent = sign + s.change + ' kr (' + sign + s.changePct + '%)';
+    badge.className = s.up ? 'badge-up' : 'badge-down';
+    document.getElementById('heroDesc').textContent = descriptions[s.ticker] || s.description || 'Notert på Oslo Børs.';
+    if (s.fiftyTwoWeekHigh) document.getElementById('heroHigh').textContent = parseFloat(s.fiftyTwoWeekHigh).toLocaleString('nb-NO', {minimumFractionDigits:2}) + ' kr';
+    if (s.fiftyTwoWeekLow) document.getElementById('heroLow').textContent = parseFloat(s.fiftyTwoWeekLow).toLocaleString('nb-NO', {minimumFractionDigits:2}) + ' kr';
+    const pills = (sectors[s.ticker] || []).map(p => `<span class="pill">${p}</span>`).join('');
+    document.getElementById('heroPills').innerHTML = pills;
+  } catch(e) {}
+}
+loadHeroStock();
+</script>
 </body>
 </html>
