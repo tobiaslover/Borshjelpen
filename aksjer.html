@@ -252,7 +252,7 @@ async function generateAISummary(s) {
       <div class="scenario-row">
         <span class="scenario-label" style="color:${sc.color}">${sc.label}</span>
         <span class="scenario-prob">${sc.prob}%</span>
-        <div class="scenario-bar-bg"><div class="scenario-bar-fill" style="width:${sc.prob * 2.5}%;background:${sc.barColor}"></div></div>
+        <div class="scenario-bar-bg"><div class="scenario-bar-fill" style="width:${sc.prob}%;background:${sc.barColor}"></div></div>
         <span class="scenario-return" style="color:${sc.color}">${sc.return}</span>
       </div>`).join('');
 
