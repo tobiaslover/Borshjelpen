@@ -32,12 +32,10 @@ export default async function handler(req, res) {
     }
 
     const price = meta.regularMarketPrice;
-    
-    // Bruk regularMarketPreviousClose for endring — dette er gårsdagens sluttkurs
-    // og er det alle finanssider bruker for daglig endring
-    const prevClose = meta.regularMarketPreviousClose || meta.chartPreviousClose || price;
-    const change = price - prevClose;
-    const changePct = prevClose ? (change / prevClose) * 100 : 0;
+    // Yahoo bruker chartPreviousClose for daglig endring
+    const prevClose = meta.chartPreviousClose || meta.regularMarketPreviousClose || price;
+    const change = +(price - prevClose).toFixed(2);
+    const changePct = +((change / prevClose) * 100).toFixed(2);
 
     // Hent selskapsnavn fra longName i meta
     const name = meta.longName || meta.shortName || meta.symbol || upper;
