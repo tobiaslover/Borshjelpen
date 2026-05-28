@@ -100,12 +100,9 @@ export default async function handler(req, res) {
     const profile = r.assetProfile || {};
 
     const price = p.regularMarketPrice?.raw || 0;
-    const prevClose = p.regularMarketPreviousClose?.raw || price;
-    const change = p.regularMarketChange?.raw || (price - prevClose);
-    // Yahoo returnerer f.eks. 0.0009 for 0.09% — ikke gang med 100
-    const changePct = p.regularMarketChangePercent?.raw != null
-      ? p.regularMarketChangePercent.raw
-      : (prevClose ? (change / prevClose) * 100 : 0);
+    const openPrice = p.regularMarketOpen?.raw || price;
+    const change = price - openPrice;
+    const changePct = openPrice ? (change / openPrice) * 100 : 0;
 
     res.status(200).json({
       ticker: upper,
