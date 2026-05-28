@@ -112,7 +112,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <div class="nav-links">
     <a href="/aksjer.html">Aksjer</a>
     <a href="#">Lær</a>
-    <a href="#">Nyhetsbrev</a>
+    <a href="#">Børsbrygg</a>
     <button class="nav-cta">Kom i gang gratis</button>
   </div>
 </nav>
@@ -165,9 +165,18 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 </section>
 
 <div class="stats-bar">
-  <div class="stat-item"><div class="stat-num">500+</div><div class="stat-label">Aksjer forklart på norsk</div></div>
-  <div class="stat-item"><div class="stat-num">Alltid</div><div class="stat-label">Begge sider presentert</div></div>
-  <div class="stat-item"><div class="stat-num">Gratis</div><div class="stat-label">Å komme i gang</div></div>
+  <div class="stat-item">
+    <div class="stat-num" id="statOBX">—</div>
+    <div class="stat-label">Oslo Børs (OBX) i dag</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="statWinner">—</div>
+    <div class="stat-label" id="statWinnerLabel">Dagens vinner</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="statLoser">—</div>
+    <div class="stat-label" id="statLoserLabel">Dagens taper</div>
+  </div>
 </div>
 
 <section class="features">
@@ -243,7 +252,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 
 <section class="newsletter">
   <div>
-    <div class="section-label">Daglig nyhetsbrev</div>
+    <div class="section-label">Børsbrygg</div>
     <h2 class="section-title" style="font-family:'Playfair Display',serif; font-size:28px; margin-bottom:1rem;">Børsen forklart. Hver morgen.</h2>
     <p style="font-size:14px; color:#666; line-height:1.7; margin-bottom:1.5rem;">Dagens viktigste børsnyheter forklart på 2 minutter — med risiko, kontekst og begge sider av saken.</p>
     <div style="display:flex; flex-direction:column; gap:10px;">
@@ -255,27 +264,13 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <div class="newsletter-preview">
     <div class="nl-header">
       <div class="nl-header-top">
-        <span class="nl-logo">Børshjelpen</span>
-        <span class="nl-date">Torsdag 29. mai 2026</span>
+        <span class="nl-logo">Børsbrygg</span>
+        <span class="nl-date" id="nlDate">Laster...</span>
       </div>
-      <div class="nl-title-main">Equinor slo forventningene — men er det hele bildet?</div>
+      <div class="nl-title-main" id="nlTitle">Henter dagens børsoppsummering...</div>
     </div>
-    <div class="nl-body">
-      <div class="nl-story">
-        <div class="nl-story-tag">Oslo Børs i dag</div>
-        <div class="nl-story-title">Børsen opp 0,8% — men vær obs på dette</div>
-        <div class="nl-story-text">Olje dro opp. Men rentefrykten er ikke borte — og det kan snu raskt hvis inflasjonsdataene skuffer fredag.</div>
-      </div>
-      <div class="nl-story">
-        <div class="nl-story-tag">Bull vs. Bear</div>
-        <div class="nl-story-title">Equinor: To scenarioer</div>
-        <div class="nl-story-text">Bull: høy oljepris + utbytte = god avkastning. Bear: energiomstilling + prisfall kan halvere inntjeningen innen 2030.</div>
-      </div>
-      <div class="nl-story">
-        <div class="nl-story-tag">Risiko i dag</div>
-        <div class="nl-story-title">Tre ting som kan snu markedet</div>
-        <div class="nl-story-text">1) Fed-tale kl. 16. 2) Kinesiske importtall. 3) OPEC-møte neste uke. Hold øye med disse.</div>
-      </div>
+    <div class="nl-body" id="nlBody">
+      <div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Laster AI-generert innhold...</div>
     </div>
   </div>
 </section>
@@ -293,6 +288,8 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 
 <script>
 const heroTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
+const watchlist = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
+
 const descriptions = {
   'EQNR': 'Norges største oljeselskap. Henter opp olje og gass fra Nordsjøen og selger globalt.',
   'DNB': 'Norges største bank. Tjener penger på renter fra lån og finansielle tjenester.',
@@ -314,6 +311,7 @@ const sectors = {
   'KAHOT': ['Teknologi','Ed-tech','Oslo Børs'],
 };
 
+// Last inn tilfeldig aksje i hero-mockup
 async function loadHeroStock() {
   const ticker = heroTickers[Math.floor(Math.random() * heroTickers.length)];
   try {
@@ -334,7 +332,107 @@ async function loadHeroStock() {
     document.getElementById('heroPills').innerHTML = pills;
   } catch(e) {}
 }
+
+// Hent alle aksjer og vis stats
+async function loadStats() {
+  try {
+    const results = await Promise.all(
+      watchlist.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null))
+    );
+    const valid = results.filter(r => r && !r.error);
+    if (!valid.length) return;
+
+    // Beregn snitt endring for "OBX"
+    const avgChange = valid.reduce((sum, r) => sum + parseFloat(r.changePct), 0) / valid.length;
+    const obxEl = document.getElementById('statOBX');
+    const sign = avgChange >= 0 ? '+' : '';
+    obxEl.textContent = sign + avgChange.toFixed(2) + '%';
+    obxEl.style.color = avgChange >= 0 ? '#2C7A5C' : '#A32D2D';
+
+    // Finn vinner og taper
+    const sorted = [...valid].sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
+    const winner = sorted[0];
+    const loser = sorted[sorted.length - 1];
+
+    const winEl = document.getElementById('statWinner');
+    winEl.textContent = '+' + winner.changePct + '%';
+    winEl.style.color = '#2C7A5C';
+    document.getElementById('statWinnerLabel').textContent = winner.name.split(' ')[0] + ' — dagens vinner';
+
+    const loseEl = document.getElementById('statLoser');
+    loseEl.textContent = loser.changePct + '%';
+    loseEl.style.color = '#A32D2D';
+    document.getElementById('statLoserLabel').textContent = loser.name.split(' ')[0] + ' — dagens taper';
+
+    // Generer AI-børsbrygg
+    loadBorsbrygg(valid);
+  } catch(e) {}
+}
+
+// Generer AI-børsbrygg
+async function loadBorsbrygg(stocks) {
+  const today = new Date().toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('nlDate').textContent = today.charAt(0).toUpperCase() + today.slice(1);
+
+  const stockSummary = stocks.map(s => {
+    const sign = parseFloat(s.changePct) >= 0 ? '+' : '';
+    return `${s.name} (${s.ticker}): ${s.price} NOK, ${sign}${s.changePct}%`;
+  }).join(', ');
+
+  try {
+    const res = await fetch('/api/summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ticker: 'OSLO',
+        name: 'Oslo Børs oppsummering',
+        description: `Dagens kursdata for norske aksjer: ${stockSummary}`,
+        price: '0',
+        currency: 'NOK',
+        changePct: '0',
+        up: true,
+        exchange: 'Oslo Børs',
+        _type: 'daily_summary'
+      })
+    });
+    const ai = await res.json();
+
+    // Finn vinner og taper for tittel
+    const sorted = [...stocks].sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
+    const winner = sorted[0];
+    const loser = sorted[sorted.length - 1];
+    document.getElementById('nlTitle').textContent = `${winner.name.split(' ')[0]} opp ${winner.changePct}% — ${loser.name.split(' ')[0]} ned ${Math.abs(loser.changePct)}%`;
+
+    const bullPoints = (ai.bull || []).slice(0, 2);
+    const bearPoints = (ai.bear || []).slice(0, 1);
+    const risk = ai.risiko || '';
+
+    document.getElementById('nlBody').innerHTML = `
+      <div class="nl-story">
+        <div class="nl-story-tag">Oslo Børs i dag</div>
+        <div class="nl-story-title">${ai.hva ? ai.hva.split('.')[0] : 'Markedsoppsummering'}</div>
+        <div class="nl-story-text">${bullPoints.join(' · ')}</div>
+      </div>
+      <div class="nl-story">
+        <div class="nl-story-tag">Risiko å følge med på</div>
+        <div class="nl-story-title">${bearPoints[0] || 'Se alle aksjer'}</div>
+        <div class="nl-story-text">${risk}</div>
+      </div>
+      <div class="nl-story">
+        <div class="nl-story-tag">Ikke finansiell rådgivning</div>
+        <div class="nl-story-title">Gjør egne vurderinger</div>
+        <div class="nl-story-text">Snakk med en finansrådgiver før du investerer.</div>
+      </div>`;
+  } catch(e) {
+    document.getElementById('nlTitle').textContent = 'Børsdata lastet — AI-analyse utilgjengelig';
+    document.getElementById('nlBody').innerHTML = '<div style="padding:1rem;font-size:13px;color:#aaa">Sjekk at GROQ_API_KEY er satt i Vercel.</div>';
+  }
+}
+
+// Kjør alt ved sidelast
 loadHeroStock();
+loadStats();
 </script>
+</body>
 </body>
 </html>
