@@ -191,7 +191,8 @@ function renderStockShell(s) {
       </div>
       <div class="price-block">
         <div class="price-main">${priceStr} ${s.currency}</div>
-        <span class="${s.up ? 'badge-up' : 'badge-down'}">${changeStr} &nbsp; ${pctStr}</span>
+        <span class="${s.up ? 'badge-up' : 'badge-down'}" title="Endring siden gårsdagens sluttkurs">${changeStr} kr &nbsp; (${pctStr}) i dag</span>
+        <div style="font-size:10px;color:#aaa;margin-top:4px;text-align:right;">Endring fra gårsdagens sluttkurs</div>
       </div>
     </div>
 
@@ -223,7 +224,7 @@ function renderStockShell(s) {
     </div>
 
     <div class="disclaimer">
-      Data fra Twelve Data · Kan være forsinket · Dette er ikke finansiell rådgivning. Gjør egne vurderinger eller snakk med en finansrådgiver.
+      Data fra Yahoo Finance · Kurser forsinket ca. 15–20 min · Endring viser forskjell fra gårsdagens sluttkurs · Dette er ikke finansiell rådgivning. Gjør egne vurderinger eller snakk med en finansrådgiver.
     </div>`;
 
   document.getElementById('trending').innerHTML = '';
