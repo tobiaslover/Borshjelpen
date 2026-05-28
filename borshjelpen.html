@@ -166,16 +166,16 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 
 <div class="stats-bar">
   <div class="stat-item">
-    <div class="stat-num" id="statOBX">—</div>
-    <div class="stat-label">Oslo Børs (OBX) i dag</div>
+    <div class="stat-num" id="statOSEBX">—</div>
+    <div class="stat-label" id="statOSEBXLabel">Oslo Børs OSEBX</div>
   </div>
   <div class="stat-item">
-    <div class="stat-num" id="statWinner">—</div>
-    <div class="stat-label" id="statWinnerLabel">Dagens vinner</div>
+    <div class="stat-num" id="statOSEBXPct">—</div>
+    <div class="stat-label">Endring i dag</div>
   </div>
   <div class="stat-item">
-    <div class="stat-num" id="statLoser">—</div>
-    <div class="stat-label" id="statLoserLabel">Dagens taper</div>
+    <div class="stat-num" id="statOSEBXVol">—</div>
+    <div class="stat-label">Volum i dag</div>
   </div>
 </div>
 
@@ -333,39 +333,35 @@ async function loadHeroStock() {
   } catch(e) {}
 }
 
-// Hent alle aksjer og vis stats
+// Hent OSEBX indeks og vis stats
 async function loadStats() {
   try {
+    // Hent OSEBX indeksdata
+    const indexRes = await fetch('/api/index');
+    const index = await indexRes.json();
+
+    if (!index.error) {
+      const sign = index.up ? '+' : '';
+      const priceEl = document.getElementById('statOSEBX');
+      priceEl.textContent = parseFloat(index.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
+      priceEl.style.color = index.up ? '#2C7A5C' : '#A32D2D';
+
+      const pctEl = document.getElementById('statOSEBXPct');
+      pctEl.textContent = sign + index.changePct + '%';
+      pctEl.style.color = index.up ? '#2C7A5C' : '#A32D2D';
+
+      if (index.volume) {
+        document.getElementById('statOSEBXVol').textContent = index.volume;
+      }
+    }
+
+    // Hent aksjedata for børsbrygg
     const results = await Promise.all(
       watchlist.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null))
     );
     const valid = results.filter(r => r && !r.error);
-    if (!valid.length) return;
+    if (valid.length) loadBorsbrygg(valid);
 
-    // Beregn snitt endring for "OBX"
-    const avgChange = valid.reduce((sum, r) => sum + parseFloat(r.changePct), 0) / valid.length;
-    const obxEl = document.getElementById('statOBX');
-    const sign = avgChange >= 0 ? '+' : '';
-    obxEl.textContent = sign + avgChange.toFixed(2) + '%';
-    obxEl.style.color = avgChange >= 0 ? '#2C7A5C' : '#A32D2D';
-
-    // Finn vinner og taper
-    const sorted = [...valid].sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
-    const winner = sorted[0];
-    const loser = sorted[sorted.length - 1];
-
-    const winEl = document.getElementById('statWinner');
-    winEl.textContent = '+' + winner.changePct + '%';
-    winEl.style.color = '#2C7A5C';
-    document.getElementById('statWinnerLabel').textContent = winner.name.split(' ')[0] + ' — dagens vinner';
-
-    const loseEl = document.getElementById('statLoser');
-    loseEl.textContent = loser.changePct + '%';
-    loseEl.style.color = '#A32D2D';
-    document.getElementById('statLoserLabel').textContent = loser.name.split(' ')[0] + ' — dagens taper';
-
-    // Generer AI-børsbrygg
-    loadBorsbrygg(valid);
   } catch(e) {}
 }
 
