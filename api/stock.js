@@ -8,36 +8,31 @@ export default async function handler(req, res) {
   const upper = ticker.toUpperCase().replace('.OL','').replace(':OSE','');
   const symbol = upper + '.OL';
 
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept': 'application/json',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Referer': `https://finance.yahoo.com/quote/${symbol}`,
+    'Origin': 'https://finance.yahoo.com',
+  };
+
   try {
-    // Hent kursdata
+    // Kall 1: Chart for kurs og endring
     const chartUrl = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`;
-    const chartRes = await fetch(chartUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Referer': 'https://finance.yahoo.com/',
-      }
-    });
+    const chartRes = await fetch(chartUrl, { headers });
     const chartData = await chartRes.json();
     const result = chartData?.chart?.result?.[0];
     const meta = result?.meta;
-    const quotes = result?.indicators?.quote?.[0];
-    const closes = (quotes?.close || []).filter(v => v !== null && v !== undefined);
+    const closes = (result?.indicators?.quote?.[0]?.close || []).filter(v => v != null);
     const price = meta?.regularMarketPrice || closes[closes.length - 1] || 0;
     const prevClose = closes[closes.length - 2] || price;
     const change = +(price - prevClose).toFixed(2);
     const changePct = prevClose ? +((change / prevClose) * 100).toFixed(2) : 0;
 
-    // Hent nøkkeltall og profil — bruk query1 i stedet for query2
-    const profileUrl = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=assetProfile,summaryDetail,financialData,price`;
-    const pRes = await fetch(profileUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'application/json',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Referer': 'https://finance.yahoo.com/quote/' + symbol,
-        'Origin': 'https://finance.yahoo.com',
-      }
-    });
+    // Kall 2: quoteSummary for nøkkeltall — vent 300ms mellom kallene
+    await new Promise(r => setTimeout(r, 300));
+    const summaryUrl = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=assetProfile%2CsummaryDetail%2CfinancialData%2Cprice`;
+    const summaryRes = await fetch(summaryUrl, { headers });
 
     let name = meta?.longName || meta?.shortName || upper;
     let pe = null, forwardPE = null, dividendYield = null, beta = null;
@@ -46,9 +41,9 @@ export default async function handler(req, res) {
     let employees = null, website = null;
     let profitMargin = null, returnOnEquity = null, revenueGrowth = null;
 
-    if (pRes.ok) {
-      const pData = await pRes.json();
-      const r = pData?.quoteSummary?.result?.[0];
+    if (summaryRes.ok) {
+      const summaryData = await summaryRes.json();
+      const r = summaryData?.quoteSummary?.result?.[0];
       if (r) {
         name = r.price?.longName || r.price?.shortName || name;
         pe = r.summaryDetail?.trailingPE?.raw?.toFixed(1) || null;
@@ -83,23 +78,12 @@ export default async function handler(req, res) {
       changePct: changePct.toFixed(2),
       up: change >= 0,
       exchange: 'Oslo Børs',
-      marketCap,
-      pe,
-      forwardPE,
-      dividendYield,
-      beta,
-      fiftyTwoWeekHigh,
-      fiftyTwoWeekLow,
+      marketCap, pe, forwardPE, dividendYield, beta,
+      fiftyTwoWeekHigh, fiftyTwoWeekLow,
       volume: meta?.regularMarketVolume?.toLocaleString('nb-NO') || null,
-      sector,
-      industry,
-      description,
-      website,
-      employees,
+      sector, industry, description, website, employees,
       country: 'Norge',
-      profitMargin,
-      returnOnEquity,
-      revenueGrowth,
+      profitMargin, returnOnEquity, revenueGrowth,
     });
 
   } catch (err) {
