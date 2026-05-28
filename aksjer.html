@@ -140,11 +140,8 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .chart-tab { font-size: 12px; padding: 4px 10px; border-radius: 100px; border: 1px solid #e8e8e8; background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; color: #888; }
 .chart-tab.active { background: #1B3A5C; color: white; border-color: #1B3A5C; }
 .chart-wrap { position: relative; height: 180px; }
-canvas#priceChart { width: 100% !important; height: 180px !important; }
 .chart-loading { display: flex; align-items: center; justify-content: center; height: 180px; color: #aaa; font-size: 13px; gap: 8px; }
 </style>
-<!-- Chart.js i head -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -389,102 +386,95 @@ document.getElementById('trending').innerHTML = `
 </script>
 
 <script>
-let priceChartInstance = null;
 let currentChartTicker = null;
 
 async function loadChart(ticker, range, btnEl) {
-  // Update active tab
   if (btnEl) {
     document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
     btnEl.classList.add('active');
   }
 
-  document.getElementById('chartLoading').style.display = 'flex';
-  document.getElementById('priceChart').style.display = 'none';
+  const loading = document.getElementById('chartLoading');
+  const svgWrap = document.getElementById('chartSvgWrap');
+  if (!loading || !svgWrap) return;
+
+  loading.style.display = 'flex';
+  svgWrap.style.display = 'none';
   currentChartTicker = ticker;
 
   try {
-    const res = await fetch(`/api/chart?ticker=${ticker}&range=${range}`);
+    const res = await fetch('/api/chart?ticker=' + ticker + '&range=' + range);
     const data = await res.json();
 
     if (!data.points || data.points.length === 0) {
-      document.getElementById('chartLoading').textContent = 'Ingen data tilgjengelig';
+      loading.textContent = 'Ingen data tilgjengelig';
       return;
     }
 
-    const labels = data.points.map(d => {
-      const date = new Date(d.t);
-      if (range === '1d') return date.toLocaleTimeString('nb-NO', {hour:'2-digit', minute:'2-digit'});
-      return date.toLocaleDateString('nb-NO', {day:'numeric', month:'short'});
-    });
     const prices = data.points.map(d => d.p);
-    const firstPrice = prices[0];
-    const lastPrice = prices[prices.length - 1];
-    const isUp = lastPrice >= firstPrice;
+    const times = data.points.map(d => d.t);
+    const minP = Math.min(...prices);
+    const maxP = Math.max(...prices);
+    const rangeP = maxP - minP || 1;
+    const firstP = prices[0];
+    const lastP = prices[prices.length - 1];
+    const isUp = lastP >= firstP;
     const color = isUp ? '#2C7A5C' : '#A32D2D';
-    const bgColor = isUp ? 'rgba(44,122,92,0.08)' : 'rgba(163,45,45,0.08)';
+    const fillColor = isUp ? 'rgba(44,122,92,0.1)' : 'rgba(163,45,45,0.1)';
 
-    document.getElementById('chartLoading').style.display = 'none';
-    const canvas = document.getElementById('priceChart');
-    if (!canvas) return;
-    canvas.style.display = 'block';
+    const W = 800, H = 160, PAD = 8;
+    const n = prices.length;
 
-    if (priceChartInstance) priceChartInstance.destroy();
-
-    priceChartInstance = new Chart(canvas, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          data: prices,
-          borderColor: color,
-          backgroundColor: bgColor,
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-          fill: true,
-          tension: 0.2,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            mode: 'index',
-            intersect: false,
-            callbacks: {
-              label: ctx => parseFloat(ctx.raw).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' NOK'
-            }
-          }
-        },
-        scales: {
-          x: {
-            grid: { display: false },
-            ticks: {
-              maxTicksLimit: 6,
-              font: { size: 10 },
-              color: '#aaa',
-              maxRotation: 0,
-            }
-          },
-          y: {
-            position: 'right',
-            grid: { color: '#f0f0f0' },
-            ticks: {
-              font: { size: 10 },
-              color: '#aaa',
-              callback: val => parseFloat(val).toLocaleString('nb-NO', {minimumFractionDigits:0, maximumFractionDigits:0})
-            }
-          }
-        },
-        interaction: { mode: 'index', intersect: false },
-      }
+    // Build SVG path
+    const pts = prices.map((p, i) => {
+      const x = PAD + (i / (n - 1)) * (W - PAD * 2);
+      const y = PAD + (1 - (p - minP) / rangeP) * (H - PAD * 2);
+      return [x.toFixed(1), y.toFixed(1)];
     });
+
+    const linePath = 'M ' + pts.map(p => p.join(',')).join(' L ');
+    const fillPath = linePath + ` L ${pts[pts.length-1][0]},${H-PAD} L ${pts[0][0]},${H-PAD} Z`;
+
+    // X-axis labels (5 evenly spaced)
+    const labelCount = 5;
+    let labels = '';
+    for (let i = 0; i < labelCount; i++) {
+      const idx = Math.floor(i * (n-1) / (labelCount-1));
+      const x = PAD + (idx / (n-1)) * (W - PAD * 2);
+      const date = new Date(times[idx]);
+      let label = range === '1d'
+        ? date.toLocaleTimeString('nb-NO', {hour:'2-digit', minute:'2-digit'})
+        : date.toLocaleDateString('nb-NO', {day:'numeric', month:'short'});
+      labels += `<text x="${x.toFixed(1)}" y="${H+14}" text-anchor="middle" font-size="10" fill="#aaa">${label}</text>`;
+    }
+
+    // Y-axis labels
+    let yLabels = '';
+    for (let i = 0; i <= 3; i++) {
+      const p = minP + (i / 3) * rangeP;
+      const y = PAD + (1 - i/3) * (H - PAD * 2);
+      yLabels += `<text x="${W+4}" y="${y.toFixed(1)}" font-size="10" fill="#aaa" dominant-baseline="middle">${p.toFixed(0)}</text>`;
+    }
+
+    // Hover line (invisible rect for interaction)
+    const svg = `<svg viewBox="0 0 ${W+50} ${H+20}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:180px;">
+      <defs>
+        <clipPath id="chartClip">
+          <rect x="${PAD}" y="${PAD}" width="${W - PAD*2}" height="${H - PAD*2}"/>
+        </clipPath>
+      </defs>
+      <path d="${fillPath}" fill="${fillColor}" clip-path="url(#chartClip)"/>
+      <path d="${linePath}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" clip-path="url(#chartClip)"/>
+      ${labels}
+      ${yLabels}
+    </svg>`;
+
+    svgWrap.innerHTML = svg;
+    loading.style.display = 'none';
+    svgWrap.style.display = 'block';
 
   } catch(e) {
-    document.getElementById('chartLoading').textContent = 'Kunne ikke laste graf.';
+    if (loading) loading.textContent = 'Kunne ikke laste graf.';
   }
 }
 </script>
