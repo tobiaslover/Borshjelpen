@@ -419,81 +419,123 @@ let priceChartInstance = null;
 
 async function loadChart(ticker, range, btnEl) {
   if (btnEl) {
-    document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.chart-tab').forEach(function(b) { b.classList.remove('active'); });
     btnEl.classList.add('active');
   }
-  const loading = document.getElementById('chartLoading');
-  const svgWrap = document.getElementById('chartSvgWrap');
+
+  var loading = document.getElementById('chartLoading');
+  var svgWrap = document.getElementById('chartSvgWrap');
   if (!loading || !svgWrap) return;
+
   loading.style.display = 'flex';
   svgWrap.style.display = 'none';
+  svgWrap.innerHTML = '';
 
   try {
-    const res = await fetch('/api/chart?ticker=' + ticker + '&range=' + range);
-    const data = await res.json();
-    if (!data.points || !data.points.length) { loading.textContent = 'Ingen data'; return; }
+    var res = await fetch('/api/chart?ticker=' + ticker + '&range=' + range);
+    var data = await res.json();
 
-    const prices = data.points.map(d => d.p);
-    const times = data.points.map(d => d.t);
-    const n = prices.length;
-    const minP = Math.min(...prices);
-    const maxP = Math.max(...prices);
-    const rangeP = maxP - minP || 1;
-    const isUp = prices[n-1] >= prices[0];
-    const stroke = isUp ? '#2C7A5C' : '#A32D2D';
-    const fillCol = isUp ? 'rgba(44,122,92,0.1)' : 'rgba(163,45,45,0.08)';
-    const W = 800, H = 160, PAD = 10;
+    if (!data.points || data.points.length === 0) {
+      loading.innerHTML = 'Ingen data tilgjengelig';
+      return;
+    }
 
-    const pts = prices.map((p, i) => {
-      const x = PAD + (i/(n-1))*(W-PAD*2);
-      const y = PAD + (1-(p-minP)/rangeP)*(H-PAD*2);
+    var prices = data.points.map(function(d) { return d.p; });
+    var times = data.points.map(function(d) { return d.t; });
+    var n = prices.length;
+    var minP = Math.min.apply(null, prices);
+    var maxP = Math.max.apply(null, prices);
+    var rangeP = maxP - minP || 1;
+    var isUp = prices[n-1] >= prices[0];
+    var strokeColor = isUp ? '#2C7A5C' : '#A32D2D';
+    var fillColor = isUp ? 'rgba(44,122,92,0.1)' : 'rgba(163,45,45,0.08)';
+
+    var W = 700, H = 150, PAD = 10;
+
+    var pts = prices.map(function(p, i) {
+      var x = PAD + (i / (n-1)) * (W - PAD*2);
+      var y = PAD + (1 - (p - minP) / rangeP) * (H - PAD*2);
       return x.toFixed(1) + ',' + y.toFixed(1);
     });
 
-    const line = 'M ' + pts.join(' L ');
-    const fill = line + ' L '+(PAD+W-PAD*2).toFixed(1)+','+(H-PAD)+' L '+PAD+','+(H-PAD)+' Z';
+    var linePath = 'M ' + pts.join(' L ');
+    var lastX = (PAD + W - PAD*2).toFixed(1);
+    var fillPath = linePath + ' L ' + lastX + ',' + (H-PAD) + ' L ' + PAD + ',' + (H-PAD) + ' Z';
 
-    let ticks = '';
-    for (let i = 0; i <= 3; i++) {
-      const p = minP + (i/3)*rangeP;
-      const y = PAD + (1-i/3)*(H-PAD*2);
-      ticks += '<line x1="'+PAD+'" y1="'+y.toFixed(1)+'" x2="'+(W-PAD)+'" y2="'+y.toFixed(1)+'" stroke="#e8e8e8" stroke-width="0.5"/>';
-      ticks += '<text x="'+(W-PAD+4)+'" y="'+y.toFixed(1)+'" font-size="10" fill="#aaa" dominant-baseline="middle">'+p.toFixed(0)+'</text>';
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + (W+50) + ' ' + (H+20));
+    svg.style.width = '100%';
+    svg.style.height = '160px';
+    svg.style.display = 'block';
+
+    // Fill area
+    var fillEl = document.createElementNS(ns, 'path');
+    fillEl.setAttribute('d', fillPath);
+    fillEl.setAttribute('fill', fillColor);
+    svg.appendChild(fillEl);
+
+    // Grid lines
+    for (var i = 0; i <= 3; i++) {
+      var p = minP + (i/3) * rangeP;
+      var y = PAD + (1 - i/3) * (H - PAD*2);
+      var line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', PAD); line.setAttribute('y1', y.toFixed(1));
+      line.setAttribute('x2', W-PAD); line.setAttribute('y2', y.toFixed(1));
+      line.setAttribute('stroke', '#e8e8e8'); line.setAttribute('stroke-width', '0.5');
+      svg.appendChild(line);
+      var txt = document.createElementNS(ns, 'text');
+      txt.setAttribute('x', W-PAD+4); txt.setAttribute('y', y.toFixed(1));
+      txt.setAttribute('font-size', '10'); txt.setAttribute('fill', '#aaa');
+      txt.setAttribute('dominant-baseline', 'middle');
+      txt.textContent = p.toFixed(0);
+      svg.appendChild(txt);
     }
 
-    let xLabels = '';
-    const labelCount = 5;
-    for (let i = 0; i < labelCount; i++) {
-      const idx = Math.floor(i*(n-1)/(labelCount-1));
-      const x = PAD + (idx/(n-1))*(W-PAD*2);
-      const date = new Date(times[idx]);
-      const label = range === '1d'
-        ? date.toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'})
-        : date.toLocaleDateString('nb-NO',{day:'numeric',month:'short'});
-      xLabels += '<text x="'+x.toFixed(1)+'" y="'+(H+14)+'" text-anchor="middle" font-size="10" fill="#aaa">'+label+'</text>';
+    // Price line
+    var pathEl = document.createElementNS(ns, 'path');
+    pathEl.setAttribute('d', linePath);
+    pathEl.setAttribute('fill', 'none');
+    pathEl.setAttribute('stroke', strokeColor);
+    pathEl.setAttribute('stroke-width', '1.5');
+    pathEl.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(pathEl);
+
+    // X labels
+    var labelCount = 5;
+    for (var i = 0; i < labelCount; i++) {
+      var idx = Math.floor(i * (n-1) / (labelCount-1));
+      var x = PAD + (idx/(n-1)) * (W - PAD*2);
+      var date = new Date(times[idx]);
+      var label = range === '1d'
+        ? date.toLocaleTimeString('nb-NO', {hour:'2-digit', minute:'2-digit'})
+        : date.toLocaleDateString('nb-NO', {day:'numeric', month:'short'});
+      var xtxt = document.createElementNS(ns, 'text');
+      xtxt.setAttribute('x', x.toFixed(1)); xtxt.setAttribute('y', H+14);
+      xtxt.setAttribute('text-anchor', 'middle');
+      xtxt.setAttribute('font-size', '10'); xtxt.setAttribute('fill', '#aaa');
+      xtxt.textContent = label;
+      svg.appendChild(xtxt);
     }
 
-    svgWrap.innerHTML = '<svg viewBox="0 0 '+(W+50)+' '+(H+20)+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:180px;display:block;">'
-      + '<path d="'+fill+'" fill="'+fillCol+'"/>'
-      + ticks
-      + '<path d="'+line+'" fill="none" stroke="'+stroke+'" stroke-width="1.5" stroke-linejoin="round"/>'
-      + xLabels
-      + '</svg>';
+    svgWrap.appendChild(svg);
 
-    const hi = Math.max(...prices).toLocaleString('nb-NO',{minimumFractionDigits:2,maximumFractionDigits:2});
-    const lo = Math.min(...prices).toLocaleString('nb-NO',{minimumFractionDigits:2,maximumFractionDigits:2});
-    const last = prices[n-1].toLocaleString('nb-NO',{minimumFractionDigits:2,maximumFractionDigits:2});
-    svgWrap.innerHTML += '<div style="display:flex;gap:1rem;margin-top:.75rem;padding-top:.75rem;border-top:.5px solid #e8e8e8;font-size:12px;color:#888;">'
-      + '<span>Høy <strong style="color:#1a1a1a">'+hi+' kr</strong></span>'
-      + '<span>Lav <strong style="color:#1a1a1a">'+lo+' kr</strong></span>'
-      + '<span>Siste <strong style="color:#1a1a1a">'+last+' kr</strong></span>'
-      + '</div>';
+    // Stats row
+    var hi = Math.max.apply(null, prices).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
+    var lo = Math.min.apply(null, prices).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
+    var last = prices[n-1].toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
+    var stats = document.createElement('div');
+    stats.style.cssText = 'display:flex;gap:1rem;margin-top:.75rem;padding-top:.75rem;border-top:.5px solid #e8e8e8;font-size:12px;color:#888;';
+    stats.innerHTML = 'Høy <strong style="color:#1a1a1a;margin-left:4px">' + hi + ' kr</strong>'
+      + '<span style="margin-left:1rem">Lav <strong style="color:#1a1a1a;margin-left:4px">' + lo + ' kr</strong></span>'
+      + '<span style="margin-left:1rem">Siste <strong style="color:#1a1a1a;margin-left:4px">' + last + ' kr</strong></span>';
+    svgWrap.appendChild(stats);
 
     loading.style.display = 'none';
     svgWrap.style.display = 'block';
 
   } catch(e) {
-    loading.textContent = 'Kunne ikke laste graf.';
+    loading.innerHTML = 'Kunne ikke laste graf: ' + e.message;
   }
 }
 
