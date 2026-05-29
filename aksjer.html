@@ -475,7 +475,7 @@ function showAutocomplete(query) {
   }).slice(0, 6);
   if (!matches.length) { list.style.display = 'none'; return; }
   list.innerHTML = matches.map(function(s) {
-    return '<div class="autocomplete-item" onclick="selectStock('' + s.ticker + '')">' +
+    return '<div class="autocomplete-item" onclick="selectStock(\'' + s.ticker + '\')">' +
       '<span class="ac-ticker">' + s.ticker + '</span>' +
       '<span class="ac-name">' + s.name + '</span>' +
       '<span class="ac-sector">' + s.sector + '</span>' +
