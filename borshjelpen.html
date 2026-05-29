@@ -302,7 +302,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
     <div class="nl-header">
       <div class="nl-header-top">
         <span class="nl-logo">Børshjelpen</span>
-        <span class="nl-date">Torsdag 29. mai 2026</span>
+        <span class="nl-date" id="nlDate"></span>
       </div>
       <div class="nl-title-main">Equinor slo forventningene — men er det hele bildet?</div>
     </div>
@@ -444,5 +444,12 @@ async function loadHeroStock() {
 }
 
 loadHeroStock();
+
+// Sett riktig norsk dato
+const nlDateEl = document.getElementById('nlDate');
+if (nlDateEl) {
+  const today = new Date().toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'Europe/Oslo'});
+  nlDateEl.textContent = today.charAt(0).toUpperCase() + today.slice(1);
+}
 </script>
 </body>
