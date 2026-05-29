@@ -242,6 +242,24 @@ function renderStockShell(s) {
       </div>
     </div>
 
+    <div class="chart-box">
+      <div class="chart-header">
+        <span class="chart-label">Kursgraf</span>
+        <div class="chart-tabs">
+          <button class="chart-tab active" onclick="loadChart('${s.ticker}','1d',this)">1D</button>
+          <button class="chart-tab" onclick="loadChart('${s.ticker}','1w',this)">1U</button>
+          <button class="chart-tab" onclick="loadChart('${s.ticker}','1m',this)">1M</button>
+          <button class="chart-tab" onclick="loadChart('${s.ticker}','1y',this)">1Å</button>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-loading" id="chartLoading" style="display:flex;align-items:center;justify-content:center;height:180px;color:#aaa;font-size:13px;gap:8px;">
+          <div class="loading-spinner" style="width:18px;height:18px;border-width:2px;flex-shrink:0"></div>Laster kursgraf...
+        </div>
+        <div id="chartSvgWrap" style="display:none;width:100%"></div>
+      </div>
+    </div>
+
     <div class="metrics">
       <div class="metric"><div class="metric-label">P/E</div><div class="metric-val ${!s.pe?'na':''}">${fmt(s.pe)}</div></div>
       <div class="metric"><div class="metric-label">Utbytte</div><div class="metric-val ${!s.dividendYield?'na':''}">${fmt(s.dividendYield)}</div></div>
