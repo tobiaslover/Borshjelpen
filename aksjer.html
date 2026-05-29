@@ -35,7 +35,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
   border-top-color: #1B3A5C;
   font-weight: 500;
 }
-.search-hero { background: #1B3A5C; padding: 2.5rem 2rem; text-align: center; overflow: visible; position: relative; z-index: 1; }
+.search-hero { background: #1B3A5C; padding: 2.5rem 2rem; text-align: center; }
 .search-title { font-family: 'Playfair Display', serif; font-size: 28px; color: white; margin-bottom: 6px; }
 .search-sub { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; }
 .search-bar { display: flex; gap: 8px; max-width: 520px; margin: 0 auto; }
@@ -138,8 +138,8 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
   .content { padding: 1rem; }
 }
 
-.search-wrap { position: relative; max-width: 520px; margin: 0 auto; }
-.autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); overflow: hidden; z-index: 9999; margin-top: 4px; }
+.search-wrap { position: relative; max-width: 520px; margin: 0 auto; z-index: 200; }
+.autocomplete-list { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); overflow: hidden; z-index: 9999; }
 .autocomplete-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
 .autocomplete-item:last-child { border-bottom: none; }
 .autocomplete-item:hover { background: #f8f7f4; }
@@ -171,11 +171,11 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
   <div class="search-title">Søk opp en aksje</div>
   <div class="search-sub">Alle aksjer på Oslo Børs — AI forklarer alt på norsk</div>
   <div class="search-wrap">
-    <div class="search-bar">
-      <input id="searchInput" class="search-input" type="text" placeholder="F.eks. Equinor, EQNR, DNB ..." autofocus autocomplete="off" />
+    <div class="search-bar" style="position:relative;flex-wrap:wrap;">
+      <input id="searchInput" class="search-input" type="text" placeholder="F.eks. Equinor, EQNR, DNB ..." autofocus autocomplete="off" style="flex:1;min-width:0;" />
       <button class="search-btn" onclick="doSearch()">Søk</button>
+      <div class="autocomplete-list" id="acList" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:9999;"></div>
     </div>
-    <div class="autocomplete-list" id="acList" style="display:none"></div>
   </div>
   <div class="search-hint">Skriv ticker direkte — EQNR, DNB, TEL, AKRBP, MOWI, YAR, NHY</div>
   <div class="suggestions">
