@@ -103,29 +103,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .cta-input { flex: 1; padding: 12px 16px; border-radius: 100px; border: none; font-size: 14px; outline: none; font-family: 'DM Sans', sans-serif; }
 .cta-btn { background: #C8A96E; color: #1B3A5C; padding: 12px 20px; border-radius: 100px; border: none; font-weight: 500; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 .footer-note { color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 1rem; }
-
-/* ===== MOBILVISNING ===== */
-@media (max-width: 768px) {
-  nav { padding: .9rem 1rem; }
-  .nav-links a { display: none; }
-  .logo { font-size: 15px; }
-
-  .hero { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1rem; }
-  .hero-right { display: none; }
-  .hero-title { font-size: 32px; }
-  .hero-sub { font-size: 14px; }
-
-  .stats-bar { grid-template-columns: 1fr; }
-  .stat-item:not(:last-child) { border-right: none; border-bottom: 1px solid #e8e8e8; }
-
-  .feature-grid { grid-template-columns: 1fr; }
-  .coach-inner { grid-template-columns: 1fr; }
-  .newsletter { grid-template-columns: 1fr; }
-
-  .cta-section > div[style*="grid-template-columns:repeat(3"] {
-    grid-template-columns: 1fr !important;
-  }
-}
 </style>
 </head>
 <body>
@@ -133,19 +110,10 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 <nav class="nav">
   <div class="logo">Børs<span>hjelpen</span></div>
   <div class="nav-links">
-    <a href="/aksjer.html">Aksjer</a>
+    <a href="#">Aksjer</a>
     <a href="#">Lær</a>
-    <a href="#">Børsbrygg</a>
-    <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
-      <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
-      <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
-    </div>
-    <div id="navUser" style="display:none;align-items:center;gap:8px;">
-      <div onclick="location.href='/profil.html'" style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;border:1px solid #e8e8e8;cursor:pointer;">
-        <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
-        <span id="navName" style="font-size:13px;font-weight:500;color:#1a1a1a;">Min side</span>
-      </div>
-    </div>
+    <a href="#">Nyhetsbrev</a>
+    <button class="nav-cta">Kom i gang gratis</button>
   </div>
 </nav>
 
@@ -153,62 +121,66 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <div class="hero-left">
     <div class="hero-badge">📈 Børsen — endelig forståelig</div>
     <h1 class="hero-title">Forstå aksjer.<br><em>Uten å være</em><br>analytiker.</h1>
-    <p class="hero-sub">Kvartalsrapport på 30 sekunder — uten finanssjargong! Daglige børsoppdateringer du faktisk forstår. En AI-coach som alltid viser begge sider — og aldri gir deg enkle kjøpstips.</p>
+    <p class="hero-sub">Kvartalsrapporter forklart på 5 setninger. Daglige børsoppdateringer du faktisk forstår. En AI-coach som alltid viser begge sider — og aldri gir deg enkle kjøpstips.</p>
     <div class="hero-actions">
       <button class="btn-primary">Start gratis →</button>
       <button class="btn-secondary">▶ Se demo</button>
     </div>
   </div>
   <div class="hero-right">
-    <div class="phone-mock" id="heroMock">
+    <div class="phone-mock">
       <div class="phone-top">
-        <div class="phone-ticker" id="heroTicker">Laster...</div>
-        <div class="phone-name" id="heroName">—</div>
+        <div class="phone-ticker">EQNR · Oslo Børs</div>
+        <div class="phone-name">Equinor</div>
         <div class="phone-price-row">
-          <span class="phone-price" id="heroPrice">—</span>
-          <span id="heroBadge" class="badge-up">—</span>
+          <span class="phone-price">274,50 kr</span>
+          <span class="badge-up">+2,1% i dag</span>
         </div>
       </div>
       <div class="phone-body">
         <div class="phone-section">
-          <div class="phone-section-title">Om selskapet</div>
-          <div class="phone-explain" id="heroDesc">Henter live data...</div>
+          <div class="phone-section-title">Hva gjør de?</div>
+          <div class="phone-explain">Norges største oljeselskap. De henter opp olje og gass fra havet og selger det til land over hele verden. Mesteparten av inntektene kommer fra råoljeprisen.</div>
         </div>
         <div class="phone-section">
-          <div class="phone-section-title">52-ukers kurs</div>
+          <div class="phone-section-title">Hvorfor gikk den opp i dag?</div>
+          <div class="phone-explain">Oljeprisen steg 1,8% etter at OPEC kunngjorde kutt i produksjon. Equinor følger alltid oljeprisen tett.</div>
+        </div>
+        <div class="phone-section">
+          <div class="phone-section-title">Risiko</div>
           <div class="risk-bars">
             <div class="risk-row">
-              <span style="min-width:40px">Høy</span>
-              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:80%;background:#2C7A5C"></div></div>
-              <span id="heroHigh">—</span>
+              <span style="min-width:80px">Oljepris</span>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:85%;background:#E24B4A"></div></div>
+              <span>Høy</span>
             </div>
             <div class="risk-row">
-              <span style="min-width:40px">Lav</span>
-              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:30%;background:#E24B4A"></div></div>
-              <span id="heroLow">—</span>
+              <span style="min-width:80px">Valuta</span>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:55%;background:#EF9F27"></div></div>
+              <span>Middels</span>
+            </div>
+            <div class="risk-row">
+              <span style="min-width:80px">Politisk</span>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:40%;background:#C8A96E"></div></div>
+              <span>Lav</span>
             </div>
           </div>
         </div>
-        <div class="pill-row" id="heroPills"></div>
-        <div class="risk-note">Data fra Yahoo Finance · Ikke finansiell rådgivning.</div>
+        <div class="pill-row">
+          <span class="pill">Energi</span>
+          <span class="pill">Utbytte</span>
+          <span class="pill">Statseiet 67%</span>
+        </div>
+        <div class="risk-note">Dette er ikke finansiell rådgivning. Gjør egne vurderinger eller snakk med en finansrådgiver.</div>
       </div>
     </div>
   </div>
 </section>
 
 <div class="stats-bar">
-  <div class="stat-item">
-    <div class="stat-num" id="statOSEBX">—</div>
-    <div class="stat-label" id="statOSEBXLabel">Oslo Børs OSEBX</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num" id="statOSEBXPct">—</div>
-    <div class="stat-label">Endring i dag</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num" id="statOSEBXVol">—</div>
-    <div class="stat-label">Volum i dag</div>
-  </div>
+  <div class="stat-item"><div class="stat-num">500+</div><div class="stat-label">Aksjer forklart på norsk</div></div>
+  <div class="stat-item"><div class="stat-num">Alltid</div><div class="stat-label">Begge sider presentert</div></div>
+  <div class="stat-item"><div class="stat-num">Gratis</div><div class="stat-label">Å komme i gang</div></div>
 </div>
 
 <section class="features">
@@ -217,8 +189,8 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <div class="feature-grid">
     <div class="feature-card">
       <div class="feature-icon" style="background:#EEE8DA;">📄</div>
-      <h3>Kvartalsrapport på 30 sekunder — uten finanssjargong</h3>
-      <p>AI leser rapporten på sekunder og gir deg det som faktisk betyr noe — uten tall du ikke forstår.</p>
+      <h3>Kvartalsrapporter på 5 setninger</h3>
+      <p>AI leser de lange rapportene og gir deg det viktigste — hva gikk bra, hva gikk dårlig, og hvilke risikoer ledelsen selv advarer om.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon" style="background:#E6EEF5;">⚖️</div>
@@ -284,33 +256,38 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 
 <section class="newsletter">
   <div>
-    <div class="section-label">Børsbrygg</div>
+    <div class="section-label">Daglig nyhetsbrev</div>
     <h2 class="section-title" style="font-family:'Playfair Display',serif; font-size:28px; margin-bottom:1rem;">Børsen forklart. Hver morgen.</h2>
     <p style="font-size:14px; color:#666; line-height:1.7; margin-bottom:1.5rem;">Dagens viktigste børsnyheter forklart på 2 minutter — med risiko, kontekst og begge sider av saken.</p>
-    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:1.5rem;">
+    <div style="display:flex; flex-direction:column; gap:10px;">
       <div style="display:flex; align-items:center; gap:10px; font-size:14px; color:#666;">✓ Hvorfor Oslo Børs gikk opp eller ned</div>
-      <div style="display:flex; align-items:center; gap:10px; font-size:14px; color:#666;">✓ Kvartalsrapport på 30 sekunder — uten finanssjargong</div>
+      <div style="display:flex; align-items:center; gap:10px; font-size:14px; color:#666;">✓ Kvartalsrapport med bull- og bear-case</div>
       <div style="display:flex; align-items:center; gap:10px; font-size:14px; color:#666;">✓ Risikoene du bør kjenne til i dag</div>
-    </div>
-    <div id="bbCta">
-      <button onclick="location.href='/auth.html'" style="background:#1B3A5C;color:white;padding:12px 24px;border-radius:100px;border:none;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
-      <p style="font-size:12px;color:#aaa;margin-top:10px;">Abonner for å lese dagens oppsummering</p>
     </div>
   </div>
   <div class="newsletter-preview">
     <div class="nl-header">
       <div class="nl-header-top">
-        <span class="nl-logo">Børsbrygg</span>
-        <span class="nl-date" id="nlDate">Laster...</span>
+        <span class="nl-logo">Børshjelpen</span>
+        <span class="nl-date">Torsdag 29. mai 2026</span>
       </div>
-      <div class="nl-title-main" id="nlTitle">Abonner for å lese dagens børsoppsummering</div>
+      <div class="nl-title-main">Equinor slo forventningene — men er det hele bildet?</div>
     </div>
-    <div class="nl-body" id="nlBody">
-      <div style="padding:2rem;text-align:center;">
-        <div style="font-size:32px;margin-bottom:1rem;">🔒</div>
-        <p style="font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:6px;">Kun for abonnenter</p>
-        <p style="font-size:13px;color:#888;margin-bottom:1.25rem;">Abonner på Standard eller Premium for å lese dagens børsoppsummering.</p>
-        <button onclick="location.href='/auth.html'" style="background:#1B3A5C;color:white;padding:10px 20px;border-radius:100px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
+    <div class="nl-body">
+      <div class="nl-story">
+        <div class="nl-story-tag">Oslo Børs i dag</div>
+        <div class="nl-story-title">Børsen opp 0,8% — men vær obs på dette</div>
+        <div class="nl-story-text">Olje dro opp. Men rentefrykten er ikke borte — og det kan snu raskt hvis inflasjonsdataene skuffer fredag.</div>
+      </div>
+      <div class="nl-story">
+        <div class="nl-story-tag">Bull vs. Bear</div>
+        <div class="nl-story-title">Equinor: To scenarioer</div>
+        <div class="nl-story-text">Bull: høy oljepris + utbytte = god avkastning. Bear: energiomstilling + prisfall kan halvere inntjeningen innen 2030.</div>
+      </div>
+      <div class="nl-story">
+        <div class="nl-story-tag">Risiko i dag</div>
+        <div class="nl-story-title">Tre ting som kan snu markedet</div>
+        <div class="nl-story-text">1) Fed-tale kl. 16. 2) Kinesiske importtall. 3) OPEC-møte neste uke. Hold øye med disse.</div>
       </div>
     </div>
   </div>
@@ -318,243 +295,13 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 
 <section class="cta-section">
   <div class="cta-title">Klar til å forstå børsen?</div>
-  <p class="cta-sub">Velg planen som passer deg — start gratis, oppgrader når du vil.</p>
-
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;max-width:800px;margin:2rem auto;">
-
-    <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:1.5rem;text-align:left;">
-      <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Gratis</div>
-      <div style="font-family:'Playfair Display',serif;font-size:28px;color:white;margin-bottom:4px;">0 kr</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:1.25rem;">For alltid</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);display:flex;gap:8px;">✓ Aksjesøk på Oslo Børs</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);display:flex;gap:8px;">✓ AI-sammendrag (5/dag)</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);display:flex;gap:8px;">✓ AI-chat (10 spørsmål/dag)</div>
-      </div>
-      <button onclick="location.href='/auth.html'" style="width:100%;padding:10px;border-radius:100px;border:1px solid rgba(255,255,255,0.3);background:none;color:white;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Start gratis →</button>
-    </div>
-
-    <div style="background:white;border-radius:16px;padding:1.5rem;text-align:left;position:relative;">
-      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#C8A96E;color:#1B3A5C;font-size:11px;font-weight:500;padding:3px 12px;border-radius:100px;white-space:nowrap;">Mest populær</div>
-      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Standard</div>
-      <div style="font-family:'Playfair Display',serif;font-size:28px;color:#1B3A5C;margin-bottom:4px;">59 kr</div>
-      <div style="font-size:12px;color:#888;margin-bottom:1.25rem;">per måned</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
-        <div style="font-size:13px;color:#555;display:flex;gap:8px;">✓ Alt i Gratis</div>
-        <div style="font-size:13px;color:#555;display:flex;gap:8px;">✓ Daglig børsoppsummering</div>
-        <div style="font-size:13px;color:#555;display:flex;gap:8px;">✓ Bull/bear-analyse på e-post</div>
-        <div style="font-size:13px;color:#555;display:flex;gap:8px;">✓ Ukentlig markedsrapport</div>
-      </div>
-      <button onclick="location.href='/auth.html'" style="width:100%;padding:10px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Abonner →</button>
-    </div>
-
-    <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:1.5rem;text-align:left;">
-      <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Premium</div>
-      <div style="font-family:'Playfair Display',serif;font-size:28px;color:white;margin-bottom:4px;">99 kr</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:1.25rem;">per måned</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);display:flex;gap:8px;">✓ Alt i Børsbrygg</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);display:flex;gap:8px;">✓ Ubegrenset AI-chat</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);display:flex;gap:8px;">✓ Alle nøkkeltall</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);display:flex;gap:8px;">✓ Prisvarsel på aksjer</div>
-      </div>
-      <button onclick="location.href='/auth.html'" style="width:100%;padding:10px;border-radius:100px;border:1px solid rgba(255,255,255,0.3);background:none;color:white;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
-    </div>
-
+  <p class="cta-sub">Gratis å starte. Ingen finansbakgrunn nødvendig. Alltid balansert.</p>
+  <div class="cta-input-row">
+    <input class="cta-input" type="email" placeholder="Din e-postadresse" />
+    <button class="cta-btn">Kom i gang →</button>
   </div>
-  <p class="footer-note">Ingen bindingstid. Avslutt når som helst.</p>
+  <p class="footer-note">Ingen spam. Avslutt når som helst.</p>
 </section>
 
-
-<script>
-const heroTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
-const watchlist = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
-
-const descriptions = {
-  'EQNR': 'Norges største oljeselskap. Henter opp olje og gass fra Nordsjøen og selger globalt.',
-  'DNB': 'Norges største bank. Tjener penger på renter fra lån og finansielle tjenester.',
-  'AKRBP': 'Et av Norges største uavhengige oljeselskaper. Fokuserer på Nordsjøen.',
-  'TEL': 'Nordens største telekomselskap. Selger mobil og bredbånd i Norge og Asia.',
-  'MOWI': 'Verdens største lakseoppdrettselskap. Produserer atlantisk laks globalt.',
-  'YAR': 'Verdens største produsent av kunstgjødsel. Gjør naturgass om til nitrogengjødsel.',
-  'NHY': 'Globalt aluminium- og energiselskap. Produserer aluminium fra råvare til ferdigprodukt.',
-  'KAHOT': 'Norsk ed-tech selskap. Driver quiz-plattformen Kahoot med 350+ millioner brukere.',
-};
-const sectors = {
-  'EQNR': ['Energi','Olje & gass','Oslo Børs'],
-  'DNB': ['Finans','Bank','Oslo Børs'],
-  'AKRBP': ['Energi','Olje','Oslo Børs'],
-  'TEL': ['Telekom','Mobil','Oslo Børs'],
-  'MOWI': ['Sjømat','Laks','Oslo Børs'],
-  'YAR': ['Kjemikalier','Gjødsel','Oslo Børs'],
-  'NHY': ['Industri','Aluminium','Oslo Børs'],
-  'KAHOT': ['Teknologi','Ed-tech','Oslo Børs'],
-};
-
-// Last inn tilfeldig aksje i hero-mockup
-async function loadHeroStock() {
-  const ticker = heroTickers[Math.floor(Math.random() * heroTickers.length)];
-  try {
-    const res = await fetch('/api/stock?ticker=' + ticker);
-    const s = await res.json();
-    if (s.error) return;
-    document.getElementById('heroTicker').textContent = s.ticker + ' · Oslo Børs';
-    document.getElementById('heroName').textContent = s.name;
-    document.getElementById('heroPrice').textContent = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
-    const sign = s.up ? '+' : '';
-    const badge = document.getElementById('heroBadge');
-    badge.textContent = sign + s.change + ' kr (' + sign + s.changePct + '%)';
-    badge.className = s.up ? 'badge-up' : 'badge-down';
-    document.getElementById('heroDesc').textContent = descriptions[s.ticker] || s.description || 'Notert på Oslo Børs.';
-    if (s.fiftyTwoWeekHigh) document.getElementById('heroHigh').textContent = parseFloat(s.fiftyTwoWeekHigh).toLocaleString('nb-NO', {minimumFractionDigits:2}) + ' kr';
-    if (s.fiftyTwoWeekLow) document.getElementById('heroLow').textContent = parseFloat(s.fiftyTwoWeekLow).toLocaleString('nb-NO', {minimumFractionDigits:2}) + ' kr';
-    const pills = (sectors[s.ticker] || []).map(p => `<span class="pill">${p}</span>`).join('');
-    document.getElementById('heroPills').innerHTML = pills;
-  } catch(e) {}
-}
-
-// Hent OSEBX indeks og vis stats
-async function loadStats() {
-  try {
-    // Hent OSEBX indeksdata
-    const indexRes = await fetch('/api/index');
-    const index = await indexRes.json();
-
-    if (!index.error) {
-      const sign = index.up ? '+' : '';
-      const priceEl = document.getElementById('statOSEBX');
-      priceEl.textContent = parseFloat(index.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
-      priceEl.style.color = index.up ? '#2C7A5C' : '#A32D2D';
-
-      const pctEl = document.getElementById('statOSEBXPct');
-      pctEl.textContent = sign + index.changePct + '%';
-      pctEl.style.color = index.up ? '#2C7A5C' : '#A32D2D';
-
-      if (index.volume) {
-        document.getElementById('statOSEBXVol').textContent = index.volume;
-      }
-    }
-
-    // Hent aksjedata for børsbrygg
-    const results = await Promise.all(
-      watchlist.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null))
-    );
-    const valid = results.filter(r => r && !r.error);
-    if (valid.length) loadBorsbrygg(valid);
-
-  } catch(e) {}
-}
-
-// Generer AI-børsbrygg
-async function loadBorsbrygg(stocks) {
-  const today = new Date().toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-  document.getElementById('nlDate').textContent = today.charAt(0).toUpperCase() + today.slice(1);
-
-  const stockSummary = stocks.map(s => {
-    const sign = parseFloat(s.changePct) >= 0 ? '+' : '';
-    return `${s.name} (${s.ticker}): ${s.price} NOK, ${sign}${s.changePct}%`;
-  }).join(', ');
-
-  try {
-    const res = await fetch('/api/summary', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ticker: 'OSLO',
-        name: 'Oslo Børs oppsummering',
-        description: `Dagens kursdata for norske aksjer: ${stockSummary}`,
-        price: '0',
-        currency: 'NOK',
-        changePct: '0',
-        up: true,
-        exchange: 'Oslo Børs',
-        _type: 'daily_summary'
-      })
-    });
-    const ai = await res.json();
-
-    // Finn vinner og taper for tittel
-    const sorted = [...stocks].sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
-    const winner = sorted[0];
-    const loser = sorted[sorted.length - 1];
-    document.getElementById('nlTitle').textContent = `${winner.name.split(' ')[0]} opp ${winner.changePct}% — ${loser.name.split(' ')[0]} ned ${Math.abs(loser.changePct)}%`;
-
-    const bullPoints = (ai.bull || []).slice(0, 2);
-    const bearPoints = (ai.bear || []).slice(0, 1);
-    const risk = ai.risiko || '';
-
-    document.getElementById('nlBody').innerHTML = `
-      <div class="nl-story">
-        <div class="nl-story-tag">Oslo Børs i dag</div>
-        <div class="nl-story-title">${ai.hva ? ai.hva.split('.')[0] : 'Markedsoppsummering'}</div>
-        <div class="nl-story-text">${bullPoints.join(' · ')}</div>
-      </div>
-      <div class="nl-story">
-        <div class="nl-story-tag">Risiko å følge med på</div>
-        <div class="nl-story-title">${bearPoints[0] || 'Se alle aksjer'}</div>
-        <div class="nl-story-text">${risk}</div>
-      </div>
-      <div class="nl-story">
-        <div class="nl-story-tag">Ikke finansiell rådgivning</div>
-        <div class="nl-story-title">Gjør egne vurderinger</div>
-        <div class="nl-story-text">Snakk med en finansrådgiver før du investerer.</div>
-      </div>`;
-  } catch(e) {
-    document.getElementById('nlTitle').textContent = 'Børsdata lastet — AI-analyse utilgjengelig';
-    document.getElementById('nlBody').innerHTML = '<div style="padding:1rem;font-size:13px;color:#aaa">Sjekk at GROQ_API_KEY er satt i Vercel.</div>';
-  }
-}
-
-// Supabase auth check
-const SUPABASE_URL = 'DIN_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'DIN_SUPABASE_ANON_KEY';
-
-async function checkAuth() {
-  try {
-    const { createClient } = window.supabase || {};
-    if (!createClient) return;
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const { data: { session } } = await sb.auth.getSession();
-
-    if (session) {
-      const user = session.user;
-      const name = user.user_metadata?.full_name || user.email.split('@')[0];
-      const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
-
-      document.getElementById('navAuth').style.display = 'none';
-      document.getElementById('navUser').style.display = 'flex';
-      document.getElementById('navAv').textContent = initials;
-      document.getElementById('navName').textContent = name.split(' ')[0];
-
-      // Sjekk abonnement (her: alle innloggede får tilgang til Børsbrygg for testing)
-      // Bytt til Stripe-sjekk når du går live
-      const isSubscriber = true; // TODO: bytt til ekte Stripe-sjekk
-
-      if (isSubscriber) {
-        document.getElementById('bbCta').style.display = 'none';
-        document.getElementById('nlTitle').textContent = 'Henter dagens børsoppsummering...';
-        document.getElementById('nlBody').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Laster AI-generert innhold...</div>';
-        // Last Børsbrygg-innhold
-        const results = await Promise.all(
-          watchlist.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null))
-        );
-        const valid = results.filter(r => r && !r.error);
-        if (valid.length) loadBorsbrygg(valid);
-      }
-    }
-  } catch(e) {}
-}
-
-// Kjør alt ved sidelast
-loadHeroStock();
-loadStats();
-if (typeof window !== 'undefined') {
-  const s = document.createElement('script');
-  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-  s.onload = checkAuth;
-  document.head.appendChild(s);
-}
-</script>
-</body>
 </body>
 </html>
