@@ -215,7 +215,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
     <div class="feature-card">
       <div class="feature-icon" style="background:#E6EEF5;">⚖️</div>
       <h3>Alltid begge sider</h3>
-      <p>For hvert selskap ser du bull-caset og bear-caset side om side. Du bestemmer selv — vi hjelper deg å forstå hva som kan gå galt.</p>
+      <p>For hvert selskap ser du bull-caset og bear-caset side om side. Du bestemmer selv — «Forstå mulighetene. Se risikoen»</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon" style="background:#EEE8DA;">📊</div>
@@ -363,4 +363,50 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 </section>
 
 </body>
-</html>
+<script>
+const heroTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
+const descriptions = {
+  'EQNR': 'Norges største oljeselskap. Henter opp olje og gass fra Nordsjøen og selger globalt.',
+  'DNB': 'Norges største bank. Tjener penger på renter fra lån og finansielle tjenester.',
+  'AKRBP': 'Et av Norges største uavhengige oljeselskaper. Fokuserer på Nordsjøen.',
+  'TEL': 'Nordens største telekomselskap. Selger mobil og bredbånd i Norge og Asia.',
+  'MOWI': 'Verdens største lakseoppdrettselskap. Produserer atlantisk laks globalt.',
+  'YAR': 'Verdens største produsent av kunstgjødsel. Gjør naturgass om til nitrogengjødsel.',
+  'NHY': 'Globalt aluminium- og energiselskap. Produserer aluminium fra råvare til ferdigprodukt.',
+  'KAHOT': 'Norsk ed-tech selskap. Driver quiz-plattformen Kahoot med 350+ millioner brukere.',
+};
+const sectors = {
+  'EQNR': ['Energi','Olje & gass','Oslo Børs'],
+  'DNB': ['Finans','Bank','Oslo Børs'],
+  'AKRBP': ['Energi','Olje','Oslo Børs'],
+  'TEL': ['Telekom','Mobil','Oslo Børs'],
+  'MOWI': ['Sjømat','Laks','Oslo Børs'],
+  'YAR': ['Kjemikalier','Gjødsel','Oslo Børs'],
+  'NHY': ['Industri','Aluminium','Oslo Børs'],
+  'KAHOT': ['Teknologi','Ed-tech','Oslo Børs'],
+};
+
+async function loadHeroStock() {
+  const ticker = heroTickers[Math.floor(Math.random() * heroTickers.length)];
+  try {
+    const res = await fetch('/api/stock?ticker=' + ticker);
+    const s = await res.json();
+    if (s.error) return;
+    document.getElementById('heroTicker').textContent = s.ticker + ' · Oslo Børs';
+    document.getElementById('heroName').textContent = s.name;
+    document.getElementById('heroPrice').textContent = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
+    const sign = s.up ? '+' : '';
+    const badge = document.getElementById('heroBadge');
+    badge.textContent = sign + s.change + ' kr (' + sign + s.changePct + '%)';
+    badge.className = s.up ? 'badge-up' : 'badge-down';
+    document.getElementById('heroDesc').textContent = descriptions[s.ticker] || 'Notert på Oslo Børs.';
+    if (s.fiftyTwoWeekHigh) document.getElementById('heroHigh').textContent = parseFloat(s.fiftyTwoWeekHigh).toLocaleString('nb-NO', {minimumFractionDigits:2}) + ' kr';
+    if (s.fiftyTwoWeekLow) document.getElementById('heroLow').textContent = parseFloat(s.fiftyTwoWeekLow).toLocaleString('nb-NO', {minimumFractionDigits:2}) + ' kr';
+    const pills = (sectors[s.ticker] || []).map(function(p) { return '<span class="pill">' + p + '</span>'; }).join('');
+    document.getElementById('heroPills').innerHTML = pills;
+  } catch(e) {}
+}
+
+loadHeroStock();
+</script>
+</body>
