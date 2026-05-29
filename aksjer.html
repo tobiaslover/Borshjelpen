@@ -35,7 +35,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
   border-top-color: #1B3A5C;
   font-weight: 500;
 }
-.search-hero { background: #1B3A5C; padding: 2.5rem 2rem; text-align: center; }
+.search-hero { background: #1B3A5C; padding: 2.5rem 2rem; text-align: center; overflow: visible; position: relative; z-index: 1; }
 .search-title { font-family: 'Playfair Display', serif; font-size: 28px; color: white; margin-bottom: 6px; }
 .search-sub { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; }
 .search-bar { display: flex; gap: 8px; max-width: 520px; margin: 0 auto; }
@@ -139,7 +139,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 }
 
 .search-wrap { position: relative; max-width: 520px; margin: 0 auto; }
-.autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); overflow: hidden; z-index: 100; margin-top: 4px; }
+.autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); overflow: hidden; z-index: 9999; margin-top: 4px; }
 .autocomplete-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
 .autocomplete-item:last-child { border-bottom: none; }
 .autocomplete-item:hover { background: #f8f7f4; }
@@ -156,7 +156,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
     <a href="borshjelpen.html" class="nav-tab">Hjem</a>
     <a href="aksjer.html" class="nav-tab active">Aksjer</a>
     <a href="#" class="nav-tab">Lær</a>
-    <a href="#" class="nav-tab">Nyhetsbrev</a>
+    <a href="#" class="nav-tab">Børsbrygg</a>
   </div>
 </nav>
 
