@@ -54,7 +54,10 @@ Svar KUN med gyldig JSON, ingen markdown, ingen forklaring:
 Regler: ingen kjøpsanbefalinger, alltid vis risiko, presenter begge sider, skriv norsk bokmål.`;
 
   try {
+    const groqController = new AbortController();
+    const groqTimeout = setTimeout(() => groqController.abort(), 8000);
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      signal: groqController.signal,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,6 +74,7 @@ Regler: ingen kjøpsanbefalinger, alltid vis risiko, presenter begge sider, skri
       })
     });
 
+    clearTimeout(groqTimeout);
     if (!response.ok) {
       const err = await response.json();
       return res.status(500).json({ error: 'Groq API feil', detail: err });
