@@ -352,6 +352,11 @@ document.getElementById('searchInput').addEventListener('keydown', function(e) {
   if (e.key === 'Escape') document.getElementById('acList').style.display = 'none';
 });
 
+// Søk automatisk hvis ticker er i URL
+const urlParams = new URLSearchParams(window.location.search);
+const urlTicker = urlParams.get('ticker');
+if (urlTicker) search(urlTicker);
+
 // Chat
 function addMsg(role, text) {
   const c = document.getElementById('chatMessages');
