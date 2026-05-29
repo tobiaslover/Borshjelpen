@@ -8,14 +8,12 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
-
 nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid #e8e8e8; }
 .logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
 .logo span { color: #C8A96E; }
 .nav-tabs { display: flex; }
 .nav-tab { font-size: 13px; padding: 6px 16px; color: #666; background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
 .nav-tab.active { color: #1B3A5C; border-bottom: 2px solid #1B3A5C; font-weight: 500; }
-
 .search-hero { background: #1B3A5C; padding: 2.5rem 2rem; text-align: center; }
 .search-title { font-family: 'Playfair Display', serif; font-size: 28px; color: white; margin-bottom: 6px; }
 .search-sub { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; }
@@ -26,14 +24,10 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .suggestions { display: flex; gap: 8px; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
 .suggest-pill { font-size: 12px; padding: 4px 12px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); cursor: pointer; background: none; font-family: 'DM Sans', sans-serif; }
 .suggest-pill:hover { background: rgba(255,255,255,0.1); color: white; }
-
 .content { max-width: 900px; margin: 0 auto; padding: 2rem; }
-
 .loading { text-align: center; padding: 3rem; color: #888; }
 .loading-spinner { width: 32px; height: 32px; border: 2px solid #e8e8e8; border-top-color: #1B3A5C; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-step { font-size: 13px; color: #aaa; margin-top: 6px; }
-
 .result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e8e8e8; }
 .result-company { display: flex; align-items: center; gap: 14px; }
 .company-logo { width: 52px; height: 52px; border-radius: 12px; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-family: 'Tenor Sans', sans-serif; font-size: 12px; color: #C8A96E; letter-spacing: 1px; flex-shrink: 0; }
@@ -43,106 +37,84 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .price-main { font-size: 28px; font-weight: 500; }
 .badge-up { font-size: 13px; background: #1A5C3A; color: #6ECFA0; padding: 4px 10px; border-radius: 100px; font-weight: 500; display: inline-block; margin-top: 5px; }
 .badge-down { font-size: 13px; background: #5C1B1B; color: #F09595; padding: 4px 10px; border-radius: 100px; font-weight: 500; display: inline-block; margin-top: 5px; }
-
 .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
 .metric { background: #f8f7f4; border-radius: 10px; padding: 12px 14px; }
 .metric-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
 .metric-val { font-size: 18px; font-weight: 500; }
 .metric-val.na { color: #ccc; font-size: 14px; }
-
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
 .card { background: #fff; border: 1px solid #e8e8e8; border-radius: 14px; padding: 1.25rem; }
 .card-title { font-size: 11px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 .card p { font-size: 13px; line-height: 1.7; color: #1a1a1a; }
-
 .ai-loading { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #f8f7f4; border-radius: 10px; margin-bottom: 1rem; }
 .ai-spinner { width: 18px; height: 18px; border: 2px solid #e8e8e8; border-top-color: #C8A96E; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
 .ai-loading p { font-size: 13px; color: #888; }
-
 .bull-bear { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
 .bull { border-left: 3px solid #1A5C3A; border-radius: 0 14px 14px 0; }
 .bear { border-left: 3px solid #5C1B1B; border-radius: 0 14px 14px 0; }
 .bull .card-title { color: #2C7A5C; }
 .bear .card-title { color: #A32D2D; }
-.point { display: flex; gap: 8px; margin-bottom: 6px; font-size: 13px; color: #1a1a1a; line-height: 1.5; }
+.point { display: flex; gap: 8px; margin-bottom: 6px; font-size: 13px; line-height: 1.5; }
 .dot-up { width: 6px; height: 6px; border-radius: 50%; background: #2C7A5C; margin-top: 6px; flex-shrink: 0; }
 .dot-down { width: 6px; height: 6px; border-radius: 50%; background: #A32D2D; margin-top: 6px; flex-shrink: 0; }
-
 .scenario-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .scenario-label { font-size: 13px; min-width: 160px; }
 .scenario-prob { font-size: 11px; color: #888; min-width: 36px; }
 .scenario-bar-bg { flex: 1; height: 8px; background: #e8e8e8; border-radius: 4px; }
 .scenario-bar-fill { height: 100%; border-radius: 4px; }
 .scenario-return { font-size: 13px; font-weight: 500; min-width: 100px; text-align: right; }
-
 .stat-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
 .stat-row:last-child { border-bottom: none; }
 .stat-label { color: #888; }
 .stat-val { font-weight: 500; }
-
 .tip-box { background: #EEE8DA; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; gap: 10px; align-items: flex-start; }
-.tip-icon { font-size: 18px; flex-shrink: 0; }
 .tip-text { font-size: 13px; line-height: 1.6; color: #5a4520; }
-
 .disclaimer { font-size: 11px; color: #aaa; font-style: italic; text-align: center; padding: 1.5rem 1rem 0; border-top: 1px solid #e8e8e8; margin-top: 1rem; }
-
 .trending { margin-top: 2rem; }
 .trending-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
 .trending-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.trending-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1rem; cursor: pointer; transition: border-color 0.15s; }
+.trending-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1rem; cursor: pointer; }
 .trending-card:hover { border-color: #1B3A5C; }
 .t-ticker { font-size: 11px; color: #888; margin-bottom: 2px; }
 .t-name { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
 .t-price-row { display: flex; justify-content: space-between; align-items: center; }
-
 .error-box { text-align: center; padding: 3rem; color: #888; }
 
-/* ===== MOBILVISNING ===== */
+/* Chat */
+.chat-widget { max-width: 900px; margin: 2rem auto; padding: 0 2rem; }
+.chat-container { border: 1px solid #e8e8e8; border-radius: 16px; overflow: hidden; }
+.chat-header { background: #1B3A5C; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 10px; }
+.chat-avatar { width: 32px; height: 32px; border-radius: 50%; background: #C8A96E; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #1B3A5C; font-weight: 500; }
+.chat-header-name { font-size: 14px; color: white; font-weight: 500; }
+.chat-header-status { font-size: 11px; color: rgba(255,255,255,0.5); }
+.chat-badge { font-size: 10px; background: rgba(200,169,110,.2); color: #C8A96E; padding: 3px 10px; border-radius: 100px; border: 1px solid rgba(200,169,110,.3); margin-left: auto; }
+.chat-messages { height: 300px; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 12px; background: #fff; }
+.msg-wrap { display: flex; flex-direction: column; }
+.msg-wrap.user { align-items: flex-end; }
+.msg-wrap.ai { align-items: flex-start; }
+.msg-bubble { max-width: 78%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.65; }
+.msg-bubble.user { background: #1B3A5C; color: white; border-radius: 16px 16px 4px 16px; }
+.msg-bubble.ai { background: #f8f7f4; color: #1a1a1a; border-radius: 16px 16px 16px 4px; }
+.chat-disclaimer { font-size: 11px; color: #bbb; font-style: italic; padding: 8px 1.25rem; border-top: 1px solid #f0f0f0; text-align: center; }
+.chat-suggestions { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 1rem; }
+.csug { font-size: 11px; padding: 4px 10px; border-radius: 100px; border: 1px solid #e8e8e8; color: #666; cursor: pointer; background: none; font-family: 'DM Sans', sans-serif; }
+.csug:hover { border-color: #1B3A5C; color: #1B3A5C; }
+.chat-input-row { display: flex; gap: 8px; padding: .9rem 1rem; border-top: 1px solid #e8e8e8; }
+.chat-input { flex: 1; padding: 9px 14px; border-radius: 100px; border: 1px solid #e8e8e8; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; }
+.chat-input:focus { border-color: #1B3A5C; }
+.chat-send { background: #1B3A5C; color: white; border: none; border-radius: 100px; padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.chat-send:disabled { background: #ccc; }
+
 @media (max-width: 768px) {
-  nav { padding: .9rem 1rem; }
   .nav-tabs { display: none; }
-  .logo { font-size: 15px; }
-
-  .search-hero { padding: 1.5rem 1rem; }
-  .search-title { font-size: 20px; }
-  .search-bar { flex-direction: column; border-radius: 12px; }
-  .si { border-radius: 100px !important; }
-  .sb { border-radius: 100px !important; }
-  .pills { gap: 5px; }
-
-  .content { padding: 1rem; }
-
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .bull-bear { grid-template-columns: 1fr; }
   .result-header { flex-direction: column; gap: 1rem; }
   .price-block { text-align: left; }
-
-  .metrics { grid-template-columns: repeat(2, 1fr); }
-  .grid2 { grid-template-columns: 1fr; }
-  .bull-bear { grid-template-columns: 1fr; }
-  .scenario-row { flex-wrap: wrap; gap: 6px; }
-  .scenario-label { min-width: unset; font-size: 12px; }
-  .scenario-return { min-width: unset; }
-
   .trending-grid { grid-template-columns: repeat(2, 1fr); }
-
-  .quarterly-body { grid-template-columns: 1fr; }
-  .quarterly-header { flex-direction: column; gap: 8px; align-items: flex-start; }
-
   .chat-widget { padding: 0 1rem; }
-  .quarterly-box { padding: 0 1rem; }
-  .chat-header { flex-wrap: wrap; gap: 6px; }
-  .chat-badge { margin-left: 0; }
+  .content { padding: 1rem; }
 }
-
-.chart-box { background: #fff; border: 1px solid #e8e8e8; border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; }
-.chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-.chart-label { font-size: 11px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 1px; }
-.chart-tabs { display: flex; gap: 4px; }
-.chart-tab { font-size: 12px; padding: 4px 10px; border-radius: 100px; border: 1px solid #e8e8e8; background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; color: #888; }
-.chart-tab.active { background: #1B3A5C; color: white; border-color: #1B3A5C; }
-.chart-wrap { position: relative; height: 180px; }
-.chart-loading { display: flex; align-items: center; justify-content: center; height: 180px; color: #aaa; font-size: 13px; gap: 8px; }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 </head>
 <body>
 
@@ -160,7 +132,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
   <div class="search-title">Søk opp en aksje</div>
   <div class="search-sub">Alle aksjer på Oslo Børs — AI forklarer alt på norsk</div>
   <div class="search-bar">
-    <input id="searchInput" class="search-input" type="text" placeholder="F.eks. Equinor, EQNR, DNB, Aker BP ..." autofocus />
+    <input id="searchInput" class="search-input" type="text" placeholder="F.eks. Equinor, EQNR, DNB ..." autofocus />
     <button class="search-btn" onclick="doSearch()">Søk</button>
   </div>
   <div class="search-hint">Skriv ticker direkte — EQNR, DNB, TEL, AKRBP, MOWI, YAR, NHY</div>
@@ -181,179 +153,150 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
   <div id="trending"></div>
 </div>
 
+<div class="chat-widget" id="chatWidget" style="display:none">
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="chat-avatar">BH</div>
+      <div>
+        <div class="chat-header-name">Børshjelpen AI</div>
+        <div class="chat-header-status">Still spørsmål om aksjen</div>
+      </div>
+      <div class="chat-badge">Ingen finansiell rådgivning</div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg-wrap ai">
+        <div class="msg-bubble ai" id="welcomeMsg">Hei! Still meg spørsmål om aksjer og børsen. Jeg gir aldri kjøpsanbefalinger.</div>
+      </div>
+    </div>
+    <div class="chat-disclaimer">Ikke finansiell rådgivning · Snakk med en rådgiver for investeringsbeslutninger</div>
+    <div class="chat-suggestions" id="chatSuggestions">
+      <button class="csug" onclick="askSug(this)">Hva er P/E?</button>
+      <button class="csug" onclick="askSug(this)">Hva er beta?</button>
+      <button class="csug" onclick="askSug(this)">Hva er utbytte?</button>
+    </div>
+    <div class="chat-input-row">
+      <input id="chatInput" class="chat-input" type="text" placeholder="Still et spørsmål..." />
+      <button id="chatSendBtn" class="chat-send" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
 <script>
 function fmt(val) { return (val === null || val === undefined) ? '—' : val; }
 
-function showLoading(step) {
-  document.getElementById('result').innerHTML = `
-    <div class="loading">
-      <div class="loading-spinner"></div>
-      <p>Henter data fra Oslo Børs...</p>
-      <p class="loading-step">${step || ''}</p>
-    </div>`;
+let chatHistory = [];
+let currentStockContext = null;
+
+function showLoading() {
+  document.getElementById('result').innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Henter data...</p></div>';
   document.getElementById('trending').innerHTML = '';
 }
 
 function showError(msg) {
-  document.getElementById('result').innerHTML = `
-    <div class="error-box">
-      <p style="font-size:32px; margin-bottom:1rem">🔍</p>
-      <p style="font-size:15px; font-weight:500; margin-bottom:6px">${msg}</p>
-      <p style="font-size:13px; color:#aaa">Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI</p>
-    </div>`;
+  document.getElementById('result').innerHTML = '<div class="error-box"><p style="font-size:32px;margin-bottom:1rem">🔍</p><p style="font-size:15px;font-weight:500">' + msg + '</p><p style="font-size:13px;color:#aaa">Prøv f.eks. EQNR, DNB, TEL</p></div>';
 }
 
 async function search(ticker) {
   document.getElementById('searchInput').value = ticker;
-  showLoading('Kobler til Twelve Data...');
-
-  let stockData;
+  showLoading();
+  let s;
   try {
-    const res = await fetch(`/api/stock?ticker=${encodeURIComponent(ticker)}`);
-    stockData = await res.json();
-    if (!res.ok || stockData.error) { showError(stockData.error || 'Aksje ikke funnet'); return; }
-  } catch(e) {
-    showError('Kunne ikke koble til server. Er du på Vercel?'); return;
-  }
+    const res = await fetch('/api/stock?ticker=' + encodeURIComponent(ticker));
+    s = await res.json();
+    if (!res.ok || s.error) { showError(s.error || 'Aksje ikke funnet'); return; }
+  } catch(e) { showError('Kunne ikke koble til server.'); return; }
 
-  renderStockShell(stockData);
-  generateAISummary(stockData);
+  renderStock(s);
+  generateAI(s);
 }
 
-function renderStockShell(s) {
+function renderStock(s) {
   const priceStr = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
   const sign = s.up ? '+' : '';
   const changeStr = sign + parseFloat(s.change).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
   const pctStr = sign + parseFloat(s.changePct).toFixed(2) + '%';
 
-  document.getElementById('result').innerHTML = `
-    <div class="result-header">
-      <div class="result-company">
-        <div class="company-logo">${s.ticker.replace('.OL','').slice(0,4)}</div>
-        <div>
-          <div class="company-name">${s.name}</div>
-          <div class="company-meta">${s.exchange} · ${s.ticker}${s.sector ? ' · ' + s.sector : ''}</div>
-        </div>
-      </div>
-      <div class="price-block">
-        <div class="price-main">${priceStr} ${s.currency}</div>
-        <span class="${s.up ? 'badge-up' : 'badge-down'}" title="Endring siden åpningskurs i dag">${changeStr} kr &nbsp; (${pctStr}) siden åpning</span>
-        <div style="font-size:10px;color:#aaa;margin-top:4px;text-align:right;">Endring fra dagens åpningskurs</div>
-      </div>
-    </div>
-
-    <div class="metrics">
-      <div class="metric"><div class="metric-label">P/E</div><div class="metric-val ${!s.pe?'na':''}">${fmt(s.pe)}</div></div>
-      <div class="metric"><div class="metric-label">Utbytte</div><div class="metric-val ${!s.dividendYield?'na':''}">${fmt(s.dividendYield)}</div></div>
-      <div class="metric"><div class="metric-label">Markedsverdi</div><div class="metric-val ${!s.marketCap?'na':''}">${fmt(s.marketCap)}</div></div>
-      <div class="metric"><div class="metric-label">Beta</div><div class="metric-val ${!s.beta?'na':''}">${fmt(s.beta)}</div></div>
-    </div>
-
-    <div id="ai-section">
-      <div class="ai-loading">
-        <div class="ai-spinner"></div>
-        <p>AI analyserer selskapet og genererer norsk sammendrag...</p>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:1rem">
-      <div class="card-title">Nøkkeltall</div>
-      <div class="stat-row"><span class="stat-label">52 ukers høy</span><span class="stat-val">${fmt(s.fiftyTwoWeekHigh)} ${s.currency}</span></div>
-      <div class="stat-row"><span class="stat-label">52 ukers lav</span><span class="stat-val">${fmt(s.fiftyTwoWeekLow)} ${s.currency}</span></div>
-      <div class="stat-row"><span class="stat-label">Fremtidig P/E</span><span class="stat-val">${fmt(s.forwardPE)}</span></div>
-      <div class="stat-row"><span class="stat-label">Profittmargin</span><span class="stat-val">${fmt(s.profitMargin)}</span></div>
-      <div class="stat-row"><span class="stat-label">Egenkapitalavkastning</span><span class="stat-val">${fmt(s.returnOnEquity)}</span></div>
-      <div class="stat-row"><span class="stat-label">Inntjeningsvekst</span><span class="stat-val">${fmt(s.revenueGrowth)}</span></div>
-      ${s.employees ? `<div class="stat-row"><span class="stat-label">Ansatte</span><span class="stat-val">${parseInt(s.employees).toLocaleString('nb-NO')}</span></div>` : ''}
-      ${s.industry ? `<div class="stat-row"><span class="stat-label">Bransje</span><span class="stat-val">${s.industry}</span></div>` : ''}
-      ${s.volume ? `<div class="stat-row"><span class="stat-label">Volum i dag</span><span class="stat-val">${s.volume}</span></div>` : ''}
-    </div>
-
-    <div class="disclaimer">
-      Data fra Yahoo Finance · Kurser forsinket ca. 15–20 min · Endring viser forskjell fra gårsdagens sluttkurs · Dette er ikke finansiell rådgivning. Gjør egne vurderinger eller snakk med en finansrådgiver.
-    </div>
-
-    <div id="ai-section">
-      <div class="ai-loading">
-        <div class="ai-spinner"></div>
-        <p>AI analyserer selskapet og genererer norsk sammendrag...</p>
-      </div>
-    </div>`;
+  document.getElementById('result').innerHTML =
+    '<div class="result-header">' +
+      '<div class="result-company">' +
+        '<div class="company-logo">' + s.ticker.slice(0,4) + '</div>' +
+        '<div><div class="company-name">' + s.name + '</div>' +
+        '<div class="company-meta">' + s.exchange + ' · ' + s.ticker + (s.sector ? ' · ' + s.sector : '') + '</div></div>' +
+      '</div>' +
+      '<div class="price-block">' +
+        '<div class="price-main">' + priceStr + ' ' + s.currency + '</div>' +
+        '<span class="' + (s.up ? 'badge-up' : 'badge-down') + '">' + changeStr + ' kr &nbsp; (' + pctStr + ') siden forrige sluttkurs</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="metrics">' +
+      '<div class="metric"><div class="metric-label">P/E</div><div class="metric-val ' + (!s.pe ? 'na' : '') + '">' + fmt(s.pe) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Utbytte</div><div class="metric-val ' + (!s.dividendYield ? 'na' : '') + '">' + fmt(s.dividendYield) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Markedsverdi</div><div class="metric-val ' + (!s.marketCap ? 'na' : '') + '">' + fmt(s.marketCap) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Beta</div><div class="metric-val ' + (!s.beta ? 'na' : '') + '">' + fmt(s.beta) + '</div></div>' +
+    '</div>' +
+    '<div id="ai-section"><div class="ai-loading"><div class="ai-spinner"></div><p>AI analyserer selskapet...</p></div></div>' +
+    '<div class="card" style="margin-bottom:1rem;margin-top:1rem">' +
+      '<div class="card-title">Nøkkeltall</div>' +
+      '<div class="stat-row"><span class="stat-label">52 ukers høy</span><span class="stat-val">' + fmt(s.fiftyTwoWeekHigh) + ' ' + s.currency + '</span></div>' +
+      '<div class="stat-row"><span class="stat-label">52 ukers lav</span><span class="stat-val">' + fmt(s.fiftyTwoWeekLow) + ' ' + s.currency + '</span></div>' +
+      '<div class="stat-row"><span class="stat-label">Profittmargin</span><span class="stat-val">' + fmt(s.profitMargin) + '</span></div>' +
+      '<div class="stat-row"><span class="stat-label">Egenkapitalavkastning</span><span class="stat-val">' + fmt(s.returnOnEquity) + '</span></div>' +
+      (s.industry ? '<div class="stat-row"><span class="stat-label">Bransje</span><span class="stat-val">' + s.industry + '</span></div>' : '') +
+      (s.volume ? '<div class="stat-row"><span class="stat-label">Volum</span><span class="stat-val">' + s.volume + '</span></div>' : '') +
+    '</div>' +
+    '<div class="disclaimer">Data fra Yahoo Finance · Forsinket ca. 15–20 min · Ikke finansiell rådgivning</div>';
 
   document.getElementById('trending').innerHTML = '';
-  showChat(s);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
+  // Vis chat
+  currentStockContext = s;
+  const widget = document.getElementById('chatWidget');
+  widget.style.display = 'block';
+  document.getElementById('welcomeMsg').textContent = 'Hei! Jeg ser du ser på ' + s.name + '. Still meg spørsmål — jeg gir aldri kjøpsanbefalinger.';
+  document.getElementById('chatSuggestions').innerHTML =
+    '<button class="csug" onclick="askSug(this)">Hva gjør ' + s.name.split(' ')[0] + '?</button>' +
+    '<button class="csug" onclick="askSug(this)">Hva er risikoen?</button>' +
+    '<button class="csug" onclick="askSug(this)">Hva er P/E?</button>';
+  chatHistory = [];
 }
 
-async function generateAISummary(s) {
+async function generateAI(s) {
   try {
     const res = await fetch('/api/summary', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(s)
     });
-
     const ai = await res.json();
+    const sec = document.getElementById('ai-section');
+    if (!sec) return;
+
     if (!res.ok || ai.error) {
-      document.getElementById('ai-section').innerHTML = `
-        <div style="padding:1rem; background:#fff8f0; border-radius:10px; font-size:13px; color:#888; margin-bottom:1rem;">
-          AI-sammendrag ikke tilgjengelig: ${ai.error || res.status}
-        </div>`;
+      sec.innerHTML = '<div style="padding:1rem;background:#fff8f0;border-radius:10px;font-size:13px;color:#888;margin-bottom:1rem;">AI-sammendrag ikke tilgjengelig: ' + (ai.error || res.status) + '</div>';
       return;
     }
 
-    const scenariosHtml = (ai.scenarios || []).map(sc => `
-      <div class="scenario-row">
-        <span class="scenario-label" style="color:${sc.color}">${sc.label}</span>
-        <span class="scenario-prob">${sc.prob}%</span>
-        <div class="scenario-bar-bg"><div class="scenario-bar-fill" style="width:${sc.prob}%;background:${sc.barColor}"></div></div>
-        <span class="scenario-return" style="color:${sc.color}">${sc.return}</span>
-      </div>`).join('');
+    const scenariosHtml = (ai.scenarios || []).map(function(sc) {
+      return '<div class="scenario-row"><span class="scenario-label" style="color:' + sc.color + '">' + sc.label + '</span><span class="scenario-prob">' + sc.prob + '%</span><div class="scenario-bar-bg"><div class="scenario-bar-fill" style="width:' + sc.prob + '%;background:' + sc.barColor + '"></div></div><span class="scenario-return" style="color:' + sc.color + '">' + sc.return + '</span></div>';
+    }).join('');
 
-    const bullHtml = (ai.bull || []).map(p => `
-      <div class="point"><div class="dot-up"></div><span>${p}</span></div>`).join('');
+    const bullHtml = (ai.bull || []).map(function(p) { return '<div class="point"><div class="dot-up"></div><span>' + p + '</span></div>'; }).join('');
+    const bearHtml = (ai.bear || []).map(function(p) { return '<div class="point"><div class="dot-down"></div><span>' + p + '</span></div>'; }).join('');
 
-    const bearHtml = (ai.bear || []).map(p => `
-      <div class="point"><div class="dot-down"></div><span>${p}</span></div>`).join('');
-
-    document.getElementById('ai-section').innerHTML = `
-      <div class="card" style="margin-bottom:1rem">
-        <div class="card-title">Hva gjør selskapet?</div>
-        <p>${ai.hva || '—'}</p>
-      </div>
-
-      <div class="bull-bear">
-        <div class="card bull">
-          <div class="card-title">Bull-case — argumenter for</div>
-          ${bullHtml}
-        </div>
-        <div class="card bear">
-          <div class="card-title">Bear-case — argumenter mot</div>
-          ${bearHtml}
-        </div>
-      </div>
-
-      <div class="card" style="margin-bottom:1rem">
-        <div class="card-title">Scenarioer neste 12 måneder</div>
-        ${scenariosHtml}
-      </div>
-
-      <div class="card" style="margin-bottom:1rem">
-        <div class="card-title">Risiko</div>
-        <p style="font-size:13px; line-height:1.7">${ai.risiko || '—'}</p>
-      </div>
-
-      ${ai.nybegynner_tips ? `
-      <div class="tip-box">
-        <div class="tip-icon">💡</div>
-        <div class="tip-text"><strong>Tips til nybegynnere:</strong> ${ai.nybegynner_tips}</div>
-      </div>` : ''}`;
+    sec.innerHTML =
+      '<div class="card" style="margin-bottom:1rem"><div class="card-title">Hva gjør selskapet?</div><p>' + (ai.hva || '—') + '</p></div>' +
+      '<div class="bull-bear">' +
+        '<div class="card bull"><div class="card-title">Bull-case</div>' + bullHtml + '</div>' +
+        '<div class="card bear"><div class="card-title">Bear-case</div>' + bearHtml + '</div>' +
+      '</div>' +
+      '<div class="card" style="margin-bottom:1rem"><div class="card-title">Scenarioer neste 12 måneder</div>' + scenariosHtml + '</div>' +
+      '<div class="card" style="margin-bottom:1rem"><div class="card-title">Risiko</div><p style="font-size:13px;line-height:1.7">' + (ai.risiko || '—') + '</p></div>' +
+      (ai.nybegynner_tips ? '<div class="tip-box"><div class="tip-text"><strong>Tips:</strong> ' + ai.nybegynner_tips + '</div></div>' : '');
 
   } catch(e) {
-    document.getElementById('ai-section').innerHTML = `
-      <div style="padding:1rem; background:#fff8f0; border-radius:10px; font-size:13px; color:#888; margin-bottom:1rem;">
-        Kunne ikke generere AI-sammendrag.
-      </div>`;
+    const sec = document.getElementById('ai-section');
+    if (sec) sec.innerHTML = '<div style="padding:1rem;background:#fff8f0;border-radius:10px;font-size:13px;color:#888;margin-bottom:1rem;">Kunne ikke generere AI-sammendrag.</div>';
   }
 }
 
@@ -362,225 +305,33 @@ function doSearch() {
   if (val) search(val);
 }
 
-document.getElementById('searchInput').addEventListener('keydown', e => {
+document.getElementById('searchInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') doSearch();
 });
 
-const popular = [
-  {ticker:'EQNR', name:'Equinor'},
-  {ticker:'DNB', name:'DNB Bank'},
-  {ticker:'AKRBP', name:'Aker BP'},
-  {ticker:'TEL', name:'Telenor'},
-  {ticker:'MOWI', name:'Mowi'},
-  {ticker:'YAR', name:'Yara International'},
-];
-
-document.getElementById('trending').innerHTML = `
-  <div class="trending">
-    <div class="trending-label">Populære aksjer på Oslo Børs</div>
-    <div class="trending-grid">
-      ${popular.map(s => `
-        <div class="trending-card" onclick="search('${s.ticker}')">
-          <div class="t-ticker">${s.ticker}.OL</div>
-          <div class="t-name">${s.name}</div>
-          <div class="t-price-row">
-            <span style="font-size:12px;color:#aaa">Klikk for live data + AI</span>
-            <span style="font-size:11px;color:#C8A96E">→</span>
-          </div>
-        </div>`).join('')}
-    </div>
-  </div>`;
-</script>
-
-<script>
-let currentChartTicker = null;
-let priceChartInstance = null;
-
-async function loadChart(ticker, range, btnEl) {
-  if (btnEl) {
-    document.querySelectorAll('.chart-tab').forEach(function(b) { b.classList.remove('active'); });
-    btnEl.classList.add('active');
-  }
-
-  var loading = document.getElementById('chartLoading');
-  var svgWrap = document.getElementById('chartSvgWrap');
-  if (!loading || !svgWrap) return;
-
-  loading.style.display = 'flex';
-  svgWrap.style.display = 'none';
-  svgWrap.innerHTML = '';
-
-  try {
-    var res = await fetch('/api/chart?ticker=' + ticker + '&range=' + range);
-    var data = await res.json();
-
-    if (!data.points || data.points.length === 0) {
-      loading.innerHTML = 'Ingen data tilgjengelig';
-      return;
-    }
-
-    var prices = data.points.map(function(d) { return d.p; });
-    var times = data.points.map(function(d) { return d.t; });
-    var n = prices.length;
-    var minP = Math.min.apply(null, prices);
-    var maxP = Math.max.apply(null, prices);
-    var rangeP = maxP - minP || 1;
-    var isUp = prices[n-1] >= prices[0];
-    var strokeColor = isUp ? '#2C7A5C' : '#A32D2D';
-    var fillColor = isUp ? 'rgba(44,122,92,0.1)' : 'rgba(163,45,45,0.08)';
-
-    var W = 700, H = 150, PAD = 10;
-
-    var pts = prices.map(function(p, i) {
-      var x = PAD + (i / (n-1)) * (W - PAD*2);
-      var y = PAD + (1 - (p - minP) / rangeP) * (H - PAD*2);
-      return x.toFixed(1) + ',' + y.toFixed(1);
-    });
-
-    var linePath = 'M ' + pts.join(' L ');
-    var lastX = (PAD + W - PAD*2).toFixed(1);
-    var fillPath = linePath + ' L ' + lastX + ',' + (H-PAD) + ' L ' + PAD + ',' + (H-PAD) + ' Z';
-
-    var ns = 'http://www.w3.org/2000/svg';
-    var svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('viewBox', '0 0 ' + (W+50) + ' ' + (H+20));
-    svg.style.width = '100%';
-    svg.style.height = '160px';
-    svg.style.display = 'block';
-
-    // Fill area
-    var fillEl = document.createElementNS(ns, 'path');
-    fillEl.setAttribute('d', fillPath);
-    fillEl.setAttribute('fill', fillColor);
-    svg.appendChild(fillEl);
-
-    // Grid lines
-    for (var i = 0; i <= 3; i++) {
-      var p = minP + (i/3) * rangeP;
-      var y = PAD + (1 - i/3) * (H - PAD*2);
-      var line = document.createElementNS(ns, 'line');
-      line.setAttribute('x1', PAD); line.setAttribute('y1', y.toFixed(1));
-      line.setAttribute('x2', W-PAD); line.setAttribute('y2', y.toFixed(1));
-      line.setAttribute('stroke', '#e8e8e8'); line.setAttribute('stroke-width', '0.5');
-      svg.appendChild(line);
-      var txt = document.createElementNS(ns, 'text');
-      txt.setAttribute('x', W-PAD+4); txt.setAttribute('y', y.toFixed(1));
-      txt.setAttribute('font-size', '10'); txt.setAttribute('fill', '#aaa');
-      txt.setAttribute('dominant-baseline', 'middle');
-      txt.textContent = p.toFixed(0);
-      svg.appendChild(txt);
-    }
-
-    // Price line
-    var pathEl = document.createElementNS(ns, 'path');
-    pathEl.setAttribute('d', linePath);
-    pathEl.setAttribute('fill', 'none');
-    pathEl.setAttribute('stroke', strokeColor);
-    pathEl.setAttribute('stroke-width', '1.5');
-    pathEl.setAttribute('stroke-linejoin', 'round');
-    svg.appendChild(pathEl);
-
-    // X labels
-    var labelCount = 5;
-    for (var i = 0; i < labelCount; i++) {
-      var idx = Math.floor(i * (n-1) / (labelCount-1));
-      var x = PAD + (idx/(n-1)) * (W - PAD*2);
-      var date = new Date(times[idx]);
-      var label = range === '1d'
-        ? date.toLocaleTimeString('nb-NO', {hour:'2-digit', minute:'2-digit'})
-        : date.toLocaleDateString('nb-NO', {day:'numeric', month:'short'});
-      var xtxt = document.createElementNS(ns, 'text');
-      xtxt.setAttribute('x', x.toFixed(1)); xtxt.setAttribute('y', H+14);
-      xtxt.setAttribute('text-anchor', 'middle');
-      xtxt.setAttribute('font-size', '10'); xtxt.setAttribute('fill', '#aaa');
-      xtxt.textContent = label;
-      svg.appendChild(xtxt);
-    }
-
-    svgWrap.appendChild(svg);
-
-    // Stats row
-    var hi = Math.max.apply(null, prices).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
-    var lo = Math.min.apply(null, prices).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
-    var last = prices[n-1].toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
-    var stats = document.createElement('div');
-    stats.style.cssText = 'display:flex;gap:1rem;margin-top:.75rem;padding-top:.75rem;border-top:.5px solid #e8e8e8;font-size:12px;color:#888;';
-    stats.innerHTML = 'Høy <strong style="color:#1a1a1a;margin-left:4px">' + hi + ' kr</strong>'
-      + '<span style="margin-left:1rem">Lav <strong style="color:#1a1a1a;margin-left:4px">' + lo + ' kr</strong></span>'
-      + '<span style="margin-left:1rem">Siste <strong style="color:#1a1a1a;margin-left:4px">' + last + ' kr</strong></span>';
-    svgWrap.appendChild(stats);
-
-    loading.style.display = 'none';
-    svgWrap.style.display = 'block';
-
-  } catch(e) {
-    loading.innerHTML = 'Kunne ikke laste graf: ' + e.message;
-  }
+// Chat
+function addMsg(role, text) {
+  const c = document.getElementById('chatMessages');
+  const d = document.createElement('div');
+  d.className = 'msg-wrap ' + role;
+  d.innerHTML = '<div class="msg-bubble ' + role + '">' + text + '</div>';
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
 }
 
+function addTyping() {
+  const c = document.getElementById('chatMessages');
+  const d = document.createElement('div');
+  d.id = 'typing'; d.className = 'msg-wrap ai';
+  d.innerHTML = '<div class="msg-bubble ai">Skriver...</div>';
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
 
-async function loadQuarterlyReport(s) {
-  if (!s) return;
-  const box = document.getElementById('quarterlyBox');
-  box.style.display = 'block';
-  document.getElementById('qTitle').textContent = s.name + ' — Kvartalsrapport';
-  document.getElementById('qSubtitle').textContent = 'Siste tilgjengelige rapport';
-  document.getElementById('qNext').textContent = 'Neste rapport: henter...';
-  document.getElementById('qBody').innerHTML = `
-    <div class="quarterly-loading" style="grid-column:1/-1">
-      <div class="quarterly-spinner"></div>
-      AI analyserer siste kvartalsrapport...
-    </div>`;
+function removeTyping() { const e = document.getElementById('typing'); if (e) e.remove(); }
 
-  try {
-    const res = await fetch('/api/summary', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...s,
-        _type: 'quarterly',
-        _prompt: `Lag et kort sammendrag av siste kvartalsrapport for ${s.name} (${s.ticker}) basert på tilgjengelig data. Fokuser på: 1) Hva gikk bra, 2) Hva gikk dårlig, 3) Hva sa ledelsen om fremtiden. Svar på norsk.`
-      })
-    });
-    const ai = await res.json();
-
-    // Sett neste rapport dato
-    const nextDates = {
-      'EQNR': 'Juli 2026', 'DNB': 'Juli 2026', 'AKRBP': 'Juli 2026',
-      'TEL': 'Juli 2026', 'MOWI': 'August 2026', 'YAR': 'Juli 2026',
-      'NHY': 'Juli 2026', 'KAHOT': 'August 2026'
-    };
-    const nextDate = nextDates[s.ticker] || 'Ikke tilgjengelig';
-    document.getElementById('qNext').textContent = 'Neste rapport: ' + nextDate;
-
-    const hva = ai.hva || 'Ingen sammendrag tilgjengelig.';
-    const bull = (ai.bull || []).slice(0, 2);
-    const bear = (ai.bear || []).slice(0, 2);
-    const risiko = ai.risiko || '';
-
-    document.getElementById('qBody').innerHTML = `
-      <div class="quarterly-card">
-        <div class="quarterly-card-title">Sammendrag</div>
-        <p>${hva}</p>
-      </div>
-      <div class="quarterly-card">
-        <div class="quarterly-card-title">Risiko nevnt av ledelsen</div>
-        <p>${risiko}</p>
-      </div>
-      <div class="quarterly-card">
-        <div class="quarterly-card-title">Positive signaler</div>
-        ${bull.map(b => `<p style="margin-bottom:6px">✓ ${b}</p>`).join('')}
-      </div>
-      <div class="quarterly-card">
-        <div class="quarterly-card-title">Negative signaler</div>
-        ${bear.map(b => `<p style="margin-bottom:6px">✗ ${b}</p>`).join('')}
-      </div>`;
-  } catch(e) {
-    document.getElementById('qBody').innerHTML = `
-      <div class="quarterly-loading" style="grid-column:1/-1">
-        Kunne ikke laste kvartalsrapport. Sjekk at GROQ_API_KEY er satt i Vercel.
-      </div>`;
-  }
+function askSug(btn) {
+  document.getElementById('chatInput').value = btn.textContent;
+  sendMessage();
 }
 
 async function sendMessage() {
@@ -588,48 +339,49 @@ async function sendMessage() {
   const btn = document.getElementById('chatSendBtn');
   const text = input.value.trim();
   if (!text) return;
-
-  input.value = '';
-  btn.disabled = true;
+  input.value = ''; btn.disabled = true;
   document.getElementById('chatSuggestions').style.display = 'none';
-
-  addMessage('user', text);
+  addMsg('user', text);
   chatHistory.push({ role: 'user', content: text });
-
   addTyping();
-
   try {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: chatHistory,
-        context: currentStockContext
-      })
+      body: JSON.stringify({ messages: chatHistory, context: currentStockContext })
     });
-
     removeTyping();
     const data = await res.json();
-
     if (!res.ok || data.error) {
-      addMessage('ai', 'Beklager, jeg kunne ikke svare akkurat nå. Prøv igjen.');
+      addMsg('ai', 'Beklager, prøv igjen.');
     } else {
-      addMessage('ai', data.reply);
+      addMsg('ai', data.reply);
       chatHistory.push({ role: 'assistant', content: data.reply });
       if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
     }
-  } catch(e) {
-    removeTyping();
-    addMessage('ai', 'Noe gikk galt. Sjekk at ANTHROPIC_API_KEY er satt i Vercel.');
-  }
-
+  } catch(e) { removeTyping(); addMsg('ai', 'Noe gikk galt.'); }
   btn.disabled = false;
   input.focus();
 }
 
-document.getElementById('chatInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+document.getElementById('chatInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') sendMessage();
 });
 
-const _origRenderStockShell = window.renderStockShell;
+// Populære aksjer
+const popular = [
+  {ticker:'EQNR', name:'Equinor'}, {ticker:'DNB', name:'DNB Bank'},
+  {ticker:'AKRBP', name:'Aker BP'}, {ticker:'TEL', name:'Telenor'},
+  {ticker:'MOWI', name:'Mowi'}, {ticker:'YAR', name:'Yara'}
+];
+document.getElementById('trending').innerHTML = '<div class="trending"><div class="trending-label">Populære aksjer på Oslo Børs</div><div class="trending-grid">' +
+  popular.map(function(s) {
+    return '<div class="trending-card" onclick="search(\'' + s.ticker + '\')">' +
+      '<div class="t-ticker">' + s.ticker + '.OL</div>' +
+      '<div class="t-name">' + s.name + '</div>' +
+      '<div class="t-price-row"><span style="font-size:12px;color:#aaa">Klikk for live data + AI</span><span style="color:#C8A96E">→</span></div>' +
+      '</div>';
+  }).join('') + '</div></div>';
 </script>
+</body>
+</html>
