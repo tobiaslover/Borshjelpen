@@ -318,7 +318,7 @@ async function generateAISummary(s) {
     if (!res.ok || ai.error) {
       document.getElementById('ai-section').innerHTML = `
         <div style="padding:1rem; background:#fff8f0; border-radius:10px; font-size:13px; color:#888; margin-bottom:1rem;">
-          AI-sammendrag ikke tilgjengelig. Sjekk at ANTHROPIC_API_KEY er satt i Vercel.
+          AI-sammendrag ikke tilgjengelig: ${ai.error || res.status}
         </div>`;
       return;
     }
