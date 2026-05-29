@@ -17,61 +17,44 @@ export default async function handler(req, res) {
 
   const { interval, range: r } = ranges[range] || ranges['1d'];
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
   try {
-    // Prøv query2 først, deretter query1
-    let response = await fetch(
-      `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${r}`,
-      { headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'application/json',
+    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${r}`;
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Referer': 'https://finance.yahoo.com/',
-      }}
-    );
+      }
+    });
+    clearTimeout(timeout);
 
-    if (!response.ok) {
-      response = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${r}`,
-        { headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Referer': 'https://finance.yahoo.com/',
-        }}
-      );
-    }
-
-    if (!response.ok) {
-      return res.status(response.status).json({ 
-        error: 'Yahoo Finance blokkerte kallet',
-        status: response.status
-      });
-    }
+    if (!response.ok) return res.status(404).json({ error: 'Data ikke funnet' });
 
     const data = await response.json();
     const result = data?.chart?.result?.[0];
     const timestamps = result?.timestamp || [];
     const closes = result?.indicators?.quote?.[0]?.close || [];
-    const meta = result?.meta;
 
     const points = timestamps
       .map((t, i) => ({ t: t * 1000, p: closes[i] }))
       .filter(d => d.p !== null && d.p !== undefined && !isNaN(d.p));
 
-    if (!points.length) {
-      return res.status(404).json({ 
-        error: 'Ingen datapunkter funnet',
-        totalTimestamps: timestamps.length,
-        totalCloses: closes.length
-      });
-    }
-
     res.status(200).json({
       ticker: upper,
       currency: 'NOK',
-      currentPrice: meta?.regularMarketPrice,
+      currentPrice: result?.meta?.regularMarketPrice,
       previousClose: points[0]?.p,
       points,
     });
 
   } catch (err) {
+    clearTimeout(timeout);
+    if (err.name === 'AbortError') {
+      return res.status(504).json({ error: 'Timeout — Yahoo Finance svarte ikke i tide' });
+    }
     res.status(500).json({ error: 'Serverfeil', detail: err.message });
   }
 }
