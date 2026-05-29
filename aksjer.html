@@ -293,8 +293,17 @@ function renderStockShell(s) {
 
   document.getElementById('trending').innerHTML = '';
   showChat(s);
-  // Last kursgraf automatisk — vent litt på DOM
-  setTimeout(() => loadChart(s.ticker, '1d', document.querySelector('.chart-tab')), 300);
+  // Last kursgraf — vent til DOM-elementer er klare
+  function tryLoadChart(attempts) {
+    const loading = document.getElementById('chartLoading');
+    const svgWrap = document.getElementById('chartSvgWrap');
+    if (loading && svgWrap) {
+      loadChart(s.ticker, '1d', document.querySelector('.chart-tab'));
+    } else if (attempts > 0) {
+      setTimeout(() => tryLoadChart(attempts - 1), 200);
+    }
+  }
+  setTimeout(() => tryLoadChart(10), 300);
 }
 
 async function generateAISummary(s) {
