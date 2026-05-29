@@ -425,6 +425,11 @@ async function loadHeroStock() {
     badge.className = s.up ? 'badge-up' : 'badge-down';
     document.getElementById('heroDesc').textContent = descriptions[s.ticker] || 'Notert på Oslo Børs.';
 
+    // Gjør hele kortet klikkbart
+    const mock = document.getElementById('heroMock');
+    mock.style.cursor = 'pointer';
+    mock.onclick = function() { location.href = '/aksjer.html?ticker=' + s.ticker; };
+
     // Risk sliders
     const risks = riskProfiles[s.ticker] || riskProfiles['EQNR'];
     document.getElementById('heroRiskBars').innerHTML = risks.map(function(r) {
