@@ -14,7 +14,28 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .nav-tabs { display: flex; }
 .nav-tab { font-size: 13px; padding: 6px 16px; color: #666; background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
 .nav-tab.active { color: #1B3A5C; border-bottom: 2px solid #1B3A5C; font-weight: 500; }
-.search-hero { background: #1B3A5C; padding: 2.5rem 2rem; text-align: center; }
+.mobile-nav {
+  display: none;
+  background: white;
+  border-top: 1px solid #e8e8e8;
+  padding: 0;
+}
+.mobile-nav a {
+  flex: 1;
+  text-align: center;
+  padding: 10px 4px;
+  font-size: 12px;
+  color: #666;
+  text-decoration: none;
+  border-top: 2px solid transparent;
+  font-family: 'DM Sans', sans-serif;
+}
+.mobile-nav a.active {
+  color: #1B3A5C;
+  border-top-color: #1B3A5C;
+  font-weight: 500;
+}
+ background: #1B3A5C; padding: 2.5rem 2rem; text-align: center; }
 .search-title { font-family: 'Playfair Display', serif; font-size: 28px; color: white; margin-bottom: 6px; }
 .search-sub { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; }
 .search-bar { display: flex; gap: 8px; max-width: 520px; margin: 0 auto; }
@@ -106,6 +127,8 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 
 @media (max-width: 768px) {
   .nav-tabs { display: none; }
+  .mobile-nav { display: flex; }
+}
   .metrics { grid-template-columns: repeat(2, 1fr); }
   .bull-bear { grid-template-columns: 1fr; }
   .result-header { flex-direction: column; gap: 1rem; }
@@ -137,7 +160,12 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
   </div>
 </nav>
 
-<div class="search-hero">
+<div class="mobile-nav">
+  <a href="borshjelpen.html">Hjem</a>
+  <a href="aksjer.html" class="active">Aksjer</a>
+  <a href="#">Lær</a>
+  <a href="#">Børsbrygg</a>
+</div>
   <div class="search-title">Søk opp en aksje</div>
   <div class="search-sub">Alle aksjer på Oslo Børs — AI forklarer alt på norsk</div>
   <div class="search-wrap">
