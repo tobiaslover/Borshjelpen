@@ -114,6 +114,15 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
   .chat-widget { padding: 0 1rem; }
   .content { padding: 1rem; }
 }
+
+.search-wrap { position: relative; max-width: 520px; margin: 0 auto; }
+.autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); overflow: hidden; z-index: 100; margin-top: 4px; }
+.autocomplete-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background: #f8f7f4; }
+.ac-ticker { font-size: 12px; font-weight: 500; color: #1B3A5C; background: #EEE8DA; padding: 2px 8px; border-radius: 100px; min-width: 52px; text-align: center; }
+.ac-name { font-size: 13px; color: #1a1a1a; }
+.ac-sector { font-size: 11px; color: #aaa; margin-left: auto; }
 </style>
 </head>
 <body>
@@ -131,9 +140,12 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 <div class="search-hero">
   <div class="search-title">Søk opp en aksje</div>
   <div class="search-sub">Alle aksjer på Oslo Børs — AI forklarer alt på norsk</div>
-  <div class="search-bar">
-    <input id="searchInput" class="search-input" type="text" placeholder="F.eks. Equinor, EQNR, DNB ..." autofocus />
-    <button class="search-btn" onclick="doSearch()">Søk</button>
+  <div class="search-wrap">
+    <div class="search-bar">
+      <input id="searchInput" class="search-input" type="text" placeholder="F.eks. Equinor, EQNR, DNB ..." autofocus autocomplete="off" />
+      <button class="search-btn" onclick="doSearch()">Søk</button>
+    </div>
+    <div class="autocomplete-list" id="acList" style="display:none"></div>
   </div>
   <div class="search-hint">Skriv ticker direkte — EQNR, DNB, TEL, AKRBP, MOWI, YAR, NHY</div>
   <div class="suggestions">
@@ -382,6 +394,114 @@ document.getElementById('trending').innerHTML = '<div class="trending"><div clas
       '<div class="t-price-row"><span style="font-size:12px;color:#aaa">Klikk for live data + AI</span><span style="color:#C8A96E">→</span></div>' +
       '</div>';
   }).join('') + '</div></div>';
+
+// Oslo Børs aksjer for autocomplete
+const osloStocks = [
+  {ticker:'EQNR', name:'Equinor ASA', sector:'Energi'},
+  {ticker:'DNB', name:'DNB Bank ASA', sector:'Finans'},
+  {ticker:'AKRBP', name:'Aker BP ASA', sector:'Energi'},
+  {ticker:'TEL', name:'Telenor ASA', sector:'Telekom'},
+  {ticker:'MOWI', name:'Mowi ASA', sector:'Sjømat'},
+  {ticker:'YAR', name:'Yara International ASA', sector:'Kjemikalier'},
+  {ticker:'NHY', name:'Norsk Hydro ASA', sector:'Industri'},
+  {ticker:'KAHOT', name:'Kahoot! ASA', sector:'Teknologi'},
+  {ticker:'SALM', name:'SalMar ASA', sector:'Sjømat'},
+  {ticker:'AKER', name:'Aker ASA', sector:'Industri'},
+  {ticker:'AKSO', name:'Aker Solutions ASA', sector:'Energi'},
+  {ticker:'BWLPG', name:'BW LPG Limited', sector:'Shipping'},
+  {ticker:'FRONTLINE', name:'Frontline PLC', sector:'Shipping'},
+  {ticker:'GOGL', name:'Golden Ocean Group', sector:'Shipping'},
+  {ticker:'HYON', name:'Hydrogen Pro AS', sector:'Energi'},
+  {ticker:'KOG', name:'Kongsberg Gruppen ASA', sector:'Forsvar'},
+  {ticker:'LSG', name:'Lerøy Seafood Group ASA', sector:'Sjømat'},
+  {ticker:'NEL', name:'Nel ASA', sector:'Energi'},
+  {ticker:'NKDE', name:'Nordic Semiconductor ASA', sector:'Teknologi'},
+  {ticker:'NOFI', name:'Norske Skog ASA', sector:'Industri'},
+  {ticker:'ORK', name:'Orkla ASA', sector:'Forbruksvarer'},
+  {ticker:'RECSI', name:'REC Silicon ASA', sector:'Teknologi'},
+  {ticker:'SCATC', name:'Scatec ASA', sector:'Fornybar energi'},
+  {ticker:'SCHA', name:'Schibsted ASA A', sector:'Medier'},
+  {ticker:'STRO', name:'Strongpoint ASA', sector:'Teknologi'},
+  {ticker:'STB', name:'Storebrand ASA', sector:'Finans'},
+  {ticker:'SUBC', name:'Subsea 7 SA', sector:'Energi'},
+  {ticker:'TGS', name:'TGS ASA', sector:'Energi'},
+  {ticker:'TOMRA', name:'Tomra Systems ASA', sector:'Teknologi'},
+  {ticker:'VAREX', name:'Vår Energi ASA', sector:'Energi'},
+  {ticker:'VOW', name:'Vow ASA', sector:'Miljøteknologi'},
+  {ticker:'WALWIL', name:'Wallenius Wilhelmsen ASA', sector:'Shipping'},
+  {ticker:'XXL', name:'XXL ASA', sector:'Handel'},
+  {ticker:'ZAL', name:'Zalaris ASA', sector:'Teknologi'},
+  {ticker:'AEGA', name:'Aega ASA', sector:'Finans'},
+  {ticker:'AMSC', name:'American Superconductor Norway', sector:'Energi'},
+  {ticker:'ARCHER', name:'Archer Limited', sector:'Energi'},
+  {ticker:'AUSS', name:'Austevoll Seafood ASA', sector:'Sjømat'},
+  {ticker:'BELCO', name:'Belships ASA', sector:'Shipping'},
+  {ticker:'BONHR', name:'Bonheur ASA', sector:'Fornybar energi'},
+  {ticker:'BOUVET', name:'Bouvet ASA', sector:'Teknologi'},
+  {ticker:'BWO', name:'BW Offshore Limited', sector:'Energi'},
+  {ticker:'CLOUD', name:'CloudBerry Clean Energy ASA', sector:'Fornybar energi'},
+  {ticker:'COD', name:'Coda Octopus Group', sector:'Teknologi'},
+  {ticker:'DLTX', name:'Delalande Technologies', sector:'Teknologi'},
+  {ticker:'ELMERA', name:'Elmera Group ASA', sector:'Energi'},
+  {ticker:'ENTRA', name:'Entra ASA', sector:'Eiendom'},
+  {ticker:'FLNG', name:'Flex LNG Ltd', sector:'Shipping'},
+  {ticker:'GJF', name:'Gjensidige Forsikring ASA', sector:'Forsikring'},
+  {ticker:'GRIEG', name:'Grieg Seafood ASA', sector:'Sjømat'},
+  {ticker:'HMONY', name:'Harmony Gold Mining', sector:'Gruvedrift'},
+  {ticker:'HPRO', name:'Hydrogenpro AS', sector:'Energi'},
+  {ticker:'MPCC', name:'MPC Container Ships ASA', sector:'Shipping'},
+  {ticker:'ODF', name:'Odfjell SE', sector:'Shipping'},
+  {ticker:'OKEA', name:'OKEA ASA', sector:'Energi'},
+  {ticker:'OSSI', name:'Ossia International', sector:'Teknologi'},
+  {ticker:'PEXIP', name:'Pexip Holding ASA', sector:'Teknologi'},
+  {ticker:'PHO', name:'Photon Group ASA', sector:'Teknologi'},
+  {ticker:'PROTC', name:'Protector Forsikring ASA', sector:'Forsikring'},
+  {ticker:'PSI', name:'PGS ASA', sector:'Energi'},
+  {ticker:'SDRL', name:'Seadrill Limited', sector:'Energi'},
+  {ticker:'SOFF', name:'Solstad Offshore ASA', sector:'Shipping'},
+  {ticker:'SPM', name:'Spectrum ASA', sector:'Energi'},
+  {ticker:'SRBANK', name:'SpareBank 1 SR-Bank ASA', sector:'Finans'},
+  {ticker:'VISTIN', name:'Vistin Pharma ASA', sector:'Farmasi'},
+  {ticker:'WILS', name:'Wilson ASA', sector:'Shipping'},
+];
+
+function showAutocomplete(query) {
+  const list = document.getElementById('acList');
+  if (!query || query.length < 1) { list.style.display = 'none'; return; }
+  const q = query.toUpperCase();
+  const matches = osloStocks.filter(function(s) {
+    return s.ticker.startsWith(q) || s.name.toUpperCase().includes(q);
+  }).slice(0, 6);
+  if (!matches.length) { list.style.display = 'none'; return; }
+  list.innerHTML = matches.map(function(s) {
+    return '<div class="autocomplete-item" onclick="selectStock('' + s.ticker + '')">' +
+      '<span class="ac-ticker">' + s.ticker + '</span>' +
+      '<span class="ac-name">' + s.name + '</span>' +
+      '<span class="ac-sector">' + s.sector + '</span>' +
+    '</div>';
+  }).join('');
+  list.style.display = 'block';
+}
+
+function selectStock(ticker) {
+  document.getElementById('searchInput').value = ticker;
+  document.getElementById('acList').style.display = 'none';
+  search(ticker);
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  showAutocomplete(this.value.trim());
+});
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.search-wrap')) {
+    document.getElementById('acList').style.display = 'none';
+  }
+});
+
+document.getElementById('searchInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') document.getElementById('acList').style.display = 'none';
+});
 </script>
 </body>
 </html>
