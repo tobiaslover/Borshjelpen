@@ -318,7 +318,8 @@ function doSearch() {
 }
 
 document.getElementById('searchInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') doSearch();
+  if (e.key === 'Enter') { document.getElementById('acList').style.display = 'none'; doSearch(); }
+  if (e.key === 'Escape') document.getElementById('acList').style.display = 'none';
 });
 
 // Chat
@@ -499,9 +500,7 @@ document.addEventListener('click', function(e) {
   }
 });
 
-document.getElementById('searchInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') document.getElementById('acList').style.display = 'none';
-});
+// keydown håndteres ovenfor
 </script>
 </body>
 </html>
