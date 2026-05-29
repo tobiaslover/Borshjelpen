@@ -58,11 +58,11 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .price-main { font-size: 28px; font-weight: 500; }
 .badge-up { font-size: 13px; background: #1A5C3A; color: #6ECFA0; padding: 4px 10px; border-radius: 100px; font-weight: 500; display: inline-block; margin-top: 5px; }
 .badge-down { font-size: 13px; background: #5C1B1B; color: #F09595; padding: 4px 10px; border-radius: 100px; font-weight: 500; display: inline-block; margin-top: 5px; }
-.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
-.metric { background: #f8f7f4; border-radius: 10px; padding: 12px 14px; }
-.metric-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.metric-val { font-size: 18px; font-weight: 500; }
-.metric-val.na { color: #ccc; font-size: 14px; }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 1rem; }
+.metric { background: #f8f7f4; border-radius: 8px; padding: 8px 10px; }
+.metric-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+.metric-val { font-size: 15px; font-weight: 500; }
+.metric-val.na { color: #ccc; font-size: 13px; }
 .card { background: #fff; border: 1px solid #e8e8e8; border-radius: 14px; padding: 1.25rem; }
 .card-title { font-size: 11px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 .card p { font-size: 13px; line-height: 1.7; color: #1a1a1a; }
@@ -252,6 +252,20 @@ async function search(ticker) {
   generateAI(s);
 }
 
+function getMarketLabel() {
+  // Oslo Børs åpner 09:00 og stenger 16:25 norsk tid
+  const now = new Date();
+  const oslo = new Date(now.toLocaleString('en-US', {timeZone: 'Europe/Oslo'}));
+  const h = oslo.getHours();
+  const m = oslo.getMinutes();
+  const day = oslo.getDay(); // 0=sun, 6=sat
+  const isWeekday = day >= 1 && day <= 5;
+  const afterOpen = h > 9 || (h === 9 && m >= 0);
+  const beforeClose = h < 16 || (h === 16 && m <= 25);
+  if (isWeekday && afterOpen && beforeClose) return 'siden åpning';
+  return 'siden forrige sluttkurs';
+}
+
 function renderStock(s) {
   const priceStr = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
   const sign = s.up ? '+' : '';
@@ -267,7 +281,7 @@ function renderStock(s) {
       '</div>' +
       '<div class="price-block">' +
         '<div class="price-main">' + priceStr + ' ' + s.currency + '</div>' +
-        '<span class="' + (s.up ? 'badge-up' : 'badge-down') + '">' + changeStr + ' kr &nbsp; (' + pctStr + ') siden forrige sluttkurs</span>' +
+        '<span class="' + (s.up ? 'badge-up' : 'badge-down') + '">' + changeStr + ' kr &nbsp; (' + pctStr + ') ' + getMarketLabel() + '</span>' +
       '</div>' +
     '</div>' +
     '<div class="metrics">' +
