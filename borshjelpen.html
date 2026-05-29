@@ -154,57 +154,44 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <div class="hero-left">
     <div class="hero-badge">📈 Børsen — endelig forståelig</div>
     <h1 class="hero-title">Forstå aksjer.<br><em>Uten å være</em><br>analytiker.</h1>
-    <p class="hero-sub">Kvartalsrapporter forklart på 5 setninger. Daglige børsoppdateringer du faktisk forstår. En AI-coach som alltid viser begge sider — og aldri gir deg enkle kjøpstips.</p>
+    <p class="hero-sub">Kvartalsrapport på 30 sekunder — helt uten finanssjargong! Daglige børsoppdateringer du faktisk forstår. En AI-coach som alltid viser begge sider — og aldri gir deg enkle kjøpstips.</p>
     <div class="hero-actions">
       <button class="btn-primary">Start gratis →</button>
       <button class="btn-secondary">▶ Se demo</button>
     </div>
   </div>
   <div class="hero-right">
-    <div class="phone-mock">
+    <div class="phone-mock" id="heroMock">
       <div class="phone-top">
-        <div class="phone-ticker">EQNR · Oslo Børs</div>
-        <div class="phone-name">Equinor</div>
+        <div class="phone-ticker" id="heroTicker">Laster...</div>
+        <div class="phone-name" id="heroName">—</div>
         <div class="phone-price-row">
-          <span class="phone-price">274,50 kr</span>
-          <span class="badge-up">+2,1% i dag</span>
+          <span class="phone-price" id="heroPrice">—</span>
+          <span id="heroBadge" class="badge-up">—</span>
         </div>
       </div>
       <div class="phone-body">
         <div class="phone-section">
-          <div class="phone-section-title">Hva gjør de?</div>
-          <div class="phone-explain">Norges største oljeselskap. De henter opp olje og gass fra havet og selger det til land over hele verden. Mesteparten av inntektene kommer fra råoljeprisen.</div>
+          <div class="phone-section-title">Om selskapet</div>
+          <div class="phone-explain" id="heroDesc">Henter live data...</div>
         </div>
         <div class="phone-section">
-          <div class="phone-section-title">Hvorfor gikk den opp i dag?</div>
-          <div class="phone-explain">Oljeprisen steg 1,8% etter at OPEC kunngjorde kutt i produksjon. Equinor følger alltid oljeprisen tett.</div>
-        </div>
-        <div class="phone-section">
-          <div class="phone-section-title">Risiko</div>
+          <div class="phone-section-title">52-ukers kurs</div>
           <div class="risk-bars">
             <div class="risk-row">
-              <span style="min-width:80px">Oljepris</span>
-              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:85%;background:#E24B4A"></div></div>
-              <span>Høy</span>
+              <span style="min-width:40px">Høy</span>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:80%;background:#2C7A5C"></div></div>
+              <span id="heroHigh">—</span>
             </div>
             <div class="risk-row">
-              <span style="min-width:80px">Valuta</span>
-              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:55%;background:#EF9F27"></div></div>
-              <span>Middels</span>
-            </div>
-            <div class="risk-row">
-              <span style="min-width:80px">Politisk</span>
-              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:40%;background:#C8A96E"></div></div>
-              <span>Lav</span>
+              <span style="min-width:40px">Lav</span>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:30%;background:#E24B4A"></div></div>
+              <span id="heroLow">—</span>
             </div>
           </div>
         </div>
-        <div class="pill-row">
-          <span class="pill">Energi</span>
-          <span class="pill">Utbytte</span>
-          <span class="pill">Statseiet 67%</span>
-        </div>
-        <div class="risk-note">Dette er ikke finansiell rådgivning. Gjør egne vurderinger eller snakk med en finansrådgiver.</div>
+        <div class="pill-row" id="heroPills"></div>
+        <div class="risk-note">Data fra Yahoo Finance · Ikke finansiell rådgivning.</div>
       </div>
     </div>
   </div>
@@ -328,12 +315,51 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 
 <section class="cta-section">
   <div class="cta-title">Klar til å forstå børsen?</div>
-  <p class="cta-sub">Gratis å starte. Ingen finansbakgrunn nødvendig. Alltid balansert.</p>
-  <div class="cta-input-row">
-    <input class="cta-input" type="email" placeholder="Din e-postadresse" />
-    <button class="cta-btn">Kom i gang →</button>
+  <p class="cta-sub">Velg planen som passer deg — start gratis, oppgrader når du vil.</p>
+
+  <div class="pricing-grid">
+
+    <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:1.5rem;text-align:left;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Gratis</div>
+      <div style="font-family:'Playfair Display',serif;font-size:28px;color:white;margin-bottom:4px;">0 kr</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:1.25rem;">For alltid</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
+        <div style="font-size:13px;color:rgba(255,255,255,0.75);">✓ Aksjesøk på Oslo Børs</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.75);">✓ AI-sammendrag (5/dag)</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.75);">✓ AI-chat (10 spørsmål/dag)</div>
+      </div>
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:10px;border-radius:100px;border:1px solid rgba(255,255,255,0.3);background:none;color:white;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Start gratis →</button>
+    </div>
+
+    <div style="background:white;border-radius:16px;padding:1.5rem;text-align:left;position:relative;">
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#C8A96E;color:#1B3A5C;font-size:11px;font-weight:500;padding:3px 12px;border-radius:100px;white-space:nowrap;">Mest populær</div>
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Standard</div>
+      <div style="font-family:'Playfair Display',serif;font-size:28px;color:#1B3A5C;margin-bottom:4px;">59 kr</div>
+      <div style="font-size:12px;color:#888;margin-bottom:1.25rem;">per måned</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
+        <div style="font-size:13px;color:#555;">✓ Alt i Gratis</div>
+        <div style="font-size:13px;color:#555;">✓ Daglig børsoppsummering</div>
+        <div style="font-size:13px;color:#555;">✓ Bull/bear-analyse på e-post</div>
+        <div style="font-size:13px;color:#555;">✓ Ukentlig markedsrapport</div>
+      </div>
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:10px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Abonner →</button>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:1.5rem;text-align:left;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Premium</div>
+      <div style="font-family:'Playfair Display',serif;font-size:28px;color:white;margin-bottom:4px;">99 kr</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:1.25rem;">per måned</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
+        <div style="font-size:13px;color:rgba(255,255,255,0.75);">✓ Alt i Standard</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.75);">✓ Ubegrenset AI-chat</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.75);">✓ Alle nøkkeltall</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.75);">✓ Prisvarsel på aksjer</div>
+      </div>
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:10px;border-radius:100px;border:1px solid rgba(255,255,255,0.3);background:none;color:white;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
+    </div>
+
   </div>
-  <p class="footer-note">Ingen spam. Avslutt når som helst.</p>
+  <p class="footer-note">Ingen bindingstid. Avslutt når som helst.</p>
 </section>
 
 </body>
