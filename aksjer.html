@@ -8,13 +8,13 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; gap: 1rem; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; }
 .logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
 .logo span { color: #C8A96E; }
-.nav-tabs { display: flex; gap: 1.5rem; align-items: center; }
-.nav-tab { font-size: 14px; color: #666; text-decoration: none; background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 0; border-bottom: none; }
-.nav-tab:hover { color: #1B3A5C; }
-.nav-tab.active { color: #1B3A5C; font-weight: 500; border-bottom: none; }
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #666; text-decoration: none; }
+.nav-links a:hover { color: #1B3A5C; }
+.nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
 .mobile-nav {
   display: none;
@@ -128,7 +128,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .chat-send:disabled { background: #ccc; }
 
 @media (max-width: 768px) {
-  .nav-tabs { display: none; }
+  .nav-links a { display: none; }
   #navAuth { display: none !important; }
   #navUser { display: none !important; }
   .mobile-nav { display: flex; }
@@ -171,22 +171,21 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 </head>
 <body>
 
-<nav>
+<nav class="nav">
   <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
-  <div class="nav-tabs">
-    <a href="borshjelpen.html" class="nav-tab">Hjem</a>
-    <a href="aksjer.html" class="nav-tab active">Aksjer</a>
-    <a href="#" class="nav-tab">Lær</a>
-    <a href="#" class="nav-tab">Børsbrygg</a>
-  </div>
-  <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
-    <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
-    <button onclick="location.href='/auth.html'" style="font-size:13px;padding:8px 16px;border-radius:100px;border:none;background:#1B3A5C;color:white;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">Registrer deg</button>
-  </div>
-  <div id="navUser" style="display:none;align-items:center;gap:8px;">
-    <div onclick="location.href='/profil.html'" style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;border:1px solid #e8e8e8;cursor:pointer;">
-      <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
-      <span id="navName" style="font-size:13px;font-weight:500;color:#1a1a1a;">Min side</span>
+  <div class="nav-links">
+    <a href="/aksjer.html">Aksjer</a>
+    <a href="#">Lær</a>
+    <a href="#">Børsbrygg</a>
+    <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
+      <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
+    </div>
+    <div id="navUser" style="display:none;align-items:center;gap:8px;">
+      <div onclick="location.href='/profil.html'" style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;border:1px solid #e8e8e8;cursor:pointer;">
+        <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+        <span id="navName" style="font-size:13px;font-weight:500;color:#1a1a1a;">Min side</span>
+      </div>
     </div>
   </div>
 </nav>
