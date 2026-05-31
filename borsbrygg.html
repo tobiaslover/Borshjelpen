@@ -291,7 +291,13 @@ async function loadBorsbrygg() {
         '<div class="story-text">' +
           (ai.nyheter || []).map(n =>
             '<div style="margin-bottom:1rem;padding:1rem;background:#f8f7f4;border-radius:10px;">' +
-              '<div style="font-weight:500;font-size:14px;margin-bottom:4px;">' + n.tittel + (n.aksje ? ' <span style="background:#1B3A5C;color:#C8A96E;font-size:10px;padding:2px 8px;border-radius:100px;font-weight:400;">' + n.aksje + '</span>' : '') + '</div>' +
+              '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
+                '<div style="font-weight:500;font-size:14px;">' + n.tittel + '</div>' +
+                '<div style="display:flex;gap:4px;flex-shrink:0;">' +
+                  (n.aksje ? '<span style="background:#1B3A5C;color:#C8A96E;font-size:10px;padding:2px 8px;border-radius:100px;">' + n.aksje + '</span>' : '') +
+                  (n.kilde ? '<span style="background:#f0f0f0;color:#888;font-size:10px;padding:2px 8px;border-radius:100px;">' + n.kilde + '</span>' : '') +
+                '</div>' +
+              '</div>' +
               '<div style="font-size:13px;color:#555;line-height:1.6;">' + n.tekst + '</div>' +
             '</div>'
           ).join('') +
