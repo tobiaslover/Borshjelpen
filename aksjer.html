@@ -330,6 +330,12 @@ function showError(msg) {
 }
 
 async function search(ticker) {
+  // Sjekk innlogging
+  const sbCheck = window._sb;
+  if (sbCheck) {
+    const { data: { session } } = await sbCheck.auth.getSession();
+    if (!session) { showLoginModal(); return; }
+  }
   document.getElementById('searchInput').value = ticker;
   showLoading();
   let s;
@@ -483,6 +489,26 @@ function getStockType(s) {
 }
 
 async function generateAI(s) {
+  // Sjekk innlogging og plan
+  const sb = window._sb;
+  if (!sb) { showLoginModal(); return; }
+  const session = (await sb.auth.getSession()).data.session;
+  if (!session) { showLoginModal(); return; }
+  const plan = await getUserPlan(sb);
+  const limits = PLANS[plan] || PLANS.free;
+  if (limits.aiAnalysis > 0) {
+    const used = await getTodayCount(sb, 'search');
+    if (used >= limits.aiAnalysis) {
+      const sec = document.getElementById('ai-section');
+      if (sec) sec.innerHTML = '<div style="padding:1.5rem;background:#fff8f0;border-radius:12px;text-align:center;margin-bottom:1rem;">' +
+        '<div style="font-size:24px;margin-bottom:8px;">🔒</div>' +
+        '<div style="font-weight:500;margin-bottom:6px;">Du har brukt ' + limits.aiAnalysis + ' AI-analyser i dag</div>' +
+        '<div style="font-size:13px;color:#888;margin-bottom:1rem;">Oppgrader for ubegrenset tilgang</div>' +
+        '<button onclick="location.href='borshjelpen.html'" style="padding:10px 20px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;">Se abonnementer →</button>' +
+        '</div>';
+      return;
+    }
+  }
   try {
     const res = await fetch('/api/summary', {
       method: 'POST',
@@ -540,6 +566,71 @@ async function logActivity(type, ticker, name) {
       xp: XP_VALUES[type] || 0
     });
   } catch(e) {}
+}
+
+
+// ===== PLAN SYSTEM =====
+const PLANS = {
+  free:     { aiAnalysis: 2,  aiChat: 5,  watchlist: 2  },
+  investor: { aiAnalysis: -1, aiChat: -1, watchlist: 10 },
+  proff:    { aiAnalysis: -1, aiChat: -1, watchlist: -1  }
+};
+
+async function getUserPlan(sb) {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return null;
+    const { data } = await sb.from('user_plans').select('plan').eq('user_id', session.user.id).single();
+    return (data && data.plan) || 'free';
+  } catch(e) { return 'free'; }
+}
+
+async function getTodayCount(sb, type) {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return 0;
+    const today = new Date().toISOString().split('T')[0];
+    const { count } = await sb.from('user_activity')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', session.user.id)
+      .eq('type', type)
+      .gte('created_at', today + 'T00:00:00Z');
+    return count || 0;
+  } catch(e) { return 0; }
+}
+
+function showUpgradeModal(message) {
+  const existing = document.getElementById('upgradeModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'upgradeModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;';
+  modal.innerHTML = '<div style="background:white;border-radius:16px;padding:2rem;max-width:400px;width:100%;text-align:center;">' +
+    '<div style="font-size:36px;margin-bottom:1rem;">🔒</div>' +
+    '<div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:8px;">Oppgrader for å fortsette</div>' +
+    '<p style="font-size:14px;color:#666;margin-bottom:1.5rem;">' + message + '</p>' +
+    '<button onclick="location.href='borshjelpen.html'" style="width:100%;padding:12px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;">Se abonnementer →</button>' +
+    '<button onclick="document.getElementById('upgradeModal').remove()" style="width:100%;padding:12px;border-radius:100px;border:1px solid #e8e8e8;background:none;font-size:14px;cursor:pointer;color:#666;">Lukk</button>' +
+    '</div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+}
+
+function showLoginModal() {
+  const existing = document.getElementById('upgradeModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'upgradeModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;';
+  modal.innerHTML = '<div style="background:white;border-radius:16px;padding:2rem;max-width:400px;width:100%;text-align:center;">' +
+    '<div style="font-size:36px;margin-bottom:1rem;">👤</div>' +
+    '<div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:8px;">Logg inn for å fortsette</div>' +
+    '<p style="font-size:14px;color:#666;margin-bottom:1.5rem;">Du må ha en konto for å bruke AI-analyse, chat og watchlist. Det er gratis!</p>' +
+    '<button onclick="location.href='auth.html'" style="width:100%;padding:12px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;">Logg inn / Registrer deg →</button>' +
+    '<button onclick="document.getElementById('upgradeModal').remove()" style="width:100%;padding:12px;border-radius:100px;border:1px solid #e8e8e8;background:none;font-size:14px;cursor:pointer;color:#666;">Lukk</button>' +
+    '</div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
 }
 
 function doSearch() {
@@ -625,6 +716,21 @@ async function sendMessage() {
   const btn = document.getElementById('chatSendBtn');
   const text = input.value.trim();
   if (!text) return;
+
+  // Sjekk innlogging og plan
+  const sbChat = window._sb;
+  if (!sbChat) { showLoginModal(); return; }
+  const sessionChat = (await sbChat.auth.getSession()).data.session;
+  if (!sessionChat) { showLoginModal(); return; }
+  const planChat = await getUserPlan(sbChat);
+  const limitsChat = PLANS[planChat] || PLANS.free;
+  if (limitsChat.aiChat > 0) {
+    const usedChat = await getTodayCount(sbChat, 'chat');
+    if (usedChat >= limitsChat.aiChat) {
+      showUpgradeModal('Du har brukt ' + limitsChat.aiChat + ' AI-spørsmål i dag. Oppgrader til Investor for ubegrenset chat.');
+      return;
+    }
+  }
   input.value = ''; btn.disabled = true;
   document.getElementById('chatSuggestions').style.display = 'none';
   addMsg('user', text);
@@ -805,7 +911,7 @@ function toggleWatchlist(s) {
     renderWatchlist();
   } else {
     if (list.length >= limit) {
-      alert('Du har nådd grensen på ' + limit + ' aksjer i watchlist. Oppgrader for å legge til flere.');
+      showUpgradeModal('Du har nådd grensen på ' + limit + ' aksjer i watchlist. Oppgrader til Investor for opptil 10 aksjer, eller Proff for ubegrenset.');
       return;
     }
     list.push({ ticker: s.ticker, name: s.name, price: s.price, changePct: s.changePct, up: s.up, currency: s.currency });
@@ -899,6 +1005,12 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         document.getElementById('mobileName').textContent = name.split(' ')[0];
       }
 
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>
     }
   } catch(e) {}
 })();
