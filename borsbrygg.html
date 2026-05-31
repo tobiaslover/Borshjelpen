@@ -436,6 +436,16 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         document.getElementById('lockedView').style.display = 'none';
         document.getElementById('subscriberView').style.display = 'block';
         loadBorsbrygg();
+        // Logg Børsbrygg-lesing med 5 XP
+        try {
+          await sb.from('user_activity').insert({
+            user_id: user.id,
+            type: 'borsbrygg',
+            ticker: null,
+            name: 'Børsbrygg lest',
+            xp: 5
+          });
+        } catch(e) {}
       }
     }
   } catch(e) {}
