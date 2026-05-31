@@ -123,7 +123,20 @@ async function doLogin() {
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
   setLoading('btn-login', false);
   if (error) { showMsg(error.message, 'error'); return; }
-  window.location.href = 'profil.html';
+  // Logg innlogging med XP
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await sb.from('user_activity').insert({
+        user_id: session.user.id,
+        type: 'login',
+        ticker: null,
+        name: 'Daglig innlogging',
+        xp: 3
+      });
+    }
+  } catch(e) {}
+  window.location.href = 'borshjelpen.html';
 }
 
 async function doSignup() {
