@@ -254,15 +254,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 <div class="content">
   <div id="result"></div>
   <div id="trending"></div>
-  <div id="watchlistSection" style="display:none">
-    <div class="watchlist-section">
-      <div class="watchlist-header">
-        <div class="watchlist-label">📌 Min Watchlist</div>
-        <div class="watchlist-limit" id="watchlistLimit"></div>
-      </div>
-      <div id="watchlistGrid"></div>
-    </div>
-  </div>
 </div>
 
 <div class="quarterly-box" id="quarterlyBox" style="display:none">
@@ -311,6 +302,16 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
       <input id="chatInput" class="chat-input" type="text" placeholder="Still et spørsmål..." />
       <button id="chatSendBtn" class="chat-send" onclick="sendMessage()">Send</button>
     </div>
+  </div>
+</div>
+
+<div id="watchlistSection" style="display:none;max-width:900px;margin:0 auto 2rem;padding:0 2rem;">
+  <div class="watchlist-section">
+    <div class="watchlist-header">
+      <div class="watchlist-label">📌 Min Watchlist</div>
+      <div class="watchlist-limit" id="watchlistLimit"></div>
+    </div>
+    <div id="watchlistGrid"></div>
   </div>
 </div>
 
@@ -368,15 +369,15 @@ function renderStock(s) {
     '<div class="result-header">' +
       '<div class="result-company">' +
         '<div class="company-logo">' + s.ticker.slice(0,4) + '</div>' +
-        '<div><div class="company-name">' + s.name + '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
+        '<div class="company-name">' + s.name + '</div>' +
+        '<button id="watchlistBtn" onclick="toggleWatchlist(currentStock)" style="font-size:11px;padding:4px 12px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap;">+ Watchlist</button>' +
+      '</div>' +
         '<div class="company-meta">' + s.exchange + ' · ' + s.ticker + (s.sector ? ' · ' + s.sector : '') + '</div></div>' +
       '</div>' +
-      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">' +
-      '<button id="watchlistBtn" onclick="toggleWatchlist(currentStock)" style="font-size:11px;padding:5px 12px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;">+ Legg til watchlist</button>' +
       '<div class="price-block">' +
         '<div class="price-main">' + priceStr + ' ' + s.currency + '</div>' +
         '<span class="' + (s.up ? 'badge-up' : 'badge-down') + '">' + changeStr + ' kr &nbsp; (' + pctStr + ') ' + getMarketLabel() + '</span>' +
-      '</div>' +
       '</div>' +
     '</div>' +
     '<div class="metrics" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:1rem;">' +
