@@ -394,6 +394,7 @@ async function generateAI(s) {
 
     sec.innerHTML =
       '<div class="card" style="margin-bottom:1rem"><div class="card-title">Hva gjør selskapet?</div><p>' + (ai.hva || '—') + '</p></div>' +
+      (ai.aktuelt ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva skjer akkurat nå?</div><p>' + ai.aktuelt + '</p></div>' : '') +
       '<div class="bull-bear">' +
         '<div class="card bull"><div class="card-title">Bull-case</div>' + bullHtml + '</div>' +
         '<div class="card bear"><div class="card-title">Bear-case</div>' + bearHtml + '</div>' +
