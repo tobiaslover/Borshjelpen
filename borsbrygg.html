@@ -263,35 +263,67 @@ async function loadBorsbrygg() {
       body: JSON.stringify({
         ticker: 'OSLO',
         name: 'Oslo Børs daglig oppsummering',
-        description: 'Dagens kursdata: ' + stockSummary,
+        description: 'Dagens kursdata for norske aksjer på Oslo Børs: ' + stockSummary +
+          '. Lag en grundig daglig børsoppsummering som dekker: ' +
+          '1) Hva som skjedde i dag på Oslo Børs og hvorfor, ' +
+          '2) De viktigste nyhetene og hendelsene som påvirket markedet, ' +
+          '3) Hvordan disse nyhetene kan påvirke enkeltaksjer fremover, ' +
+          '4) Globale faktorer (olje, renter, valuta) som påvirket norske aksjer, ' +
+          '5) Risikoer og muligheter å følge med på. ' +
+          'Skriv på enkel norsk for nybegynnere. Alltid vis begge sider.',
         price: '0', currency: 'NOK', changePct: '0', up: true, exchange: 'Oslo Børs'
       })
     });
     const ai = await res.json();
 
-    const bull = (ai.bull || []).slice(0, 2);
-    const bear = (ai.bear || []).slice(0, 1);
+    const bull = (ai.bull || []);
+    const bear = (ai.bear || []);
 
     document.getElementById('editionBody').innerHTML =
+
       '<div class="story">' +
-        '<div class="story-tag">Oslo Børs i dag</div>' +
+        '<div class="story-tag">📊 Hva skjedde i dag</div>' +
         '<div class="story-title">' + title + '</div>' +
         '<div class="story-text">' + (ai.hva || '') + '</div>' +
       '</div>' +
+
       '<div class="story">' +
-        '<div class="story-tag">Bull vs. Bear</div>' +
-        '<div class="story-title">Hva driver markedet?</div>' +
-        '<div class="story-text">' + bull.join(' · ') + '</div>' +
+        '<div class="story-tag">📰 Viktigste nyheter og hvorfor</div>' +
+        '<div class="story-title">Dette drev markedet i dag</div>' +
+        '<div class="story-text">' +
+          bull.map(b => '<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:#2C7A5C;font-weight:500;flex-shrink:0;">↑</span><span>' + b + '</span></div>').join('') +
+          bear.map(b => '<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:#A32D2D;font-weight:500;flex-shrink:0;">↓</span><span>' + b + '</span></div>').join('') +
+        '</div>' +
       '</div>' +
+
       '<div class="story">' +
-        '<div class="story-tag">Risiko i dag</div>' +
-        '<div class="story-title">' + (bear[0] || 'Hold øye med markedet') + '</div>' +
+        '<div class="story-tag">📈 Hvordan påvirker dette aksjene</div>' +
+        '<div class="story-title">Slik kan dagens nyheter slå ut fremover</div>' +
+        '<div class="story-text">' +
+          valid.slice(0, 4).map(s => {
+            const sign = parseFloat(s.changePct) >= 0 ? '+' : '';
+            const color = parseFloat(s.changePct) >= 0 ? '#2C7A5C' : '#A32D2D';
+            return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;">' +
+              '<span style="font-weight:500;">' + s.name + '</span>' +
+              '<span style="color:' + color + ';font-weight:500;">' + sign + s.changePct + '%</span>' +
+              '</div>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+
+      '<div class="story">' +
+        '<div class="story-tag">⚠️ Risiko og muligheter</div>' +
+        '<div class="story-title">Hold øye med dette</div>' +
         '<div class="story-text">' + (ai.risiko || '') + '</div>' +
       '</div>' +
+
       '<div class="story">' +
-        '<div class="story-tag">Tips til nybegynnere</div>' +
-        '<div class="story-title">' + (ai.nybegynner_tips || '') + '</div>' +
-        '<div class="story-text" style="font-size:12px;color:#aaa;margin-top:8px;">Ikke finansiell rådgivning · Gjør egne vurderinger</div>' +
+        '<div class="story-tag">💡 Tips til nybegynnere</div>' +
+        '<div class="story-title">' + (ai.nybegynner_tips || 'Husk å alltid gjøre egne vurderinger') + '</div>' +
+        '<div class="story-text" style="font-size:12px;color:#aaa;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0;">' +
+          'Kursdata fra Yahoo Finance · Forsinket ca. 15 min · ' +
+          'Dette er ikke finansiell rådgivning. Gjør alltid egne vurderinger eller snakk med en finansrådgiver.' +
+        '</div>' +
       '</div>';
 
   } catch(e) {
