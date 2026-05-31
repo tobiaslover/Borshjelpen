@@ -203,7 +203,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 <nav class="nav">
   <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
   <div class="nav-links">
-    <a href="/borshjelpen.html">Hjem</a>
+    <a href="/aksjer.html">Aksjer</a>
     <a href="#">Lær</a>
     <a href="/borsbrygg.html">Børsbrygg</a>
     <a href="/kontakt.html">Kontakt</a>
@@ -997,19 +997,17 @@ function applySession(user) {
   }
 }
 
-(async function checkAuth() {
-  try {
-    const sb = window._sb;
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      applySession(session.user);
-    }
-    // Backup: lytt på auth state change
-    sb.auth.onAuthStateChange(function(event, session) {
-      if (session) applySession(session.user);
-    });
-  } catch(e) {}
-})();
+// Lytt på auth state — dette er den mest pålitelige metoden
+window._sb.auth.onAuthStateChange(function(event, session) {
+  if (session) applySession(session.user);
+});
+
+// Sjekk også eksisterende sesjon
+window._sb.auth.getSession().then(function(result) {
+  if (result.data && result.data.session) {
+    applySession(result.data.session.user);
+  }
+});
 </script>
 </body>
 </html>
