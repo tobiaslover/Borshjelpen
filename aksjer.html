@@ -403,6 +403,7 @@ function renderStock(s) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   loadQuarterlyReport(s);
   renderWatchlistBtn(s);
+  logActivity('search', s.ticker, s.name);
 
   // Render stock type badges
   const badges = getStockType(s);
@@ -520,6 +521,22 @@ async function generateAI(s) {
     const sec = document.getElementById('ai-section');
     if (sec) sec.innerHTML = '<div style="padding:1rem;background:#fff8f0;border-radius:10px;font-size:13px;color:#888;margin-bottom:1rem;">Kunne ikke generere AI-sammendrag.</div>';
   }
+}
+
+// Logg aktivitet til Supabase
+async function logActivity(type, ticker, name) {
+  try {
+    const sb = window._sb;
+    if (!sb) return;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    await sb.from('user_activity').insert({
+      user_id: session.user.id,
+      type: type,
+      ticker: ticker,
+      name: name
+    });
+  } catch(e) {}
 }
 
 function doSearch() {
@@ -859,6 +876,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
     document.head.appendChild(script);
     await new Promise(r => script.onload = r);
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    window._sb = sb;
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       const user = session.user;
