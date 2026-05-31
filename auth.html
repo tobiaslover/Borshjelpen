@@ -135,7 +135,10 @@ async function doSignup() {
   setLoading('btn-signup', true);
   const { error } = await sb.auth.signUp({
     email, password: pass,
-    options: { data: { full_name: name } }
+    options: {
+      data: { full_name: name },
+      emailRedirectTo: 'https://borshjelpen.vercel.app/auth.html'
+    }
   });
   setLoading('btn-signup', false);
   if (error) { showMsg(error.message, 'error'); return; }
