@@ -90,6 +90,18 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   .bb-content { padding: 0 1rem; }
   .bb-header-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
+
+.wl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+.wl-card { background: white; border-radius: 12px; border: 1px solid #e8e8e8; overflow: hidden; }
+.wl-header { padding: .75rem 1rem; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+.wl-header.winners { background: #E1F5EE; color: #085041; }
+.wl-header.losers { background: #FCEBEB; color: #A32D2D; }
+.wl-item { display: flex; justify-content: space-between; align-items: center; padding: .75rem 1rem; border-top: 1px solid #f5f5f5; }
+.wl-name { font-size: 13px; font-weight: 500; }
+.wl-ticker { font-size: 11px; color: #aaa; margin-top: 1px; }
+.wl-pct { font-size: 13px; font-weight: 500; }
+.wl-pct.up { color: #2C7A5C; }
+.wl-pct.down { color: #A32D2D; }
 </style>
 </head>
 <body>
@@ -198,6 +210,18 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
           <div class="edition-spinner"></div>
           AI genererer dagens oppsummering...
         </div>
+      </div>
+    </div>
+
+    <div class="archive-label" style="margin-top:1.5rem;">Gårsdagens vinnere og tapere</div>
+    <div class="wl-grid">
+      <div class="wl-card">
+        <div class="wl-header winners">🏆 Gårsdagens vinnere</div>
+        <div id="winnersList"><div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Laster...</div></div>
+      </div>
+      <div class="wl-card">
+        <div class="wl-header losers">📉 Gårsdagens tapere</div>
+        <div id="losersList"><div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Laster...</div></div>
       </div>
     </div>
 
@@ -346,6 +370,38 @@ async function loadBorsbrygg() {
 
 // Last innhold direkte for testing
 loadBorsbrygg();
+loadWinnersLosers();
+
+async function loadWinnersLosers() {
+  const allTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT','KOG','SALM','ORK','STB','GJF','NAS','SUBC'];
+  try {
+    const results = await Promise.all(
+      allTickers.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null))
+    );
+    const valid = results
+      .filter(r => r && !r.error && r.changePct !== undefined)
+      .sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
+
+    const winners = valid.slice(0, 3);
+    const losers = valid.slice(-3).reverse();
+
+    function renderItem(s) {
+      const sign = parseFloat(s.changePct) >= 0 ? '+' : '';
+      const cls = parseFloat(s.changePct) >= 0 ? 'up' : 'down';
+      return '<div class="wl-item">' +
+        '<div><div class="wl-name">' + s.name.split(' ')[0] + '</div><div class="wl-ticker">' + s.ticker + '</div></div>' +
+        '<div class="wl-pct ' + cls + '">' + sign + s.changePct + '%</div>' +
+        '</div>';
+    }
+
+    document.getElementById('winnersList').innerHTML = winners.map(renderItem).join('') || '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
+    document.getElementById('losersList').innerHTML = losers.map(renderItem).join('') || '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
+
+  } catch(e) {
+    document.getElementById('winnersList').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Kunne ikke laste data</div>';
+    document.getElementById('losersList').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Kunne ikke laste data</div>';
+  }
+}
 const SUPABASE_ANON_KEY = 'DIN_SUPABASE_ANON_KEY';
 
 (async function checkAuth() {
