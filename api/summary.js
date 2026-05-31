@@ -74,6 +74,7 @@ Svar KUN med gyldig JSON, ingen markdown:
   "bull": ["Argument for 1", "Argument for 2", "Argument for 3"],
   "bear": ["Argument mot 1", "Argument mot 2", "Argument mot 3"],
   "risiko": "1-2 setninger om viktigste risikoer akkurat nå.",
+  "historisk": "2-3 setninger om hvordan denne aksjen historisk sett har oppført seg. Nevn typisk utvikling over tid, om den er kjent for stabilitet eller svingninger, og hva som historisk har drevet kursen.",
   "nybegynner_tips": "1 konkret tips til nybegynnere.",
   "scenarios": [
     {"label": "Optimistisk scenario", "prob": 30, "return": "+15-25%", "color": "#2C7A5C", "barColor": "#1A5C3A"},
