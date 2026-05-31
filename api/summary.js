@@ -73,7 +73,7 @@ export default async function handler(req, res) {
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(function() { controller.abort(); }, 12000);
+    const timeout = setTimeout(function() { controller.abort(); }, 25000);
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       signal: controller.signal,
@@ -97,7 +97,8 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const err = await response.json();
-      return res.status(500).json({ error: 'Groq feil', detail: err });
+      const msg = (err.error && err.error.message) || JSON.stringify(err);
+      return res.status(500).json({ error: msg });
     }
 
     const data = await response.json();
