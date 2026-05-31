@@ -113,7 +113,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
     <div>
       <div class="profile-name" id="profileName">Laster...</div>
       <div class="profile-email" id="profileEmail"></div>
-      <div class="profile-plan">⭐ Gratis plan</div>
+      <div class="profile-plan" id="profilePlan">🌱 Nybegynner</div>
     </div>
     <button class="edit-btn">Rediger profil</button>
   </div>
@@ -248,7 +248,16 @@ async function loadStats(userId) {
     document.getElementById('statSearch').textContent = searches;
     document.getElementById('statAI').textContent = '—';
     document.getElementById('statNews').textContent = '—';
-    document.getElementById('statXP').textContent = searches * 10;
+    const xp = searches * 2;
+    document.getElementById('statXP').textContent = xp;
+
+    // Vis nivå på profil
+    let level = '🌱 Nybegynner';
+    if (xp >= 1000) level = '🏆 Proff';
+    else if (xp >= 500) level = '🔍 Analytiker';
+    else if (xp >= 100) level = '📈 Investor';
+    const planEl = document.getElementById('profilePlan');
+    if (planEl) planEl.textContent = level;
   } catch(e) {}
 }
 
