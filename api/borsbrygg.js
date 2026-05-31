@@ -8,37 +8,72 @@ export default async function handler(req, res) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY mangler' });
 
-  const { stockSummary, date } = req.body;
+  const { stockSummary } = req.body;
 
-  const today = date || new Date().toLocaleDateString('nb-NO', {
+  const today = new Date().toLocaleDateString('nb-NO', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Oslo'
   });
+
+  // Hent ekte nyheter fra E24 RSS
+  let newsText = '';
+  try {
+    const rssRes = await fetch('https://e24.no/rss/feed', {
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+    if (rssRes.ok) {
+      const rssText = await rssRes.text();
+      const items = [...rssText.matchAll(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/g)]
+        .map(m => (m[1] || m[2] || '').trim())
+        .filter(t => t && t !== 'E24' && t.length > 10)
+        .slice(0, 12);
+      if (items.length) newsText = 'Dagens nyheter fra E24: ' + items.join(' | ');
+    }
+  } catch(e) {}
+
+  // Fallback: prøv DN
+  if (!newsText) {
+    try {
+      const rssRes = await fetch('https://www.dn.no/rss', {
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
+      if (rssRes.ok) {
+        const rssText = await rssRes.text();
+        const items = [...rssText.matchAll(/<title>(.*?)<\/title>/g)]
+          .map(m => m[1].replace(/<!\[CDATA\[|\]\]>/g, '').trim())
+          .filter(t => t && t !== 'DN' && t.length > 10)
+          .slice(0, 12);
+        if (items.length) newsText = 'Dagens nyheter fra DN: ' + items.join(' | ');
+      }
+    } catch(e) {}
+  }
 
   const prompt = `Du er redaktør for Børsbrygg — en daglig børsoppsummering for norske nybegynnere.
 
 Dato: ${today}
 Kursdata fra Oslo Børs i dag: ${stockSummary}
+${newsText ? '\n' + newsText + '\n' : '\nIngen nyhetsdata tilgjengelig — bruk kun kursdata.\n'}
 
-Lag en grundig og informativ daglig børsoppsummering. Svar KUN med gyldig JSON:
+Lag en daglig børsoppsummering BASERT KUN PÅ INFORMASJONEN OVER. Finn ikke opp nyheter. Hvis du ikke har nok nyhetsdata, si det ærlig og fokuser på kursbevegelsene.
 
+Svar KUN med gyldig JSON:
 {
-  "hva_skjedde": "3-4 setninger om hva som faktisk skjedde på Oslo Børs i dag. Nevn konkrete selskaper, kursendringer og de viktigste markedsbevegelsene. Forklar sammenhenger mellom global økonomi (olje, renter, valuta, USA-marked) og norske aksjer. Skriv som en erfaren journalist.",
+  "hva_skjedde": "3-4 setninger om hva som faktisk skjedde på Oslo Børs i dag basert på kursdata og nyheter over. Nevn konkrete selskaper og endringer. IKKE finn opp nyheter.",
   "nyheter": [
-    {"tittel": "Konkret nyhetstittel", "tekst": "2-3 setninger som forklarer nyheten og hvorfor den er viktig for norske investorer.", "aksje": "EQNR eller annen ticker om relevant"},
-    {"tittel": "Andre nyhetstittel", "tekst": "2-3 setninger.", "aksje": null},
-    {"tittel": "Tredje nyhetstittel", "tekst": "2-3 setninger.", "aksje": null}
+    {"tittel": "Tittel basert på faktisk nyhet over", "tekst": "2-3 setninger om nyheten og betydningen.", "aksje": "ticker eller null"},
+    {"tittel": "...", "tekst": "...", "aksje": null},
+    {"tittel": "...", "tekst": "...", "aksje": null}
   ],
   "aksje_påvirkning": [
-    {"ticker": "EQNR", "navn": "Equinor", "forklaring": "Kort forklaring på hvorfor aksjen beveget seg slik den gjorde i dag og hva som kan påvirke den fremover."},
+    {"ticker": "EQNR", "navn": "Equinor", "forklaring": "Kort forklaring basert på faktisk kursdata."},
     {"ticker": "DNB", "navn": "DNB", "forklaring": "..."},
     {"ticker": "TEL", "navn": "Telenor", "forklaring": "..."}
   ],
-  "globale_faktorer": "2-3 setninger om globale faktorer (oljepris, Fed, dollarkurs, europeiske markeder) som påvirket Oslo Børs i dag.",
-  "risiko": "2-3 konkrete risikoer eller muligheter å følge med på i dagene fremover.",
-  "nybegynner_tips": "Ett konkret og nyttig tips til nybegynnere basert på dagens marked."
+  "globale_faktorer": "2-3 setninger om globale faktorer basert på det vi vet fra kursdata og nyheter.",
+  "risiko": "2-3 konkrete risikoer å følge med på fremover.",
+  "nybegynner_tips": "Ett konkret tips til nybegynnere basert på dagens marked."
 }
 
-Regler: Skriv på norsk bokmål. Ingen kjøpsanbefalinger. Alltid vis begge sider. Forklar faguttrykk.`;
+Regler: Norsk bokmål. Ingen kjøpsanbefalinger. Alltid begge sider. Forklar faguttrykk. IKKE finn opp hendelser.`;
 
   try {
     const controller = new AbortController();
@@ -54,9 +89,9 @@ Regler: Skriv på norsk bokmål. Ingen kjøpsanbefalinger. Alltid vis begge side
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         max_tokens: 2000,
-        temperature: 0.5,
+        temperature: 0.3,
         messages: [
-          { role: 'system', content: 'Du er en erfaren norsk finansjournalist. Svar alltid med gyldig JSON og ingenting annet.' },
+          { role: 'system', content: 'Du er en erfaren norsk finansjournalist. Svar alltid med gyldig JSON. Finn aldri opp fakta.' },
           { role: 'user', content: prompt }
         ]
       })
@@ -66,7 +101,7 @@ Regler: Skriv på norsk bokmål. Ingen kjøpsanbefalinger. Alltid vis begge side
 
     if (!response.ok) {
       const err = await response.json();
-      return res.status(500).json({ error: 'Groq API feil', detail: err });
+      return res.status(500).json({ error: 'Groq feil', detail: err });
     }
 
     const data = await response.json();
