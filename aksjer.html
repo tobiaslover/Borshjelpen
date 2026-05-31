@@ -524,6 +524,8 @@ async function generateAI(s) {
 }
 
 // Logg aktivitet til Supabase
+const XP_VALUES = { search: 2, chat: 1, borsbrygg: 5, login: 3, watchlist: 5 };
+
 async function logActivity(type, ticker, name) {
   try {
     const sb = window._sb;
@@ -533,8 +535,9 @@ async function logActivity(type, ticker, name) {
     await sb.from('user_activity').insert({
       user_id: session.user.id,
       type: type,
-      ticker: ticker,
-      name: name
+      ticker: ticker || null,
+      name: name || null,
+      xp: XP_VALUES[type] || 0
     });
   } catch(e) {}
 }
@@ -627,6 +630,7 @@ async function sendMessage() {
   addMsg('user', text);
   chatHistory.push({ role: 'user', content: text });
   addTyping();
+  if (currentStock) logActivity('chat', currentStock.ticker, currentStock.name);
   try {
     const res = await fetch('/api/chat', {
       method: 'POST',
@@ -808,6 +812,7 @@ function toggleWatchlist(s) {
     saveWatchlist(list);
     renderWatchlistBtn(s);
     renderWatchlist();
+    logActivity('watchlist', s.ticker, s.name);
   }
 }
 
