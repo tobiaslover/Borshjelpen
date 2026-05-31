@@ -177,6 +177,25 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .historical-card { background: #1B3A5C; border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; color: white; }
 .historical-title { font-size: 11px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 .historical-text { font-size: 13px; line-height: 1.7; color: rgba(255,255,255,0.85); }
+
+.watchlist-section { margin-top: 2rem; }
+.watchlist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.watchlist-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+.watchlist-empty { background: #fff; border: 1px dashed #e8e8e8; border-radius: 12px; padding: 2rem; text-align: center; color: #aaa; font-size: 13px; }
+.watchlist-empty-icon { font-size: 28px; margin-bottom: 8px; }
+.watchlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.watchlist-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1rem; cursor: pointer; position: relative; transition: border-color 0.15s; }
+.watchlist-card:hover { border-color: #1B3A5C; }
+.watchlist-remove { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; border-radius: 50%; background: #f0f0f0; border: none; cursor: pointer; font-size: 11px; color: #aaa; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.watchlist-remove:hover { background: #fee; color: #A32D2D; }
+.wl-ticker-tag { font-size: 11px; color: #888; margin-bottom: 2px; }
+.wl-name { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+.wl-price-row { display: flex; justify-content: space-between; align-items: center; }
+.wl-price { font-size: 14px; font-weight: 500; }
+.wl-change-up { font-size: 12px; color: #2C7A5C; font-weight: 500; }
+.wl-change-down { font-size: 12px; color: #A32D2D; font-weight: 500; }
+.watchlist-limit { font-size: 11px; color: #C8A96E; text-align: right; margin-bottom: 6px; }
+@media (max-width: 480px) { .watchlist-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
@@ -235,6 +254,15 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 <div class="content">
   <div id="result"></div>
   <div id="trending"></div>
+  <div id="watchlistSection" style="display:none">
+    <div class="watchlist-section">
+      <div class="watchlist-header">
+        <div class="watchlist-label">📌 Min Watchlist</div>
+        <div class="watchlist-limit" id="watchlistLimit"></div>
+      </div>
+      <div id="watchlistGrid"></div>
+    </div>
+  </div>
 </div>
 
 <div class="quarterly-box" id="quarterlyBox" style="display:none">
@@ -343,9 +371,12 @@ function renderStock(s) {
         '<div><div class="company-name">' + s.name + '</div>' +
         '<div class="company-meta">' + s.exchange + ' · ' + s.ticker + (s.sector ? ' · ' + s.sector : '') + '</div></div>' +
       '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">' +
+      '<button id="watchlistBtn" onclick="toggleWatchlist(currentStock)" style="font-size:11px;padding:5px 12px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;">+ Legg til watchlist</button>' +
       '<div class="price-block">' +
         '<div class="price-main">' + priceStr + ' ' + s.currency + '</div>' +
         '<span class="' + (s.up ? 'badge-up' : 'badge-down') + '">' + changeStr + ' kr &nbsp; (' + pctStr + ') ' + getMarketLabel() + '</span>' +
+      '</div>' +
       '</div>' +
     '</div>' +
     '<div class="metrics" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:1rem;">' +
@@ -369,6 +400,7 @@ function renderStock(s) {
   document.getElementById('trending').innerHTML = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
   loadQuarterlyReport(s);
+  renderWatchlistBtn(s);
 
   // Render stock type badges
   const badges = getStockType(s);
@@ -720,6 +752,99 @@ document.addEventListener('click', function(e) {
 });
 
 // keydown håndteres ovenfor
+
+// ===== WATCHLIST =====
+var currentStock = null;
+var WATCHLIST_LIMITS = { free: 2, investor: 10, proff: Infinity };
+
+function getWatchlist() {
+  try { return JSON.parse(localStorage.getItem('bh_watchlist') || '[]'); } catch(e) { return []; }
+}
+
+function saveWatchlist(list) {
+  localStorage.setItem('bh_watchlist', JSON.stringify(list));
+}
+
+function getWatchlistLimit() {
+  // TODO: bytt til ekte Stripe-sjekk ved lansering
+  return WATCHLIST_LIMITS['free']; // Gratis inntil videre
+}
+
+function toggleWatchlist(s) {
+  if (!s) return;
+  var list = getWatchlist();
+  var limit = getWatchlistLimit();
+  var idx = list.findIndex(function(w) { return w.ticker === s.ticker; });
+  if (idx >= 0) {
+    list.splice(idx, 1);
+    saveWatchlist(list);
+    renderWatchlistBtn(s);
+    renderWatchlist();
+  } else {
+    if (list.length >= limit) {
+      alert('Du har nådd grensen på ' + limit + ' aksjer i watchlist. Oppgrader for å legge til flere.');
+      return;
+    }
+    list.push({ ticker: s.ticker, name: s.name, price: s.price, changePct: s.changePct, up: s.up, currency: s.currency });
+    saveWatchlist(list);
+    renderWatchlistBtn(s);
+    renderWatchlist();
+  }
+}
+
+function removeFromWatchlist(ticker) {
+  var list = getWatchlist().filter(function(w) { return w.ticker !== ticker; });
+  saveWatchlist(list);
+  renderWatchlist();
+  if (currentStock && currentStock.ticker === ticker) renderWatchlistBtn(currentStock);
+}
+
+function renderWatchlistBtn(s) {
+  currentStock = s;
+  var btn = document.getElementById('watchlistBtn');
+  if (!btn) return;
+  var list = getWatchlist();
+  var inList = list.some(function(w) { return w.ticker === s.ticker; });
+  btn.textContent = inList ? '✓ I watchlist' : '+ Legg til watchlist';
+  btn.style.background = inList ? '#E1F5EE' : 'none';
+  btn.style.color = inList ? '#085041' : '#888';
+  btn.style.borderColor = inList ? '#a8dcc8' : '#e8e8e8';
+}
+
+function renderWatchlist() {
+  var list = getWatchlist();
+  var section = document.getElementById('watchlistSection');
+  var grid = document.getElementById('watchlistGrid');
+  var limitEl = document.getElementById('watchlistLimit');
+  var limit = getWatchlistLimit();
+
+  if (list.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  limitEl.textContent = list.length + '/' + (limit === Infinity ? '∞' : limit) + ' aksjer';
+
+  grid.innerHTML = list.map(function(s) {
+    var sign = s.up ? '+' : '';
+    var cls = s.up ? 'wl-change-up' : 'wl-change-down';
+    var priceStr = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
+    return '<div class="watchlist-card" onclick="search(\'' + s.ticker + '\')">' +
+      '<button class="watchlist-remove" onclick="event.stopPropagation();removeFromWatchlist(\'' + s.ticker + '\')" title="Fjern">✕</button>' +
+      '<div class="wl-ticker-tag">' + s.ticker + '.OL</div>' +
+      '<div class="wl-name">' + s.name.split(' ')[0] + '</div>' +
+      '<div class="wl-price-row">' +
+        '<span class="wl-price">' + priceStr + ' kr</span>' +
+        '<span class="' + cls + '">' + sign + s.changePct + '%</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// Vis watchlist ved sidelast
+renderWatchlist();
+
 
 // Auth check
 const SUPABASE_URL = 'DIN_SUPABASE_URL';
