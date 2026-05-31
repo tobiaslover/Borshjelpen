@@ -244,7 +244,10 @@ async function loadBorsbrygg() {
       watchlist.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null))
     );
     const valid = results.filter(r => r && !r.error);
-    if (!valid.length) return;
+    if (!valid.length) {
+      document.getElementById('editionBody').innerHTML = '<div class="edition-loading">Kunne ikke hente kursdata. Prøv igjen senere.</div>';
+      return;
+    }
 
     const sorted = [...valid].sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
     const winner = sorted[0];
@@ -257,77 +260,81 @@ async function loadBorsbrygg() {
       return s.name + ' (' + s.ticker + '): ' + s.price + ' NOK, ' + sign + s.changePct + '%';
     }).join(', ');
 
-    const res = await fetch('/api/summary', {
+    const res = await fetch('/api/borsbrygg', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ticker: 'OSLO',
-        name: 'Oslo Børs daglig oppsummering',
-        description: 'Dagens kursdata for norske aksjer på Oslo Børs: ' + stockSummary +
-          '. Lag en grundig daglig børsoppsummering som dekker: ' +
-          '1) Hva som skjedde i dag på Oslo Børs og hvorfor, ' +
-          '2) De viktigste nyhetene og hendelsene som påvirket markedet, ' +
-          '3) Hvordan disse nyhetene kan påvirke enkeltaksjer fremover, ' +
-          '4) Globale faktorer (olje, renter, valuta) som påvirket norske aksjer, ' +
-          '5) Risikoer og muligheter å følge med på. ' +
-          'Skriv på enkel norsk for nybegynnere. Alltid vis begge sider.',
-        price: '0', currency: 'NOK', changePct: '0', up: true, exchange: 'Oslo Børs'
-      })
+      body: JSON.stringify({ stockSummary })
     });
     const ai = await res.json();
-
-    const bull = (ai.bull || []);
-    const bear = (ai.bear || []);
+    if (ai.error) throw new Error(ai.error);
 
     document.getElementById('editionBody').innerHTML =
 
+      // 1. Hva skjedde
       '<div class="story">' +
         '<div class="story-tag">📊 Hva skjedde i dag</div>' +
         '<div class="story-title">' + title + '</div>' +
-        '<div class="story-text">' + (ai.hva || '') + '</div>' +
+        '<div class="story-text">' + (ai.hva_skjedde || '') + '</div>' +
       '</div>' +
 
+      // 2. Globale faktorer
       '<div class="story">' +
-        '<div class="story-tag">📰 Viktigste nyheter og hvorfor</div>' +
-        '<div class="story-title">Dette drev markedet i dag</div>' +
+        '<div class="story-tag">🌍 Globale faktorer</div>' +
+        '<div class="story-title">Slik påvirket verden Oslo Børs</div>' +
+        '<div class="story-text">' + (ai.globale_faktorer || '') + '</div>' +
+      '</div>' +
+
+      // 3. Viktige nyheter
+      '<div class="story">' +
+        '<div class="story-tag">📰 Viktige nyheter</div>' +
+        '<div class="story-title">Dette bør du vite</div>' +
         '<div class="story-text">' +
-          bull.map(b => '<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:#2C7A5C;font-weight:500;flex-shrink:0;">↑</span><span>' + b + '</span></div>').join('') +
-          bear.map(b => '<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:#A32D2D;font-weight:500;flex-shrink:0;">↓</span><span>' + b + '</span></div>').join('') +
+          (ai.nyheter || []).map(n =>
+            '<div style="margin-bottom:1rem;padding:1rem;background:#f8f7f4;border-radius:10px;">' +
+              '<div style="font-weight:500;font-size:14px;margin-bottom:4px;">' + n.tittel + (n.aksje ? ' <span style="background:#1B3A5C;color:#C8A96E;font-size:10px;padding:2px 8px;border-radius:100px;font-weight:400;">' + n.aksje + '</span>' : '') + '</div>' +
+              '<div style="font-size:13px;color:#555;line-height:1.6;">' + n.tekst + '</div>' +
+            '</div>'
+          ).join('') +
         '</div>' +
       '</div>' +
 
+      // 4. Aksje-påvirkning
       '<div class="story">' +
         '<div class="story-tag">📈 Hvordan påvirker dette aksjene</div>' +
-        '<div class="story-title">Slik kan dagens nyheter slå ut fremover</div>' +
+        '<div class="story-title">Slik kan det slå ut fremover</div>' +
         '<div class="story-text">' +
-          valid.slice(0, 4).map(s => {
-            const sign = parseFloat(s.changePct) >= 0 ? '+' : '';
-            const color = parseFloat(s.changePct) >= 0 ? '#2C7A5C' : '#A32D2D';
-            return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;">' +
-              '<span style="font-weight:500;">' + s.name + '</span>' +
-              '<span style="color:' + color + ';font-weight:500;">' + sign + s.changePct + '%</span>' +
-              '</div>';
+          (ai.aksje_påvirkning || []).map(a => {
+            const stock = valid.find(s => s.ticker === a.ticker);
+            const sign = stock && parseFloat(stock.changePct) >= 0 ? '+' : '';
+            const color = stock && parseFloat(stock.changePct) >= 0 ? '#2C7A5C' : '#A32D2D';
+            const pct = stock ? sign + stock.changePct + '%' : '';
+            return '<div style="padding:12px 0;border-bottom:1px solid #f0f0f0;">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+                '<span style="font-weight:500;">' + a.navn + '</span>' +
+                '<span style="color:' + color + ';font-size:13px;font-weight:500;">' + pct + '</span>' +
+              '</div>' +
+              '<div style="font-size:13px;color:#555;line-height:1.6;">' + a.forklaring + '</div>' +
+            '</div>';
           }).join('') +
         '</div>' +
       '</div>' +
 
+      // 5. Risiko
       '<div class="story">' +
         '<div class="story-tag">⚠️ Risiko og muligheter</div>' +
         '<div class="story-title">Hold øye med dette</div>' +
         '<div class="story-text">' + (ai.risiko || '') + '</div>' +
       '</div>' +
 
+      // 6. Tips
       '<div class="story">' +
         '<div class="story-tag">💡 Tips til nybegynnere</div>' +
-        '<div class="story-title">' + (ai.nybegynner_tips || 'Husk å alltid gjøre egne vurderinger') + '</div>' +
-        '<div class="story-text" style="font-size:12px;color:#aaa;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0;">' +
-          'Kursdata fra Yahoo Finance · Forsinket ca. 15 min · ' +
-          'Dette er ikke finansiell rådgivning. Gjør alltid egne vurderinger eller snakk med en finansrådgiver.' +
-        '</div>' +
+        '<div class="story-title">' + (ai.nybegynner_tips || '') + '</div>' +
+        '<div class="story-text" style="font-size:12px;color:#aaa;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0;">Kursdata fra Yahoo Finance · Forsinket ca. 15 min · Ikke finansiell rådgivning · Gjør alltid egne vurderinger.</div>' +
       '</div>';
 
   } catch(e) {
-    document.getElementById('editionBody').innerHTML = '<div class="edition-loading">Kunne ikke laste innhold. Prøv igjen senere.</div>';
+    document.getElementById('editionBody').innerHTML = '<div class="edition-loading">Kunne ikke laste innhold: ' + e.message + '</div>';
   }
 }
 
