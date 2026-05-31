@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt oss — Børshjelpen</title>
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; min-height: 100vh; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; background: white; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
+.logo span { color: #C8A96E; }
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #666; text-decoration: none; }
+.nav-links a:hover { color: #1B3A5C; }
+.nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+.page { max-width: 600px; margin: 4rem auto; padding: 0 2rem; }
+.page-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; margin-bottom: 6px; }
+.page-sub { font-size: 15px; color: #666; margin-bottom: 2.5rem; line-height: 1.7; }
+
+.form-card { background: white; border-radius: 16px; border: 1px solid #e8e8e8; padding: 2rem; }
+.field { margin-bottom: 1.25rem; }
+.field label { display: block; font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 11px 14px; border-radius: 10px;
+  border: 1px solid #e8e8e8; font-size: 14px;
+  font-family: 'DM Sans', sans-serif; outline: none;
+  transition: border-color .15s; background: #fafafa;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: #1B3A5C; background: white; }
+.field textarea { resize: vertical; min-height: 130px; }
+.btn { width: 100%; padding: 12px; border-radius: 100px; border: none; background: #1B3A5C; color: white; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: .5rem; transition: background .15s; }
+.btn:hover { background: #2a5070; }
+.btn:disabled { background: #ccc; cursor: not-allowed; }
+.success { display: none; text-align: center; padding: 2rem; }
+.success-icon { font-size: 48px; margin-bottom: 1rem; }
+.success-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.success-sub { font-size: 14px; color: #666; }
+
+.info-row { display: flex; gap: 1rem; margin-top: 2rem; }
+.info-card { flex: 1; background: white; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1.25rem; text-align: center; }
+.info-icon { font-size: 24px; margin-bottom: 8px; }
+.info-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.info-val { font-size: 13px; font-weight: 500; color: #1B3A5C; }
+
+@media (max-width: 768px) {
+  .nav-links a { display: none; }
+  .page { margin: 2rem auto; }
+  .info-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <div class="nav-links">
+    <a href="/aksjer.html">Aksjer</a>
+    <a href="#">Lær</a>
+    <a href="#">Børsbrygg</a>
+    <a href="/kontakt.html" style="color:#1B3A5C;font-weight:500;">Kontakt</a>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">Kontakt oss</div>
+  <p class="page-sub">Har du spørsmål, tilbakemeldinger eller ønsker å samarbeide? Vi hører gjerne fra deg og svarer innen 1–2 virkedager.</p>
+
+  <div class="form-card">
+    <div id="formWrap">
+      <div class="field">
+        <label>Navn</label>
+        <input type="text" id="navn" placeholder="Ditt fulle navn" />
+      </div>
+      <div class="field">
+        <label>E-post</label>
+        <input type="email" id="epost" placeholder="din@epost.no" />
+      </div>
+      <div class="field">
+        <label>Emne</label>
+        <select id="emne">
+          <option value="">Velg emne...</option>
+          <option value="Teknisk problem">Teknisk problem</option>
+          <option value="Spørsmål om abonnement">Spørsmål om abonnement</option>
+          <option value="Tilbakemelding på tjenesten">Tilbakemelding på tjenesten</option>
+          <option value="Samarbeid eller presse">Samarbeid eller presse</option>
+          <option value="Personvern og data">Personvern og data</option>
+          <option value="Annet">Annet</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Melding</label>
+        <textarea id="melding" placeholder="Skriv meldingen din her..."></textarea>
+      </div>
+      <button class="btn" id="sendBtn" onclick="sendForm()">Send melding</button>
+    </div>
+
+    <div class="success" id="successMsg">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Melding sendt!</div>
+      <p class="success-sub">Takk for at du tok kontakt. Vi svarer på <strong id="successEmail"></strong> innen 1–2 virkedager.</p>
+    </div>
+  </div>
+
+  <div class="info-row">
+    <div class="info-card">
+      <div class="info-icon">📧</div>
+      <div class="info-label">E-post</div>
+      <div class="info-val">kontakt@børshjelpen.no</div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">⏱️</div>
+      <div class="info-label">Responstid</div>
+      <div class="info-val">1–2 virkedager</div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">🇳🇴</div>
+      <div class="info-label">Basert i</div>
+      <div class="info-val">Norge</div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function sendForm() {
+  const navn = document.getElementById('navn').value.trim();
+  const epost = document.getElementById('epost').value.trim();
+  const emne = document.getElementById('emne').value;
+  const melding = document.getElementById('melding').value.trim();
+
+  if (!navn || !epost || !emne || !melding) {
+    alert('Fyll inn alle feltene.');
+    return;
+  }
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sender...';
+
+  // Send via Formspree (gratis kontaktskjema-tjeneste)
+  // Bytt ut URL med din egen Formspree-endpoint
+  try {
+    const res = await fetch('https://formspree.io/f/DIN_FORMSPREE_ID', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ navn, epost, emne, melding })
+    });
+
+    if (res.ok) {
+      document.getElementById('formWrap').style.display = 'none';
+      document.getElementById('successEmail').textContent = epost;
+      document.getElementById('successMsg').style.display = 'block';
+    } else {
+      throw new Error('Feil');
+    }
+  } catch(e) {
+    // Fallback: åpne e-postklient
+    const subject = encodeURIComponent('[Børshjelpen] ' + emne);
+    const body = encodeURIComponent('Navn: ' + navn + '\nE-post: ' + epost + '\n\n' + melding);
+    window.location.href = 'mailto:kontakt@børshjelpen.no?subject=' + subject + '&body=' + body;
+    btn.disabled = false;
+    btn.textContent = 'Send melding';
+  }
+}
+</script>
+</body>
+</html>
