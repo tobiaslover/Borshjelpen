@@ -120,29 +120,14 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 
   <div class="section-label">Aktivitet</div>
   <div class="stats-grid">
-    <div class="stat-card"><div class="stat-num">14</div><div class="stat-lbl">Aksjer søkt</div></div>
-    <div class="stat-card"><div class="stat-num">28</div><div class="stat-lbl">AI-spørsmål</div></div>
-    <div class="stat-card"><div class="stat-num">7</div><div class="stat-lbl">Nyhetsbrev lest</div></div>
-    <div class="stat-card"><div class="stat-num gold">340</div><div class="stat-lbl">XP opptjent</div></div>
+    <div class="stat-card"><div class="stat-num" id="statSearch">—</div><div class="stat-lbl">Aksjer søkt</div></div>
+    <div class="stat-card"><div class="stat-num" id="statAI">—</div><div class="stat-lbl">AI-spørsmål</div></div>
+    <div class="stat-card"><div class="stat-num" id="statNews">—</div><div class="stat-lbl">Nyhetsbrev lest</div></div>
+    <div class="stat-card"><div class="stat-num gold" id="statXP">—</div><div class="stat-lbl">XP opptjent</div></div>
   </div>
 
   <div class="section-label">Overvåkningsliste</div>
-  <div class="watch-grid">
-    <div class="wcard" onclick="location.href='aksjer.html'">
-      <div class="wt">EQNR.OL</div>
-      <div class="wn">Equinor</div>
-      <div class="wrow"><span class="wp">274,50 kr</span><span class="badge-up">+2,1%</span></div>
-    </div>
-    <div class="wcard" onclick="location.href='aksjer.html'">
-      <div class="wt">DNB.OL</div>
-      <div class="wn">DNB Bank</div>
-      <div class="wrow"><span class="wp">228,30 kr</span><span class="badge-down">-0,8%</span></div>
-    </div>
-    <div class="wcard" onclick="location.href='aksjer.html'">
-      <div class="wt">MOWI.OL</div>
-      <div class="wn">Mowi</div>
-      <div class="wrow"><span class="wp">186,40 kr</span><span class="badge-up">+1,7%</span></div>
-    </div>
+  <div class="watch-grid" id="watchGrid">
     <div class="wcard add" onclick="location.href='aksjer.html'">
       <span style="font-size:22px">+</span>
       <span style="font-size:12px">Legg til aksje</span>
@@ -154,18 +139,59 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
     <div style="padding:1.5rem;text-align:center;color:#aaa;font-size:13px;">Laster aktivitet...</div>
   </div>
 
-  <div class="upgrade-card">
-    <div>
-      <div class="uc-title">Oppgrader til Premium</div>
-      <div class="uc-sub">Lås opp alle funksjoner</div>
-      <div class="uc-features">
-        <div class="uc-feat">✓ Ubegrenset AI-chat</div>
-        <div class="uc-feat">✓ Alle aksjer — Oslo Børs + internasjonale</div>
-        <div class="uc-feat">✓ Daglig nyhetsbrev med kvartalsrapporter</div>
-        <div class="uc-feat">✓ Prisvarsel når aksjer beveger seg</div>
+  <div style="margin-top:1.5rem;">
+    <div class="section-label" style="margin-bottom:1rem;">Oppgrader abonnement</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+
+      <div style="background:#f8f7f4;border:2px solid #e8e8e8;border-radius:16px;padding:1.25rem;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Gratis</div>
+        <div style="font-family:'Playfair Display',serif;font-size:24px;color:#1B3A5C;margin-bottom:3px;">0 kr</div>
+        <div style="font-size:11px;color:#aaa;margin-bottom:1rem;">For alltid</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem;">
+          <div style="font-size:12px;color:#555;">✓ AI-analyse — 2 per dag</div>
+          <div style="font-size:12px;color:#555;">✓ AI-chat — 5 spørsmål per dag</div>
+          <div style="font-size:12px;color:#555;">✓ Watchlist — 2 aksjer</div>
+          <div style="font-size:12px;color:#555;">✓ Børsbrygg</div>
+          <div style="font-size:12px;color:#555;">✓ Læring — grunnleggende</div>
+        </div>
+        <div style="font-size:12px;color:#C8A96E;font-weight:500;text-align:center;">Din nåværende plan</div>
       </div>
+
+      <div style="background:#1B3A5C;border:2px solid #1B3A5C;border-radius:16px;padding:1.25rem;position:relative;">
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#C8A96E;color:#1B3A5C;font-size:10px;font-weight:500;padding:3px 10px;border-radius:100px;white-space:nowrap;">Mest populær</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Investor</div>
+        <div style="font-family:'Playfair Display',serif;font-size:24px;color:white;margin-bottom:3px;">79 kr</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:1rem;">per måned</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem;">
+          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ AI-analyse</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ AI-chat</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ Watchlist — opptil 10 aksjer</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ Børsbrygg</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ Børsmeldinger oppsummert</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ Læring</div>
+        </div>
+        <button onclick="location.href='auth.html'" style="width:100%;padding:9px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Abonner →</button>
+      </div>
+
+      <div style="background:#f8f7f4;border:2px solid #e8e8e8;border-radius:16px;padding:1.25rem;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Proff</div>
+        <div style="font-family:'Playfair Display',serif;font-size:24px;color:#1B3A5C;margin-bottom:3px;">149 kr</div>
+        <div style="font-size:11px;color:#aaa;margin-bottom:1rem;">per måned</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem;">
+          <div style="font-size:12px;color:#555;">✓ AI-analyse</div>
+          <div style="font-size:12px;color:#555;">✓ AI-chat</div>
+          <div style="font-size:12px;color:#555;">✓ Watchlist — ubegrenset</div>
+          <div style="font-size:12px;color:#555;">✓ Børsbrygg</div>
+          <div style="font-size:12px;color:#555;">✓ Børsmeldinger oppsummert</div>
+          <div style="font-size:12px;color:#555;">✓ Læring</div>
+          <div style="font-size:12px;color:#555;">✓ Kvartalsrapporter oppsummert</div>
+          <div style="font-size:12px;color:#555;">✓ Porteføljeanalyse</div>
+        </div>
+        <button onclick="location.href='auth.html'" style="width:100%;padding:9px;border-radius:100px;border:1px solid #1B3A5C;background:none;color:#1B3A5C;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
+      </div>
+
     </div>
-    <button class="uc-btn">99 kr/mnd →</button>
+    <p style="font-size:11px;color:#aaa;text-align:center;margin-top:1rem;">Ingen bindingstid · Avslutt når som helst</p>
   </div>
 </div>
 
@@ -196,9 +222,52 @@ async function loadUser() {
 
   // Hent faktisk aktivitet fra Supabase
   loadActivity(user.id);
+  loadStats(user.id);
+  loadWatchlist();
 }
 
-async function loadActivity(userId) {
+async function loadStats(userId) {
+  try {
+    const { data } = await sb
+      .from('user_activity')
+      .select('type')
+      .eq('user_id', userId);
+    const searches = (data || []).filter(function(d) { return d.type === 'search'; }).length;
+    document.getElementById('statSearch').textContent = searches;
+    document.getElementById('statAI').textContent = '—';
+    document.getElementById('statNews').textContent = '—';
+    document.getElementById('statXP').textContent = searches * 10;
+  } catch(e) {}
+}
+
+function loadWatchlist() {
+  try {
+    const list = JSON.parse(localStorage.getItem('bh_watchlist') || '[]');
+    const grid = document.getElementById('watchGrid');
+    if (list.length === 0) {
+      grid.innerHTML = '<div class="wcard add" onclick="location.href=\'aksjer.html\'">' +
+        '<span style="font-size:22px">+</span>' +
+        '<span style="font-size:12px">Legg til aksje</span>' +
+        '</div>';
+      return;
+    }
+    grid.innerHTML = list.map(function(s) {
+      const sign = s.up ? '+' : '';
+      const cls = s.up ? 'badge-up' : 'badge-down';
+      const priceStr = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
+      return '<div class="wcard" onclick="location.href=\'aksjer.html?ticker=' + s.ticker + '\'">' +
+        '<div class="wt">' + s.ticker + '.OL</div>' +
+        '<div class="wn">' + s.name.split(' ')[0] + '</div>' +
+        '<div class="wrow"><span class="wp">' + priceStr + ' kr</span>' +
+        '<span class="' + cls + '">' + sign + s.changePct + '%</span></div>' +
+        '</div>';
+    }).join('') +
+    '<div class="wcard add" onclick="location.href=\'aksjer.html\'">' +
+      '<span style="font-size:22px">+</span>' +
+      '<span style="font-size:12px">Legg til aksje</span>' +
+    '</div>';
+  } catch(e) {}
+}
   const list = document.getElementById('activityList');
   try {
     const { data, error } = await sb
