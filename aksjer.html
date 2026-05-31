@@ -394,32 +394,55 @@ function renderStock(s) {
 
 function getStockType(s) {
   const badges = [];
-  const div = parseFloat(s.dividendYield) || 0;
-  const beta = parseFloat(s.beta) || 1;
-  const pe = parseFloat(s.pe) || 0;
   const sector = (s.sector || '').toLowerCase();
+  const name = (s.name || '').toLowerCase();
+  const ticker = (s.ticker || '').toUpperCase();
 
-  // Utbytte
-  if (div > 2) badges.push({label: '💰 Utbytteaksje', cls: 'badge-dividend'});
-  else if (div > 0.5) badges.push({label: '💵 Lavt utbytte', cls: 'badge-dividend'});
+  // Kjente utbytteaksjer
+  const dividendStocks = ['EQNR','DNB','TEL','NHY','YAR','ORK','GJF','STB','AKRBP','SUBC'];
+  if (dividendStocks.includes(ticker)) badges.push({label: '💰 Utbytteaksje', cls: 'badge-dividend'});
 
-  // Vekst vs verdi
-  if (pe > 30) badges.push({label: '🚀 Vekstaksje', cls: 'badge-growth'});
-  else if (pe > 0 && pe < 15) badges.push({label: '💎 Verdiaksje', cls: 'badge-value'});
+  // Kjente vekstaksjer
+  const growthStocks = ['KAHOT','NEL','RECSI','SCATC','HYON','CLOUD'];
+  if (growthStocks.includes(ticker)) badges.push({label: '🚀 Vekstaksje', cls: 'badge-growth'});
 
-  // Syklisk vs defensiv
-  if (sector.includes('energy') || sector.includes('material') || sector.includes('industri')) {
-    badges.push({label: '🔄 Syklisk', cls: 'badge-cyclical'});
-  } else if (sector.includes('consumer staples') || sector.includes('utilities') || sector.includes('health')) {
-    badges.push({label: '🛡️ Defensiv', cls: 'badge-defensive'});
+  // Sjømat
+  if (ticker === 'MOWI' || ticker === 'SALM' || ticker === 'LSG' || ticker === 'GRIEG' || ticker === 'AUSS') {
+    badges.push({label: '🐟 Sjømat', cls: 'badge-value'});
   }
 
-  // Volatilitet
-  if (beta > 1.5) badges.push({label: '⚡ Høy volatilitet', cls: 'badge-small'});
-  else if (beta < 0.7) badges.push({label: '😴 Lav volatilitet', cls: 'badge-small'});
+  // Energi / olje
+  if (sector.includes('energy') || ticker === 'EQNR' || ticker === 'AKRBP' || ticker === 'VAR' || ticker === 'OKEA') {
+    badges.push({label: '⛽ Energi', cls: 'badge-cyclical'});
+  }
 
-  // Sektor
-  if (s.sector) badges.push({label: s.sector, cls: 'badge-small'});
+  // Finans
+  if (sector.includes('financial') || ticker === 'DNB' || ticker === 'STB' || ticker === 'GJF' || ticker === 'SRBANK') {
+    badges.push({label: '🏦 Finans', cls: 'badge-defensive'});
+  }
+
+  // Teknologi
+  if (sector.includes('tech') || ticker === 'KAHOT' || ticker === 'TOMRA' || ticker === 'BOUVET' || ticker === 'PEXIP') {
+    badges.push({label: '💻 Teknologi', cls: 'badge-growth'});
+  }
+
+  // Shipping
+  if (ticker === 'FRONTLINE' || ticker === 'GOGL' || ticker === 'BWLPG' || ticker === 'MPCC' || ticker === 'BELCO') {
+    badges.push({label: '🚢 Shipping', cls: 'badge-cyclical'});
+  }
+
+  // Statseiet
+  if (ticker === 'EQNR' || ticker === 'DNB' || ticker === 'TEL') {
+    badges.push({label: '🇳🇴 Statseiet', cls: 'badge-small'});
+  }
+
+  // Sektornavn som fallback
+  if (badges.length === 0 && s.sector) {
+    badges.push({label: s.sector, cls: 'badge-small'});
+  }
+
+  // Børs
+  badges.push({label: 'Oslo Børs', cls: 'badge-small'});
 
   return badges;
 }
