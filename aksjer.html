@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aksjer — Børshjelpen</title>
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
@@ -979,15 +980,11 @@ renderWatchlist();
 // Auth check
 const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
+window._sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 (async function checkAuth() {
   try {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    document.head.appendChild(script);
-    await new Promise(r => script.onload = r);
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    window._sb = sb;
+    const sb = window._sb;
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       const user = session.user;
@@ -1005,12 +1002,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         document.getElementById('mobileName').textContent = name.split(' ')[0];
       }
 
-    }
-  } catch(e) {}
-})();
-</script>
-</body>
-</html>
     }
   } catch(e) {}
 })();
