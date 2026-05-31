@@ -113,7 +113,10 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
     <div>
       <div class="profile-name" id="profileName">Laster...</div>
       <div class="profile-email" id="profileEmail"></div>
-      <div class="profile-plan" id="profilePlan">🌱 Nybegynner</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+        <div class="profile-plan" style="background:#E6EEF5;color:#1B3A5C;border-color:#b0cce0;">🔵 Gratis</div>
+        <div class="profile-plan" id="profilePlan" style="background:#1B3A5C;color:#C8A96E;border-color:#1B3A5C;">🌱 Nybegynner</div>
+      </div>
     </div>
     <button class="edit-btn">Rediger profil</button>
   </div>
@@ -126,7 +129,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
     <div class="stat-card"><div class="stat-num gold" id="statXP">—</div><div class="stat-lbl">XP opptjent</div></div>
   </div>
 
-  <div class="section-label">Overvåkningsliste</div>
+  <div class="section-label">Watchlist</div>
   <div class="watch-grid" id="watchGrid">
     <div class="wcard add" onclick="location.href='aksjer.html'">
       <span style="font-size:22px">+</span>
@@ -143,8 +146,8 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
     <div class="section-label" style="margin-bottom:1rem;">Oppgrader abonnement</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
 
-      <div style="background:#f8f7f4;border:2px solid #e8e8e8;border-radius:16px;padding:1.25rem;">
-        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Gratis</div>
+      <div style="background:#E6EEF5;border:2px solid #b0cce0;border-radius:16px;padding:1.25rem;">
+        <div style="font-size:11px;color:#1B3A5C;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Gratis</div>
         <div style="font-family:'Playfair Display',serif;font-size:24px;color:#1B3A5C;margin-bottom:3px;">0 kr</div>
         <div style="font-size:11px;color:#aaa;margin-bottom:1rem;">For alltid</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem;">
@@ -154,40 +157,40 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
           <div style="font-size:12px;color:#555;">✓ Børsbrygg</div>
           <div style="font-size:12px;color:#555;">✓ Læring — grunnleggende</div>
         </div>
-        <div style="font-size:12px;color:#C8A96E;font-weight:500;text-align:center;">Din nåværende plan</div>
+        <div style="font-size:12px;color:#1B3A5C;font-weight:500;text-align:center;">Din nåværende plan</div>
       </div>
 
-      <div style="background:#1B3A5C;border:2px solid #1B3A5C;border-radius:16px;padding:1.25rem;position:relative;">
+      <div style="background:linear-gradient(135deg,#e8e8e8,#f5f5f5);border:2px solid #aaa;border-radius:16px;padding:1.25rem;position:relative;">
         <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#C8A96E;color:#1B3A5C;font-size:10px;font-weight:500;padding:3px 10px;border-radius:100px;white-space:nowrap;">Mest populær</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Investor</div>
-        <div style="font-family:'Playfair Display',serif;font-size:24px;color:white;margin-bottom:3px;">79 kr</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:1rem;">per måned</div>
+        <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Investor</div>
+        <div style="font-family:'Playfair Display',serif;font-size:24px;color:#333;margin-bottom:3px;">79 kr</div>
+        <div style="font-size:11px;color:#777;margin-bottom:1rem;">per måned</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem;">
-          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ AI-analyse</div>
-          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ AI-chat</div>
-          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ Watchlist — opptil 10 aksjer</div>
-          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ Børsbrygg</div>
-          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ Børsmeldinger oppsummert</div>
-          <div style="font-size:12px;color:rgba(255,255,255,.8);">✓ Læring</div>
+          <div style="font-size:12px;color:#444;">✓ AI-analyse</div>
+          <div style="font-size:12px;color:#444;">✓ AI-chat</div>
+          <div style="font-size:12px;color:#444;">✓ Watchlist — opptil 10 aksjer</div>
+          <div style="font-size:12px;color:#444;">✓ Børsbrygg</div>
+          <div style="font-size:12px;color:#444;">✓ Børsmeldinger oppsummert</div>
+          <div style="font-size:12px;color:#444;">✓ Læring</div>
         </div>
-        <button onclick="location.href='auth.html'" style="width:100%;padding:9px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Abonner →</button>
+        <button onclick="location.href='auth.html'" style="width:100%;padding:9px;border-radius:100px;border:none;background:#888;color:white;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Abonner →</button>
       </div>
 
-      <div style="background:#f8f7f4;border:2px solid #e8e8e8;border-radius:16px;padding:1.25rem;">
-        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Proff</div>
-        <div style="font-family:'Playfair Display',serif;font-size:24px;color:#1B3A5C;margin-bottom:3px;">149 kr</div>
-        <div style="font-size:11px;color:#aaa;margin-bottom:1rem;">per måned</div>
+      <div style="background:linear-gradient(135deg,#FFF8E7,#FFF0C0);border:2px solid #C8A96E;border-radius:16px;padding:1.25rem;">
+        <div style="font-size:11px;color:#8B6E3A;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Proff</div>
+        <div style="font-family:'Playfair Display',serif;font-size:24px;color:#8B6E3A;margin-bottom:3px;">149 kr</div>
+        <div style="font-size:11px;color:#a07830;margin-bottom:1rem;">per måned</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem;">
-          <div style="font-size:12px;color:#555;">✓ AI-analyse</div>
-          <div style="font-size:12px;color:#555;">✓ AI-chat</div>
-          <div style="font-size:12px;color:#555;">✓ Watchlist — ubegrenset</div>
+          <div style="font-size:12px;color:#5a4520;">✓ AI-analyse</div>
+          <div style="font-size:12px;color:#5a4520;">✓ AI-chat</div>
+          <div style="font-size:12px;color:#5a4520;">✓ Watchlist — ubegrenset</div>
           <div style="font-size:12px;color:#555;">✓ Børsbrygg</div>
           <div style="font-size:12px;color:#555;">✓ Børsmeldinger oppsummert</div>
           <div style="font-size:12px;color:#555;">✓ Læring</div>
           <div style="font-size:12px;color:#555;">✓ Kvartalsrapporter oppsummert</div>
           <div style="font-size:12px;color:#555;">✓ Porteføljeanalyse</div>
         </div>
-        <button onclick="location.href='auth.html'" style="width:100%;padding:9px;border-radius:100px;border:1px solid #1B3A5C;background:none;color:#1B3A5C;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
+        <button onclick="location.href='auth.html'" style="width:100%;padding:9px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
       </div>
 
     </div>
