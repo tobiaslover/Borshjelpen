@@ -165,6 +165,18 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .quarterly-loading { padding: 1.5rem; text-align: center; color: #aaa; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; grid-column: 1/-1; }
 .quarterly-spinner { width: 18px; height: 18px; border: 2px solid #e8e8e8; border-top-color: #C8A96E; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
 @media (max-width: 480px) { .quarterly-body { grid-template-columns: 1fr; } .quarterly-box { padding: 0 1rem; } }
+
+.stock-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+.stock-badge { font-size: 11px; padding: 4px 12px; border-radius: 100px; font-weight: 500; }
+.badge-dividend { background: #E1F5EE; color: #085041; border: 1px solid #a8dcc8; }
+.badge-growth { background: #E6EEF5; color: #1B3A5C; border: 1px solid #b0cce0; }
+.badge-value { background: #EEE8DA; color: #5a4520; border: 1px solid #d4c4a0; }
+.badge-cyclical { background: #FFF3E0; color: #7a4000; border: 1px solid #f0c070; }
+.badge-defensive { background: #F3E5F5; color: #4a0080; border: 1px solid #c090e0; }
+.badge-small { background: #FAFAFA; color: #555; border: 1px solid #ddd; }
+.historical-card { background: #1B3A5C; border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; color: white; }
+.historical-title { font-size: 11px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.historical-text { font-size: 13px; line-height: 1.7; color: rgba(255,255,255,0.85); }
 </style>
 </head>
 <body>
@@ -324,6 +336,7 @@ function renderStock(s) {
   const pctStr = sign + parseFloat(s.changePct).toFixed(2) + '%';
 
   document.getElementById('result').innerHTML =
+    '<div id="stockBadges" class="stock-badges"></div>' +
     '<div class="result-header">' +
       '<div class="result-company">' +
         '<div class="company-logo">' + s.ticker.slice(0,4) + '</div>' +
@@ -357,6 +370,15 @@ function renderStock(s) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   loadQuarterlyReport(s);
 
+  // Render stock type badges
+  const badges = getStockType(s);
+  const badgesEl = document.getElementById('stockBadges');
+  if (badgesEl && badges.length) {
+    badgesEl.innerHTML = badges.map(function(b) {
+      return '<span class="stock-badge ' + b.cls + '">' + b.label + '</span>';
+    }).join('');
+  }
+
   // Vis chat
   currentStockContext = s;
   const widget = document.getElementById('chatWidget');
@@ -367,6 +389,39 @@ function renderStock(s) {
     '<button class="csug" onclick="askSug(this)">Hva er risikoen?</button>' +
     '<button class="csug" onclick="askSug(this)">Hva er P/E?</button>';
   chatHistory = [];
+}
+
+
+function getStockType(s) {
+  const badges = [];
+  const div = parseFloat(s.dividendYield) || 0;
+  const beta = parseFloat(s.beta) || 1;
+  const pe = parseFloat(s.pe) || 0;
+  const sector = (s.sector || '').toLowerCase();
+
+  // Utbytte
+  if (div > 2) badges.push({label: '💰 Utbytteaksje', cls: 'badge-dividend'});
+  else if (div > 0.5) badges.push({label: '💵 Lavt utbytte', cls: 'badge-dividend'});
+
+  // Vekst vs verdi
+  if (pe > 30) badges.push({label: '🚀 Vekstaksje', cls: 'badge-growth'});
+  else if (pe > 0 && pe < 15) badges.push({label: '💎 Verdiaksje', cls: 'badge-value'});
+
+  // Syklisk vs defensiv
+  if (sector.includes('energy') || sector.includes('material') || sector.includes('industri')) {
+    badges.push({label: '🔄 Syklisk', cls: 'badge-cyclical'});
+  } else if (sector.includes('consumer staples') || sector.includes('utilities') || sector.includes('health')) {
+    badges.push({label: '🛡️ Defensiv', cls: 'badge-defensive'});
+  }
+
+  // Volatilitet
+  if (beta > 1.5) badges.push({label: '⚡ Høy volatilitet', cls: 'badge-small'});
+  else if (beta < 0.7) badges.push({label: '😴 Lav volatilitet', cls: 'badge-small'});
+
+  // Sektor
+  if (s.sector) badges.push({label: s.sector, cls: 'badge-small'});
+
+  return badges;
 }
 
 async function generateAI(s) {
@@ -401,6 +456,7 @@ async function generateAI(s) {
       '</div>' +
       '<div class="card" style="margin-bottom:1rem"><div class="card-title">Scenarioer neste 12 måneder</div>' + scenariosHtml + '</div>' +
       '<div class="card" style="margin-bottom:1rem"><div class="card-title">Risiko</div><p style="font-size:13px;line-height:1.7">' + (ai.risiko || '—') + '</p></div>' +
+      (ai.historisk ? '<div class="historical-card"><div class="historical-title">📊 Historisk sett</div><div class="historical-text">' + ai.historisk + '</div></div>' : '') +
       (ai.nybegynner_tips ? '<div class="tip-box"><div class="tip-text"><strong>Tips:</strong> ' + ai.nybegynner_tips + '</div></div>' : '');
 
   } catch(e) {
