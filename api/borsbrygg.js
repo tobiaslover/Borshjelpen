@@ -6,6 +6,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Kun POST støttes' });
 
   const apiKey = process.env.GROQ_API_KEY;
+  const newsApiKey = process.env.NEWS_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY mangler' });
 
   const { stockSummary } = req.body;
@@ -14,63 +15,51 @@ export default async function handler(req, res) {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Oslo'
   });
 
-  // Hent ekte nyheter fra E24 RSS
+  // Hent nyheter fra NewsAPI
   let newsText = '';
   try {
-    const rssRes = await fetch('https://e24.no/rss/feed', {
-      headers: { 'User-Agent': 'Mozilla/5.0' }
-    });
-    if (rssRes.ok) {
-      const rssText = await rssRes.text();
-      const items = [...rssText.matchAll(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/g)]
-        .map(m => (m[1] || m[2] || '').trim())
-        .filter(t => t && t !== 'E24' && t.length > 10)
-        .slice(0, 12);
-      if (items.length) newsText = 'Dagens nyheter fra E24: ' + items.join(' | ');
+    if (newsApiKey) {
+      const newsRes = await fetch(
+        'https://newsapi.org/v2/everything?q=Oslo+Børs+OR+aksjer+OR+Equinor+OR+DNB&language=no&sortBy=publishedAt&pageSize=10',
+        { headers: { 'X-Api-Key': newsApiKey } }
+      );
+      if (newsRes.ok) {
+        const newsData = await newsRes.json();
+        const articles = (newsData.articles || [])
+          .filter(a => a.title && a.description)
+          .slice(0, 8)
+          .map(a => '• ' + a.title + ': ' + a.description);
+        if (articles.length) {
+          newsText = 'Relevante nyheter (kan være inntil 24t gamle):\n' + articles.join('\n');
+        }
+      }
     }
   } catch(e) {}
-
-  // Fallback: prøv DN
-  if (!newsText) {
-    try {
-      const rssRes = await fetch('https://www.dn.no/rss', {
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-      });
-      if (rssRes.ok) {
-        const rssText = await rssRes.text();
-        const items = [...rssText.matchAll(/<title>(.*?)<\/title>/g)]
-          .map(m => m[1].replace(/<!\[CDATA\[|\]\]>/g, '').trim())
-          .filter(t => t && t !== 'DN' && t.length > 10)
-          .slice(0, 12);
-        if (items.length) newsText = 'Dagens nyheter fra DN: ' + items.join(' | ');
-      }
-    } catch(e) {}
-  }
 
   const prompt = `Du er redaktør for Børsbrygg — en daglig børsoppsummering for norske nybegynnere.
 
 Dato: ${today}
-Kursdata fra Oslo Børs i dag: ${stockSummary}
+Kursdata fra Oslo Børs: ${stockSummary}
 ${newsText ? '\n' + newsText + '\n' : '\nIngen nyhetsdata tilgjengelig — bruk kun kursdata.\n'}
 
-Lag en daglig børsoppsummering BASERT KUN PÅ INFORMASJONEN OVER. Finn ikke opp nyheter. Hvis du ikke har nok nyhetsdata, si det ærlig og fokuser på kursbevegelsene.
+Lag en daglig børsoppsummering BASERT KUN PÅ INFORMASJONEN OVER. Finn aldri opp nyheter eller hendelser som ikke er nevnt over.
 
 Svar KUN med gyldig JSON:
 {
-  "hva_skjedde": "3-4 setninger om hva som faktisk skjedde på Oslo Børs i dag basert på kursdata og nyheter over. Nevn konkrete selskaper og endringer. IKKE finn opp nyheter.",
+  "hva_skjedde": "3-4 setninger om hva som faktisk skjedde basert på kursdata og nyheter over. Nevn konkrete selskaper og tall. IKKE finn opp nyheter.",
   "nyheter": [
-    {"tittel": "Tittel basert på faktisk nyhet over", "tekst": "2-3 setninger om nyheten og betydningen.", "aksje": "ticker eller null"},
+    {"tittel": "Tittel basert på faktisk nyhet over", "tekst": "2-3 setninger om nyheten og hva den betyr for norske investorer.", "aksje": "ticker eller null"},
     {"tittel": "...", "tekst": "...", "aksje": null},
     {"tittel": "...", "tekst": "...", "aksje": null}
   ],
   "aksje_påvirkning": [
-    {"ticker": "EQNR", "navn": "Equinor", "forklaring": "Kort forklaring basert på faktisk kursdata."},
+    {"ticker": "EQNR", "navn": "Equinor", "forklaring": "Kort forklaring basert på faktisk kursdata og nyheter."},
     {"ticker": "DNB", "navn": "DNB", "forklaring": "..."},
     {"ticker": "TEL", "navn": "Telenor", "forklaring": "..."}
   ],
-  "globale_faktorer": "2-3 setninger om globale faktorer basert på det vi vet fra kursdata og nyheter.",
+  "globale_faktorer": "2-3 setninger om globale faktorer basert på tilgjengelig informasjon.",
   "risiko": "2-3 konkrete risikoer å følge med på fremover.",
-  "nybegynner_tips": "Ett konkret tips til nybegynnere basert på dagens marked."
+  "nybegynner_tips": "Ett konkret og nyttig tips til nybegynnere basert på dagens marked."
 }
 
 Regler: Norsk bokmål. Ingen kjøpsanbefalinger. Alltid begge sider. Forklar faguttrykk. IKKE finn opp hendelser.`;
