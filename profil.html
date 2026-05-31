@@ -177,13 +177,13 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
       </div>
 
       <div style="background:linear-gradient(135deg,#FFF8E7,#FFF0C0);border:2px solid #C8A96E;border-radius:16px;padding:1.25rem;">
-        <div style="font-size:11px;color:#8B6E3A;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Proff</div>
-        <div style="font-family:'Playfair Display',serif;font-size:24px;color:#8B6E3A;margin-bottom:3px;">149 kr</div>
-        <div style="font-size:11px;color:#a07830;margin-bottom:1rem;">per måned</div>
+        <div style="font-size:11px;color:#5a3e00;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Proff</div>
+        <div style="font-family:'Playfair Display',serif;font-size:24px;color:#5a3e00;margin-bottom:3px;">149 kr</div>
+        <div style="font-size:11px;color:#6b4e00;margin-bottom:1rem;">per måned</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem;">
-          <div style="font-size:12px;color:#5a4520;">✓ AI-analyse</div>
-          <div style="font-size:12px;color:#5a4520;">✓ AI-chat</div>
-          <div style="font-size:12px;color:#5a4520;">✓ Watchlist — ubegrenset</div>
+          <div style="font-size:12px;color:#3a2800;">✓ AI-analyse</div>
+          <div style="font-size:12px;color:#3a2800;">✓ AI-chat</div>
+          <div style="font-size:12px;color:#3a2800;">✓ Watchlist — ubegrenset</div>
           <div style="font-size:12px;color:#555;">✓ Børsbrygg</div>
           <div style="font-size:12px;color:#555;">✓ Børsmeldinger oppsummert</div>
           <div style="font-size:12px;color:#555;">✓ Læring</div>
@@ -245,16 +245,20 @@ async function loadStats(userId) {
   try {
     const { data } = await sb
       .from('user_activity')
-      .select('type')
+      .select('type, xp')
       .eq('user_id', userId);
-    const searches = (data || []).filter(function(d) { return d.type === 'search'; }).length;
+
+    const all = data || [];
+    const searches = all.filter(function(d) { return d.type === 'search'; }).length;
+    const chats = all.filter(function(d) { return d.type === 'chat'; }).length;
+    const news = all.filter(function(d) { return d.type === 'borsbrygg'; }).length;
+    const xp = all.reduce(function(sum, d) { return sum + (d.xp || 0); }, 0);
+
     document.getElementById('statSearch').textContent = searches;
-    document.getElementById('statAI').textContent = '—';
-    document.getElementById('statNews').textContent = '—';
-    const xp = searches * 2;
+    document.getElementById('statAI').textContent = chats;
+    document.getElementById('statNews').textContent = news;
     document.getElementById('statXP').textContent = xp;
 
-    // Vis nivå på profil
     let level = '🌱 Nybegynner';
     if (xp >= 1000) level = '🏆 Proff';
     else if (xp >= 500) level = '🔍 Analytiker';
