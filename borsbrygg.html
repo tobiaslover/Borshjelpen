@@ -122,7 +122,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 </div>
 
 <!-- LOCKED VIEW -->
-<div id="lockedView">
+<div id="lockedView" style="display:none">
   <div class="bb-hero">
     <div class="bb-tag">Børsbrygg</div>
     <h1 class="bb-title">Børsen forklart.<br>Hver morgen.</h1>
@@ -175,7 +175,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 </div>
 
 <!-- SUBSCRIBER VIEW -->
-<div id="subscriberView" style="display:none">
+<div id="subscriberView">
   <div class="bb-content">
     <div class="bb-header-bar">
       <div class="bb-header-left">
@@ -299,8 +299,8 @@ async function loadBorsbrygg() {
   }
 }
 
-// Auth check
-const SUPABASE_URL = 'DIN_SUPABASE_URL';
+// Last innhold direkte for testing
+loadBorsbrygg();
 const SUPABASE_ANON_KEY = 'DIN_SUPABASE_ANON_KEY';
 
 (async function checkAuth() {
