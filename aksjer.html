@@ -369,11 +369,13 @@ function renderStock(s) {
     '<div class="result-header">' +
       '<div class="result-company">' +
         '<div class="company-logo">' + s.ticker.slice(0,4) + '</div>' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
-        '<div class="company-name">' + s.name + '</div>' +
-        '<button id="watchlistBtn" onclick="toggleWatchlist(currentStock)" style="font-size:11px;padding:4px 12px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap;">+ Watchlist</button>' +
-      '</div>' +
-        '<div class="company-meta">' + s.exchange + ' · ' + s.ticker + (s.sector ? ' · ' + s.sector : '') + '</div></div>' +
+        '<div>' +
+          '<div style="display:flex;align-items:center;gap:10px;">' +
+            '<div class="company-name">' + s.name + '</div>' +
+            '<button id="watchlistBtn" onclick="toggleWatchlist(currentStock)" style="font-size:11px;padding:4px 12px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap;">+ Watchlist</button>' +
+          '</div>' +
+          '<div class="company-meta">' + s.exchange + ' · ' + s.ticker + (s.sector ? ' · ' + s.sector : '') + '</div>' +
+        '</div>' +
       '</div>' +
       '<div class="price-block">' +
         '<div class="price-main">' + priceStr + ' ' + s.currency + '</div>' +
