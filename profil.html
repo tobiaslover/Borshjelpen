@@ -207,10 +207,24 @@ function getInitials(name) {
 }
 
 async function loadUser() {
+  // Prøv getSession først
   const { data: { session } } = await sb.auth.getSession();
-  if (!session) { window.location.href = 'auth.html'; return; }
-  const user = session.user;
-  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  if (session) {
+    renderUser(session.user);
+    return;
+  }
+  // Fallback: vent på auth state change
+  sb.auth.onAuthStateChange(function(event, session) {
+    if (session) {
+      renderUser(session.user);
+    } else {
+      window.location.href = 'auth.html';
+    }
+  });
+}
+
+function renderUser(user) {
+  const name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
   const initials = getInitials(name);
   document.getElementById('navAv').textContent = initials;
   document.getElementById('navName').textContent = name.split(' ')[0];
@@ -219,8 +233,6 @@ async function loadUser() {
   document.getElementById('profileAv').textContent = initials;
   document.getElementById('profileName').textContent = name;
   document.getElementById('profileEmail').textContent = user.email;
-
-  // Hent faktisk aktivitet fra Supabase
   loadActivity(user.id);
   loadStats(user.id);
   loadWatchlist();
@@ -268,6 +280,8 @@ function loadWatchlist() {
     '</div>';
   } catch(e) {}
 }
+
+async function loadActivity(userId) {
   const list = document.getElementById('activityList');
   try {
     const { data, error } = await sb
