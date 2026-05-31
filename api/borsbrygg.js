@@ -1,13 +1,26 @@
+// Cache for dagens utgave — én per dag
+const cache = {};
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Kun POST støttes' });
 
   const apiKey = process.env.GROQ_API_KEY;
   const newsApiKey = process.env.NEWS_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY mangler' });
+
+  // Dagens dato som cache-nøkkel
+  const todayKey = new Date().toLocaleDateString('no-NO', { timeZone: 'Europe/Oslo' });
+
+  // Returner cached utgave hvis den finnes for i dag
+  if (req.method === 'GET' || cache[todayKey]) {
+    if (cache[todayKey]) return res.status(200).json(cache[todayKey]);
+    return res.status(404).json({ error: 'Ingen utgave generert ennå i dag' });
+  }
+
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Kun POST støttes' });
 
   const { stockSummary } = req.body;
 
@@ -15,22 +28,25 @@ export default async function handler(req, res) {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Oslo'
   });
 
-  // Hent nyheter fra NewsAPI
+  // Hent kun aksje- og finansnyheter fra NewsAPI
   let newsText = '';
   try {
     if (newsApiKey) {
+      const query = encodeURIComponent(
+        'aksjer OR børs OR Equinor OR DNB OR Telenor OR "Oslo Børs" OR oljepris OR renter OR inflasjon OR aksjemarked'
+      );
       const newsRes = await fetch(
-        'https://newsapi.org/v2/everything?q=Oslo+Børs+OR+aksjer+OR+Equinor+OR+DNB&language=no&sortBy=publishedAt&pageSize=10',
+        `https://newsapi.org/v2/everything?q=${query}&language=no&sortBy=publishedAt&pageSize=15`,
         { headers: { 'X-Api-Key': newsApiKey } }
       );
       if (newsRes.ok) {
         const newsData = await newsRes.json();
         const articles = (newsData.articles || [])
-          .filter(a => a.title && a.description)
-          .slice(0, 8)
-          .map(a => '• ' + a.title + ': ' + a.description);
+          .filter(a => a.title && a.description && a.source && a.source.name)
+          .slice(0, 12)
+          .map(a => "* [" + a.source.name + "] " + a.title + ": " + a.description);
         if (articles.length) {
-          newsText = 'Relevante nyheter (kan være inntil 24t gamle):\n' + articles.join('\n');
+          newsText = "Finansnyheter fra norske medier (inntil 24t gamle):\n" + articles.join("\n");
         }
       }
     }
@@ -39,30 +55,34 @@ export default async function handler(req, res) {
   const prompt = `Du er redaktør for Børsbrygg — en daglig børsoppsummering for norske nybegynnere.
 
 Dato: ${today}
-Kursdata fra Oslo Børs: ${stockSummary}
-${newsText ? '\n' + newsText + '\n' : '\nIngen nyhetsdata tilgjengelig — bruk kun kursdata.\n'}
+Kursdata fra Oslo Børs i dag: ${stockSummary}
+${newsText ? "\n" + newsText + "\n" : "\nIngen nyhetsdata — bruk kun kursdata.\n"}
 
-Lag en daglig børsoppsummering BASERT KUN PÅ INFORMASJONEN OVER. Finn aldri opp nyheter eller hendelser som ikke er nevnt over.
+Lag en grundig daglig børsoppsummering BASERT KUN PÅ INFORMASJONEN OVER. Finn aldri opp nyheter.
 
 Svar KUN med gyldig JSON:
 {
-  "hva_skjedde": "3-4 setninger om hva som faktisk skjedde basert på kursdata og nyheter over. Nevn konkrete selskaper og tall. IKKE finn opp nyheter.",
+  "hva_skjedde": "4-5 setninger om hva som faktisk skjedde. Konkrete selskaper og tall.",
   "nyheter": [
-    {"tittel": "Tittel basert på faktisk nyhet over", "tekst": "2-3 setninger om nyheten og hva den betyr for norske investorer.", "aksje": "ticker eller null"},
-    {"tittel": "...", "tekst": "...", "aksje": null},
-    {"tittel": "...", "tekst": "...", "aksje": null}
+    {"tittel": "...", "tekst": "2-3 setninger.", "aksje": "ticker eller null", "kilde": "kildenavn"},
+    {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."},
+    {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."},
+    {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."},
+    {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."},
+    {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."}
   ],
   "aksje_påvirkning": [
-    {"ticker": "EQNR", "navn": "Equinor", "forklaring": "Kort forklaring basert på faktisk kursdata og nyheter."},
+    {"ticker": "EQNR", "navn": "Equinor", "forklaring": "..."},
     {"ticker": "DNB", "navn": "DNB", "forklaring": "..."},
-    {"ticker": "TEL", "navn": "Telenor", "forklaring": "..."}
+    {"ticker": "TEL", "navn": "Telenor", "forklaring": "..."},
+    {"ticker": "MOWI", "navn": "Mowi", "forklaring": "..."}
   ],
-  "globale_faktorer": "2-3 setninger om globale faktorer basert på tilgjengelig informasjon.",
-  "risiko": "2-3 konkrete risikoer å følge med på fremover.",
-  "nybegynner_tips": "Ett konkret og nyttig tips til nybegynnere basert på dagens marked."
+  "globale_faktorer": "3-4 setninger om globale faktorer.",
+  "risiko": "3 konkrete risikoer å følge med på.",
+  "nybegynner_tips": "Ett konkret tips til nybegynnere."
 }
 
-Regler: Norsk bokmål. Ingen kjøpsanbefalinger. Alltid begge sider. Forklar faguttrykk. IKKE finn opp hendelser.`;
+Regler: Norsk bokmål. Ingen kjøpsanbefalinger. Alltid begge sider. IKKE finn opp hendelser.`;
 
   try {
     const controller = new AbortController();
@@ -77,8 +97,8 @@ Regler: Norsk bokmål. Ingen kjøpsanbefalinger. Alltid begge sider. Forklar fag
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        max_tokens: 2000,
-        temperature: 0.3,
+        max_tokens: 2500,
+        temperature: 0.2,
         messages: [
           { role: 'system', content: 'Du er en erfaren norsk finansjournalist. Svar alltid med gyldig JSON. Finn aldri opp fakta.' },
           { role: 'user', content: prompt }
@@ -94,9 +114,13 @@ Regler: Norsk bokmål. Ingen kjøpsanbefalinger. Alltid begge sider. Forklar fag
     }
 
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || '';
+    const text = data.choices[0].message.content || '';
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
+
+    // Cache dagens utgave — samme innhold resten av dagen
+    cache[todayKey] = parsed;
+
     res.status(200).json(parsed);
 
   } catch (err) {
