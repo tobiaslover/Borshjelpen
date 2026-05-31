@@ -982,27 +982,32 @@ const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
 window._sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function applySession(user) {
+  const name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
+  const initials = name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0,2);
+  document.getElementById('navAuth').style.display = 'none';
+  document.getElementById('navUser').style.display = 'flex';
+  document.getElementById('navAv').textContent = initials;
+  document.getElementById('navName').textContent = name.split(' ')[0];
+  if (document.getElementById('mobileAuth')) {
+    document.getElementById('mobileAuth').style.display = 'none';
+    document.getElementById('mobileUser').style.display = 'flex';
+    document.getElementById('mobileAv').textContent = initials;
+    document.getElementById('mobileName').textContent = name.split(' ')[0];
+  }
+}
+
 (async function checkAuth() {
   try {
     const sb = window._sb;
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
-      const user = session.user;
-      const name = user.user_metadata?.full_name || user.email.split('@')[0];
-      const initials = name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0,2);
-      // Desktop
-      document.getElementById('navAuth').style.display = 'none';
-      document.getElementById('navUser').style.display = 'flex';
-      document.getElementById('navAv').textContent = initials;
-      document.getElementById('navName').textContent = name.split(' ')[0];
-      if (document.getElementById('mobileAuth')) {
-        document.getElementById('mobileAuth').style.display = 'none';
-        document.getElementById('mobileUser').style.display = 'flex';
-        document.getElementById('mobileAv').textContent = initials;
-        document.getElementById('mobileName').textContent = name.split(' ')[0];
-      }
-
+      applySession(session.user);
     }
+    // Backup: lytt på auth state change
+    sb.auth.onAuthStateChange(function(event, session) {
+      if (session) applySession(session.user);
+    });
   } catch(e) {}
 })();
 </script>
