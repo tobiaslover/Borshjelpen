@@ -768,6 +768,20 @@ renderWatchlist();
 // ===== PORTEFØLJEANALYSE =====
 var portfolio = [];
 
+function savePortfolio() {
+  try { localStorage.setItem('bh_portfolio', JSON.stringify(portfolio)); } catch(e) {}
+}
+
+function loadPortfolio() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('bh_portfolio') || '[]');
+    if (Array.isArray(saved) && saved.length > 0) {
+      portfolio = saved;
+      renderPortfolioList();
+    }
+  } catch(e) {}
+}
+
 async function initPortfolio() {
   var sb = window._sb;
   if (!sb) return;
@@ -830,11 +844,13 @@ function addToPortfolio() {
     portfolio.push({ ticker: ticker, name: name, pct: pct, sector: stockInfo ? stockInfo.sector : 'Ukjent' });
   }
   input.value = ''; input.dataset.ticker = ''; input.dataset.name = ''; pctInput.value = '';
+  savePortfolio();
   renderPortfolioList();
 }
 
 function removeFromPortfolio(ticker) {
   portfolio = portfolio.filter(function(p) { return p.ticker !== ticker; });
+  savePortfolio();
   renderPortfolioList();
 }
 
@@ -842,7 +858,7 @@ function updatePct(ticker, val) {
   var pct = parseFloat(val);
   if (isNaN(pct) || pct < 0) return;
   var item = portfolio.find(function(p) { return p.ticker === ticker; });
-  if (item) { item.pct = pct; renderPortfolioList(); }
+  if (item) { item.pct = pct; savePortfolio(); renderPortfolioList(); }
 }
 
 function renderPortfolioList() {
@@ -951,7 +967,7 @@ async function analyzePortfolioFresh() {
 
 window.addEventListener('load', function() {
   setTimeout(initPortfolio, 800);
-  renderPortfolioList();
+  loadPortfolio();
 });
 
 // Auth — identisk med borshjelpen.html
