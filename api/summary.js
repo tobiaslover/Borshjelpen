@@ -6,28 +6,24 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Kun POST støttes' });
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const newsApiKey = process.env.NEWS_API_KEY;
+  const fmpApiKey = process.env.FMP_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY mangler' });
 
   const s = req.body;
   if (!s.ticker) return res.status(400).json({ error: 'Ticker mangler' });
 
-  // Hent nyheter for denne aksjen
+  // Hent nyheter fra FMP
   let newsText = '';
   try {
-    if (newsApiKey && s.name) {
-      const companyName = s.name.split(' ')[0];
-      const query = encodeURIComponent(companyName + ' OR ' + s.ticker + ' aksjer OR bors');
+    if (fmpApiKey && s.ticker) {
       const newsRes = await fetch(
-        'https://newsapi.org/v2/everything?q=' + query + '&language=no&sortBy=publishedAt&pageSize=8',
-        { headers: { 'X-Api-Key': newsApiKey } }
+        'https://financialmodelingprep.com/api/v3/stock_news?tickers=' + s.ticker + '.OL&limit=8&apikey=' + fmpApiKey
       );
       if (newsRes.ok) {
         const newsData = await newsRes.json();
-        const articles = (newsData.articles || [])
-          .filter(function(a) { return a.title && a.description; })
+        const articles = (Array.isArray(newsData) ? newsData : [])
           .slice(0, 6)
-          .map(function(a) { return '* [' + (a.source && a.source.name || '') + '] ' + a.title + ': ' + a.description; });
+          .map(function(a) { return '* [' + (a.site || '') + '] ' + a.title + ': ' + (a.text || '').slice(0, 150); });
         if (articles.length) newsText = 'Relevante nyheter om ' + s.name + ':\n' + articles.join('\n');
       }
     }
