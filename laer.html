@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aksjeguiden — Børshjelpen</title>
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
+.logo span { color: #C8A96E; }
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #666; text-decoration: none; }
+.nav-links a:hover { color: #1B3A5C; }
+.nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.content { max-width: 600px; margin: 0 auto; padding: 6rem 2rem; text-align: center; }
+.icon { font-size: 56px; margin-bottom: 1.5rem; }
+h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; margin-bottom: 1rem; color: #1B3A5C; }
+p { font-size: 15px; color: #888; line-height: 1.7; margin-bottom: 2rem; }
+.badge { display: inline-block; background: #EEE8DA; color: #8B6E3A; font-size: 12px; font-weight: 500; padding: 6px 16px; border-radius: 100px; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <div class="nav-links">
+    <a href="/borshjelpen.html">Hjem</a>
+    <a href="/aksjer.html">Aksjer</a>
+    <a href="/borsbrygg.html">Børsbrygg</a>
+    <a href="/kontakt.html">Kontakt</a>
+    <a href="/om.html">Om oss</a>
+    <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
+      <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
+    </div>
+    <div id="navUser" style="display:none;align-items:center;gap:8px;">
+      <div onclick="location.href='/profil.html'" style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;border:1px solid #e8e8e8;cursor:pointer;">
+        <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+        <span id="navName" style="font-size:13px;font-weight:500;color:#1a1a1a;">Min side</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="content">
+  <div class="icon">📚</div>
+  <h1>Aksjeguiden</h1>
+  <p>Vi jobber med å lage enkle og gode læringsressurser om aksjer og børsen — uten finanssjargong. Snart kan du lære alt fra hva en aksje er til hvordan du leser en kvartalsrapport.</p>
+  <div class="badge">🚧 Under utvikling</div>
+</div>
+
+<script>
+(async function checkAuth() {
+  try {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    document.head.appendChild(script);
+    await new Promise(function(r) { script.onload = r; });
+    var sb = supabase.createClient(
+      'https://twckvtwzyadevqbyehnu.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
+    );
+    var sess = (await sb.auth.getSession()).data.session;
+    if (sess) {
+      var name = (sess.user.user_metadata && sess.user.user_metadata.full_name) || sess.user.email.split('@')[0];
+      var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      document.getElementById('navAuth').style.display = 'none';
+      document.getElementById('navUser').style.display = 'flex';
+      document.getElementById('navAv').textContent = initials;
+      document.getElementById('navName').textContent = name.split(' ')[0];
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>
