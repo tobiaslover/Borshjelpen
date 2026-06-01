@@ -891,6 +891,7 @@ async function analyzePortfolio() {
         .replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="display:flex;align-items:center;gap:8px;margin:1.25rem 0 6px;"><strong style="font-size:14px;">$2</strong></div>')
         .replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 6px;">$1</div>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:3px 0;font-size:13px;line-height:1.6;"><span style="color:#C8A96E;flex-shrink:0;margin-top:1px;">•</span><span>$1</span></div>')
         .replace(/\n\n/g, '</p><p style="font-size:13px;line-height:1.7;margin-bottom:8px;">')
         .replace(/\n/g, '<br>');
     result.innerHTML = '<div class="card" style="margin-top:1rem;">' +
@@ -924,7 +925,7 @@ async function analyzePortfolioFresh() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål med disse seksjonene. Bruk IKKE ### eller markdown-headings. Start hver seksjon med en relevant emoji og tittel i fet tekst:\n\n📊 Sektoreksponering og diversifisering\n📰 Hva skjer nå i disse sektorene — beskriv konkret hva som påvirker hver sektor akkurat nå (oljepriser, renter, geopolitikk, etc.)\n🌍 Geografisk og valutarisiko\n⚠️ Konsentrasjonsrisiko\n🔍 Samlede risikoer\n💡 Konkrete tips til forbedring\n\nVær spesifikk om aktuelle hendelser og trender i hver sektor. Enkelt norsk uten finansjargong. Gi ALDRI kjøps- eller salgsanbefalinger.' }],
+        messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål. Bruk IKKE ### eller markdown-headings. Strukturer svaret slik:\n\n📊 **Sektoreksponering og diversifisering**\n- [sektor]: [kort forklaring]\n- [sektor]: [kort forklaring]\n\n📰 **Hva skjer nå i disse sektorene**\n- [sektor]: [konkret hva som påvirker sektoren akkurat nå — oljepriser, renter, geopolitikk etc.]\n- [sektor]: [konkret]\n\n🌍 **Geografisk og valutarisiko**\n- [punkt]\n- [punkt]\n\n⚠️ **Konsentrasjonsrisiko**\n- [punkt]\n- [punkt]\n\n🔍 **Samlede risikoer**\n- [risiko]\n- [risiko]\n\n💡 **Konkrete tips til forbedring**\n- [tips]\n- [tips]\n\nKort og konkret per punkt. Enkelt norsk. Gi ALDRI kjøps- eller salgsanbefalinger.' }],
         context: null
       })
     });
@@ -933,6 +934,7 @@ async function analyzePortfolioFresh() {
       .replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="display:flex;align-items:center;gap:8px;margin:1.25rem 0 6px;"><strong style="font-size:14px;">$2</strong></div>')
       .replace(/### (.*?)(\n|$)/g, '<div style="display:flex;align-items:center;gap:8px;margin:1.25rem 0 6px;"><strong style="font-size:14px;">$1</strong></div>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:3px 0;font-size:13px;line-height:1.6;"><span style="color:#C8A96E;flex-shrink:0;margin-top:1px;">•</span><span>$1</span></div>')
       .replace(/\n\n/g, '</p><p style="font-size:13px;line-height:1.7;margin-bottom:8px;">')
       .replace(/\n/g, '<br>');
 
