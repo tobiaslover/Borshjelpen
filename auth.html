@@ -76,6 +76,12 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
         <div class="field"><label>Navn</label><input type="text" id="signup-name" placeholder="Ditt fulle navn" /></div>
         <div class="field"><label>E-post</label><input type="email" id="signup-email" placeholder="din@epost.no" /></div>
         <div class="field"><label>Passord</label><input type="password" id="signup-pass" placeholder="Minst 8 tegn" /></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:1rem;">
+          <input type="checkbox" id="terms-check" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;cursor:pointer;accent-color:#1B3A5C;" />
+          <label for="terms-check" style="font-size:13px;color:#666;line-height:1.5;cursor:pointer;">
+            Jeg har lest og godtar <a href="/vilkar.html" target="_blank" style="color:#1B3A5C;">vilkårene for bruk</a> og <a href="/personvern.html" target="_blank" style="color:#1B3A5C;">personvernerklæringen</a>
+          </label>
+        </div>
         <button class="btn-main" id="btn-signup" onclick="doSignup()">Opprett konto</button>
         <div class="divider"><div class="divider-line"></div>eller<div class="divider-line"></div></div>
         <button class="btn-google" onclick="doGoogle()">
@@ -143,6 +149,14 @@ async function doSignup() {
   const name = document.getElementById('signup-name').value.trim();
   const email = document.getElementById('signup-email').value.trim();
   const pass = document.getElementById('signup-pass').value;
+  const termsChecked = document.getElementById('terms-check').checked;
+
+  if (!termsChecked) {
+    showMsg('Du må godta vilkårene og personvernerklæringen for å opprette konto.', 'error');
+    document.getElementById('terms-check').style.outline = '2px solid #A32D2D';
+    setTimeout(function() { document.getElementById('terms-check').style.outline = 'none'; }, 2000);
+    return;
+  }
   if (!name || !email || !pass) { showMsg('Fyll inn alle feltene.', 'error'); return; }
   if (pass.length < 8) { showMsg('Passordet må være minst 8 tegn.', 'error'); return; }
   setLoading('btn-signup', true);
