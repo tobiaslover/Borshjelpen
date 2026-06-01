@@ -15,18 +15,14 @@ export default async function handler(req, res) {
   const todayKey = new Date().toLocaleDateString('no-NO', { timeZone: 'Europe/Oslo' });
 
   // Returner cached utgave hvis den finnes for i dag
-  if (req.method === 'GET' || cache[todayKey]) {
-    if (cache[todayKey]) return res.status(200).json(cache[todayKey]);
-    return res.status(404).json({ error: 'Ingen utgave generert ennå i dag' });
-  }
+  if (cache[todayKey]) return res.status(200).json(cache[todayKey]);
 
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Kun POST støttes' });
-
-  const { stockSummary } = req.body;
-
+  // Tillat både GET og POST — generer alltid hvis ingen cache
   const today = new Date().toLocaleDateString('nb-NO', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Oslo'
   });
+
+  const stockSummary = (req.body && req.body.stockSummary) || 'Ingen kursdata tilgjengelig';
 
   // Hent kun aksje- og finansnyheter fra FMP
   let newsText = '';
@@ -116,7 +112,7 @@ Regler: Norsk bokmål. Ingen kjøpsanbefalinger. Alltid begge sider. IKKE finn o
 
     if (!response.ok) {
       const err = await response.json();
-      return res.status(500).json({ error: 'Groq feil', detail: err });
+      return res.status(500).json({ error: 'OpenAI feil', detail: err });
     }
 
     const data = await response.json();
