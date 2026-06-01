@@ -159,23 +159,23 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 }
 
 /* Hamburger mobil nav */
-.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; position: relative; }
 .hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
-.mobile-menu { display: none; position: fixed; inset: 0; background: white; z-index: 9999; flex-direction: column; padding: 1.5rem 2rem; }
+.mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 99999; flex-direction: column; padding: 1.5rem 2rem; overflow-y: auto; }
 .mobile-menu.open { display: flex; }
 .mobile-menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
 .mobile-menu-logo { font-family: 'Tenor Sans', sans-serif; font-size: 16px; letter-spacing: 2.5px; text-transform: uppercase; color: #1a1a1a; text-decoration: none; }
 .mobile-menu-logo span { color: #C8A96E; }
-.mobile-menu-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
+.mobile-menu-close { background: none; border: none; font-size: 28px; cursor: pointer; color: #666; line-height: 1; padding: 4px; }
 .mobile-menu-links { display: flex; flex-direction: column; gap: 0; flex: 1; }
-.mobile-menu-links a { font-size: 24px; font-family: 'Playfair Display', serif; font-weight: 700; color: #1B3A5C; text-decoration: none; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
-.mobile-menu-links a:hover { color: #C8A96E; }
-.mobile-menu-footer { padding-top: 1.5rem; display: flex; gap: 10px; flex-direction: column; }
-.mobile-menu-btn { width: 100%; padding: 14px; border-radius: 100px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; }
-.mobile-menu-login { background: none; border: 1px solid #e8e8e8; color: #666; }
-.mobile-menu-register { background: #1B3A5C; border: none; color: white; }
+.mobile-menu-links a { font-size: 26px; font-family: 'Playfair Display', serif; font-weight: 700; color: #1B3A5C; text-decoration: none; padding: 16px 0; border-bottom: 1px solid #f0f0f0; display: block; }
+.mobile-menu-links a:active { color: #C8A96E; }
+.mobile-menu-footer { padding-top: 1.5rem; display: flex; gap: 8px; flex-direction: column; }
+.mobile-menu-btn { width: 100%; padding: 14px; border-radius: 100px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; border: none; }
+.mobile-menu-login { background: none; border: 1px solid #e8e8e8 !important; color: #666; }
+.mobile-menu-register { background: #1B3A5C; color: white; }
 .mobile-menu-user { display: none; align-items: center; gap: 12px; padding: 12px 16px; background: #f8f7f4; border-radius: 12px; cursor: pointer; }
-.mobile-menu-av { width: 40px; height: 40px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #C8A96E; font-weight: 500; font-family: 'Tenor Sans', sans-serif; }
+.mobile-menu-av { width: 40px; height: 40px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #C8A96E; font-weight: 500; font-family: 'Tenor Sans', sans-serif; flex-shrink: 0; }
 .mobile-menu-username { font-size: 15px; font-weight: 500; }
 @media (max-width: 768px) {
   .hamburger-btn { display: block; }
