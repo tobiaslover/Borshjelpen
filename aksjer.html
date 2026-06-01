@@ -880,6 +880,37 @@ function renderPortfolioList() {
 async function analyzePortfolio() {
   if (portfolio.length < 2) return;
   var btn = document.getElementById('pfAnalyzeBtn');
+  var result = document.getElementById('pfResult');
+
+  // Sjekk cache — oppdater hvis eldre enn 4 timer
+  var pfKey = 'pf_analysis_' + portfolio.map(function(p){return p.ticker+p.pct;}).join('_');
+  try {
+    var cached = JSON.parse(localStorage.getItem(pfKey) || 'null');
+    if (cached && (Date.now() - cached.ts) < 24 * 60 * 60 * 1000) {
+      var cachedReply = cached.reply
+        .replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="display:flex;align-items:center;gap:8px;margin:1.25rem 0 6px;"><strong style="font-size:14px;">$2</strong></div>')
+        .replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 6px;">$1</div>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n\n/g, '</p><p style="font-size:13px;line-height:1.7;margin-bottom:8px;">')
+        .replace(/\n/g, '<br>');
+      result.innerHTML = '<div class="card" style="margin-top:1rem;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+          '<div class="card-title" style="margin-bottom:0;">AI Porteføljeanalyse</div>' +
+          '<button onclick="analyzePortfolioFresh()" style="font-size:11px;padding:3px 10px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Oppdater</button>' +
+        '</div>' +
+        '<p style="font-size:13px;line-height:1.7;">' + cachedReply + '</p>' +
+        '<div style="font-size:11px;color:#aaa;margin-top:8px;">Sist oppdatert: ' + new Date(cached.ts).toLocaleString('nb-NO') + '</div>' +
+      '</div>';
+      return;
+    }
+  } catch(e) {}
+
+  analyzePortfolioFresh();
+}
+
+async function analyzePortfolioFresh() {
+  if (portfolio.length < 2) return;
+  var btn = document.getElementById('pfAnalyzeBtn');
   btn.textContent = 'Analyserer...'; btn.disabled = true;
   var result = document.getElementById('pfResult');
   result.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div><p>AI analyserer porteføljen din...</p></div>';
@@ -892,12 +923,22 @@ async function analyzePortfolio() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål som inkluderer:\n1. Sektoreksponering og diversifisering\n2. Geografisk og valutarisiko\n3. Konsentrasjonsrisiko\n4. Samlede risikoer\n5. Konkrete tips til forbedring\n\nEnkelt norsk uten finansjargong. Gi ALDRI kjøps- eller salgsanbefalinger.' }],
+        messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål med disse seksjonene. Bruk IKKE ### eller markdown-headings. Start hver seksjon med en relevant emoji og tittel i fet tekst:\n\n📊 Sektoreksponering og diversifisering\n🌍 Geografisk og valutarisiko\n⚠️ Konsentrasjonsrisiko\n🔍 Samlede risikoer\n💡 Konkrete tips til forbedring\n\nEnkelt norsk uten finansjargong. Gi ALDRI kjøps- eller salgsanbefalinger.' }],
         context: null
       })
     });
     var data = await res.json();
-    var reply = (data.reply || 'Kunne ikke analysere.').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n\n/g, '</p><p style="margin-bottom:10px;">').replace(/\n/g, '<br>');
+    var reply = (data.reply || 'Kunne ikke analysere.')
+      .replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="display:flex;align-items:center;gap:8px;margin:1.25rem 0 6px;"><strong style="font-size:14px;">$2</strong></div>')
+      .replace(/### (.*?)(\n|$)/g, '<div style="display:flex;align-items:center;gap:8px;margin:1.25rem 0 6px;"><strong style="font-size:14px;">$1</strong></div>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n\n/g, '</p><p style="font-size:13px;line-height:1.7;margin-bottom:8px;">')
+      .replace(/\n/g, '<br>');
+
+    // Lagre analysen i localStorage
+    var pfKey = 'pf_analysis_' + portfolio.map(function(p){return p.ticker+p.pct;}).join('_');
+    localStorage.setItem(pfKey, JSON.stringify({ reply: data.reply, ts: Date.now() }));
+
     result.innerHTML = '<div class="card" style="margin-top:1rem;"><div class="card-title">AI Porteføljeanalyse</div><p style="font-size:13px;line-height:1.7;">' + reply + '</p></div>';
   } catch(e) {
     result.innerHTML = '<div style="font-size:13px;color:#888;padding:1rem;">Kunne ikke analysere porteføljen akkurat nå.</div>';
