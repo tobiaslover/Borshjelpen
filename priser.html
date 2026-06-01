@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abonnement — Børshjelpen</title>
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
+.logo span { color: #C8A96E; }
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #666; text-decoration: none; }
+.nav-links a:hover { color: #1B3A5C; }
+.nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+.hero { background: #1B3A5C; padding: 4rem 2rem; text-align: center; }
+.hero-label { font-size: 12px; color: #C8A96E; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; }
+.hero-title { font-family: 'Playfair Display', serif; font-size: 42px; color: white; font-weight: 700; margin-bottom: 1rem; }
+.hero-sub { font-size: 15px; color: rgba(255,255,255,0.55); max-width: 480px; margin: 0 auto; }
+
+.plans { max-width: 900px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+
+.plan-card { border-radius: 20px; padding: 2rem; position: relative; }
+.plan-card.free { background: #E6EEF5; border: 2px solid #b0cce0; }
+.plan-card.investor { background: linear-gradient(135deg,#e8e8e8,#f5f5f5); border: 2px solid #bbb; }
+.plan-card.proff { background: linear-gradient(135deg,#FFF8E7,#FFF0C0); border: 2px solid #C8A96E; }
+
+.popular-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: #C8A96E; color: #1B3A5C; font-size: 11px; font-weight: 600; padding: 4px 14px; border-radius: 100px; white-space: nowrap; }
+
+.plan-name { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; margin-bottom: 8px; }
+.plan-card.free .plan-name { color: #1B3A5C; }
+.plan-card.investor .plan-name { color: #555; }
+.plan-card.proff .plan-name { color: #8B6E3A; }
+
+.plan-price { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; margin-bottom: 4px; }
+.plan-card.free .plan-price { color: #1B3A5C; }
+.plan-card.investor .plan-price { color: #333; }
+.plan-card.proff .plan-price { color: #8B6E3A; }
+
+.plan-period { font-size: 12px; margin-bottom: 1.5rem; }
+.plan-card.free .plan-period { color: #5a7a9c; }
+.plan-card.investor .plan-period { color: #777; }
+.plan-card.proff .plan-period { color: #a07830; }
+
+.plan-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2rem; }
+.feature-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; }
+.feature-item .check { font-size: 11px; margin-top: 2px; flex-shrink: 0; }
+.plan-card.free .feature-item { color: #1B3A5C; }
+.plan-card.investor .feature-item { color: #444; }
+.plan-card.proff .feature-item { color: #3a2800; }
+
+.plan-btn { width: 100%; padding: 12px; border-radius: 100px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s; }
+.plan-btn:hover { opacity: 0.85; }
+.plan-card.free .plan-btn { background: none; border: 2px solid #1B3A5C; color: #1B3A5C; }
+.plan-card.investor .plan-btn { background: #888; border: none; color: white; }
+.plan-card.proff .plan-btn { background: #C8A96E; border: none; color: #1B3A5C; }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 1rem; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: 20px; padding: 2.5rem; max-width: 440px; width: 100%; text-align: center; }
+.modal-icon { font-size: 40px; margin-bottom: 1rem; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+.modal-sub { font-size: 14px; color: #888; margin-bottom: 1.5rem; line-height: 1.6; }
+.modal-plan-badge { display: inline-block; padding: 4px 14px; border-radius: 100px; font-size: 12px; font-weight: 500; margin-bottom: 1.5rem; }
+.modal-input { width: 100%; padding: 12px 16px; border: 1px solid #e8e8e8; border-radius: 100px; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: 12px; }
+.modal-input:focus { border-color: #1B3A5C; }
+.modal-submit { width: 100%; padding: 12px; border-radius: 100px; border: none; background: #1B3A5C; color: white; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-bottom: 10px; }
+.modal-close { background: none; border: none; font-size: 13px; color: #aaa; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.modal-success { display: none; }
+.modal-success-icon { font-size: 48px; margin-bottom: 1rem; }
+
+.footer-note { text-align: center; font-size: 12px; color: #aaa; padding-bottom: 3rem; }
+
+@media (max-width: 700px) {
+  .plans { grid-template-columns: 1fr; }
+  .hero-title { font-size: 30px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <div class="nav-links">
+    <a href="/aksjer.html">Aksjer</a>
+    <a href="#">Lær</a>
+    <a href="/borsbrygg.html">Børsbrygg</a>
+    <a href="/kontakt.html">Kontakt</a>
+    <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
+      <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
+    </div>
+    <div id="navUser" style="display:none;align-items:center;gap:8px;">
+      <div onclick="location.href='/profil.html'" style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;border:1px solid #e8e8e8;cursor:pointer;">
+        <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+        <span id="navName" style="font-size:13px;font-weight:500;color:#1a1a1a;">Min side</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-label">Abonnement</div>
+  <div class="hero-title">Velg planen som passer deg</div>
+  <div class="hero-sub">Ingen bindingstid · Avslutt når som helst · Ingen skjulte kostnader</div>
+</div>
+
+<div class="plans">
+
+  <div class="plan-card free">
+    <div class="plan-name">Gratis</div>
+    <div class="plan-price">0 kr</div>
+    <div class="plan-period">For alltid</div>
+    <div class="plan-features">
+      <div class="feature-item"><span class="check">✓</span><span>AI-analyse — 2 per dag</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>AI-chat — 5 spørsmål per dag</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Watchlist — 2 aksjer</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Børsbrygg</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Læring — grunnleggende</span></div>
+    </div>
+    <button class="plan-btn" onclick="location.href='/auth.html'">Kom i gang gratis →</button>
+  </div>
+
+  <div class="plan-card investor">
+    <div class="popular-badge">Mest populær</div>
+    <div class="plan-name">Investor</div>
+    <div class="plan-price">79 kr</div>
+    <div class="plan-period">per måned</div>
+    <div class="plan-features">
+      <div class="feature-item"><span class="check">✓</span><span>AI-analyse</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>AI-chat</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Watchlist — opptil 10 aksjer</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Børsbrygg</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Børsmeldinger oppsummert</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Læring</span></div>
+    </div>
+    <button class="plan-btn" onclick="openModal('investor')">Abonner på Investor →</button>
+  </div>
+
+  <div class="plan-card proff">
+    <div class="plan-name">Proff</div>
+    <div class="plan-price">149 kr</div>
+    <div class="plan-period">per måned</div>
+    <div class="plan-features">
+      <div class="feature-item"><span class="check">✓</span><span>AI-analyse</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>AI-chat</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Watchlist — ubegrenset</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Børsbrygg</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Børsmeldinger oppsummert</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Læring</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Kvartalsrapporter oppsummert</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Porteføljeanalyse</span></div>
+    </div>
+    <button class="plan-btn" onclick="openModal('proff')">Abonner på Proff →</button>
+  </div>
+
+</div>
+
+<p class="footer-note">Betalingsløsning kommer snart · Meld interesse så varsler vi deg</p>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div id="modalForm">
+      <div class="modal-icon" id="modalIcon">⭐</div>
+      <div class="modal-title" id="modalTitle">Investor-plan</div>
+      <div class="modal-sub">Betalingsløsning er under utvikling. Legg igjen e-posten din — vi varsler deg så snart du kan abonnere!</div>
+      <span class="modal-plan-badge" id="modalBadge">79 kr/mnd</span><br>
+      <input type="email" id="emailInput" class="modal-input" placeholder="din@epost.no" />
+      <button class="modal-submit" onclick="submitEmail()">Varsle meg →</button>
+      <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">Lukk</button>
+    </div>
+    <div class="modal-success" id="modalSuccess">
+      <div class="modal-success-icon">🎉</div>
+      <div class="modal-title">Takk!</div>
+      <div class="modal-sub">Vi varsler deg på <strong id="confirmedEmail"></strong> så snart betalingen er klar. Du vil være blant de første!</div>
+      <button class="modal-submit" style="margin-top:1rem" onclick="document.getElementById('modalOverlay').classList.remove('open')">Tilbake</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var selectedPlan = 'investor';
+
+function openModal(plan) {
+  selectedPlan = plan;
+  if (plan === 'investor') {
+    document.getElementById('modalIcon').textContent = '🥈';
+    document.getElementById('modalTitle').textContent = 'Investor-plan';
+    document.getElementById('modalBadge').textContent = '79 kr/mnd';
+    document.getElementById('modalBadge').style.background = '#e8e8e8';
+    document.getElementById('modalBadge').style.color = '#333';
+  } else {
+    document.getElementById('modalIcon').textContent = '🏆';
+    document.getElementById('modalTitle').textContent = 'Proff-plan';
+    document.getElementById('modalBadge').textContent = '149 kr/mnd';
+    document.getElementById('modalBadge').style.background = '#FFF0C0';
+    document.getElementById('modalBadge').style.color = '#8B6E3A';
+  }
+  document.getElementById('modalForm').style.display = 'block';
+  document.getElementById('modalSuccess').style.display = 'none';
+  document.getElementById('emailInput').value = '';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+}
+
+function submitEmail() {
+  var email = document.getElementById('emailInput').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('emailInput').style.borderColor = '#A32D2D';
+    return;
+  }
+  document.getElementById('confirmedEmail').textContent = email;
+  document.getElementById('modalForm').style.display = 'none';
+  document.getElementById('modalSuccess').style.display = 'block';
+}
+
+// Auth
+(async function checkAuth() {
+  try {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    document.head.appendChild(script);
+    await new Promise(function(r) { script.onload = r; });
+    var sb = supabase.createClient(
+      'https://twckvtwzyadevqbyehnu.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
+    );
+    var sess = (await sb.auth.getSession()).data.session;
+    if (sess) {
+      var name = (sess.user.user_metadata && sess.user.user_metadata.full_name) || sess.user.email.split('@')[0];
+      var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      document.getElementById('navAuth').style.display = 'none';
+      document.getElementById('navUser').style.display = 'flex';
+      document.getElementById('navAv').textContent = initials;
+      document.getElementById('navName').textContent = name.split(' ')[0];
+      // Forhåndsutfyll e-post
+      document.getElementById('emailInput').value = sess.user.email;
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>
