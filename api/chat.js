@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Kun POST støttes' });
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY mangler i Vercel Environment Variables.' });
 
   const { messages, context } = req.body;
@@ -29,7 +29,7 @@ REGLER:
   try {
     const chatController = new AbortController();
     const chatTimeout = setTimeout(() => chatController.abort(), 8000);
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       signal: chatController.signal,
       method: 'POST',
       headers: {
@@ -37,7 +37,7 @@ REGLER:
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'gpt-4o-mini',
         max_tokens: 600,
         temperature: 0.5,
         messages: [
