@@ -162,7 +162,10 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 
 </div>
 
-<p class="footer-note">Betalingsløsning kommer snart · Meld interesse så varsler vi deg</p>
+<p class="footer-note">Ingen bindingstid · Avslutt når som helst</p>
+<p style="font-size:11px;color:#aaa;text-align:center;margin-top:6px;padding-bottom:3rem;">
+  Ved kjøp aksepterer du at tjenesten starter umiddelbart og at 14 dagers angrerett etter angrerettloven dermed bortfaller. Les våre <a href="/vilkar.html" style="color:#888;">vilkår</a> og <a href="/personvern.html" style="color:#888;">personvernerklæring</a>.
+</p>
 
 <!-- Modal -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
@@ -189,6 +192,12 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 var selectedPlan = 'investor';
 
 async function startCheckout(plan) {
+  // Vis angrerett-bekreftelse
+  const confirmed = confirm(
+    'Ved å fortsette aksepterer du at tjenesten starter umiddelbart og at du dermed gir avkall på 14 dagers angrerett etter angrerettloven.\n\nVil du fortsette?'
+  );
+  if (!confirmed) return;
+
   const btn = document.getElementById('btn-' + plan);
   if (btn) { btn.textContent = 'Laster...'; btn.disabled = true; }
 
