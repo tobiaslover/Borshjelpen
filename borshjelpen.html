@@ -137,7 +137,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 }
 .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; max-width:800px; margin:2rem auto; }
 
-.mobile-nav {
+.mobile-nav-DISABLED {
   display: none;
   background: white;
   border-bottom: 1px solid #e8e8e8;
@@ -214,12 +214,12 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
     <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
   </div>
   <div style="display:flex;flex-direction:column;flex:1;">
-    <a href="/aksjer.html" onclick="closeMobileMenu()">Aksjer</a>
-    <a href="/laer.html" onclick="closeMobileMenu()">Lær</a>
-    <a href="/borsbrygg.html" onclick="closeMobileMenu()">Børsbrygg</a>
-    <a href="/kontakt.html" onclick="closeMobileMenu()">Kontakt</a>
-    <a href="/om.html" onclick="closeMobileMenu()">Om oss</a>
-    <a href="/priser.html" onclick="closeMobileMenu()">Priser</a>
+    <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Lær</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/kontakt.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">✉️</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Kontakt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/om.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">💡</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Om oss</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/priser.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">⭐</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Priser</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
   </div>
   <div style="padding-top:1.5rem;">
     <div id="mobileMenuUser" style="display:none;align-items:center;gap:12px;padding:12px 16px;background:#f8f7f4;border-radius:12px;cursor:pointer;margin-bottom:8px;" onclick="location.href='/profil.html'">
@@ -233,14 +233,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   </div>
 </div>
 
-<div class="mobile-nav">
-  <a href="borshjelpen.html" class="active">Hjem</a>
-  <a href="/aksjer.html">Aksjer</a>
-  <a href="/laer.html">Lær</a>
-  <a href="/borsbrygg.html">Børsbrygg</a>
-  <a href="/kontakt.html">Kontakt</a>
-    <a href="/om.html">Om oss</a>
-</div>
+
 
 <section class="hero">
   <div class="hero-left">
