@@ -272,6 +272,71 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   </div>
 </div>
 
+<!-- Porteføljeanalyse -->
+<div style="max-width:900px;margin:0 auto 3rem;padding:0 2rem;">
+  <div style="border:1px solid #e8e8e8;border-radius:16px;overflow:hidden;">
+
+    <div style="background:#1B3A5C;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:#C8A96E;display:flex;align-items:center;justify-content:center;font-size:16px;">📊</div>
+        <div>
+          <div style="font-size:14px;color:white;font-weight:500;">Porteføljeanalyse</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.5);">Legg til aksjer og se AI-analyse av porteføljen din</div>
+        </div>
+      </div>
+      <div id="portfolioPlanBadge" style="font-size:11px;background:rgba(200,169,110,.2);color:#C8A96E;padding:4px 10px;border-radius:100px;border:1px solid rgba(200,169,110,.3);">Proff</div>
+    </div>
+
+    <div id="portfolioBody" style="padding:1.5rem;background:#fff;">
+
+      <!-- Låst for gratis/investor -->
+      <div id="portfolioLocked" style="text-align:center;padding:2rem;display:none;">
+        <div style="font-size:32px;margin-bottom:12px;">🔒</div>
+        <div style="font-weight:500;font-size:15px;margin-bottom:8px;">Porteføljeanalyse krever Proff</div>
+        <div style="font-size:13px;color:#888;margin-bottom:1.5rem;">Analyser eksponeringen i porteføljen din — sektor, risiko og diversifisering</div>
+        <button onclick="location.href='/priser.html'" style="padding:10px 24px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Oppgrader til Proff →</button>
+      </div>
+
+      <!-- Aktiv portefølje -->
+      <div id="portfolioActive">
+        <!-- Søk + legg til -->
+        <div style="display:flex;gap:8px;margin-bottom:1.25rem;">
+          <div style="position:relative;flex:1;">
+            <input id="pfInput" type="text" placeholder="Søk aksje (f.eks. EQNR, DNB...)" autocomplete="off"
+              style="width:100%;padding:10px 14px;border:1px solid #e8e8e8;border-radius:100px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;" />
+            <div id="pfAcList" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:999;overflow:hidden;"></div>
+          </div>
+          <input id="pfPct" type="number" min="0" max="100" placeholder="%" style="width:70px;padding:10px 14px;border:1px solid #e8e8e8;border-radius:100px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;text-align:center;" />
+          <button onclick="addToPortfolio()" style="padding:10px 18px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Legg til</button>
+        </div>
+
+        <!-- Portefølje-liste -->
+        <div id="pfList" style="margin-bottom:1.25rem;"></div>
+
+        <!-- Total % indikator -->
+        <div id="pfTotalRow" style="display:none;margin-bottom:1.25rem;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:6px;">
+            <span>Total allokering</span>
+            <span id="pfTotalPct">0%</span>
+          </div>
+          <div style="height:6px;background:#e8e8e8;border-radius:3px;">
+            <div id="pfTotalBar" style="height:100%;border-radius:3px;background:#1B3A5C;width:0%;transition:width 0.3s;"></div>
+          </div>
+        </div>
+
+        <!-- Analyser-knapp -->
+        <button id="pfAnalyzeBtn" onclick="analyzePortfolio()" style="display:none;width:100%;padding:12px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">
+          Analyser portefølje →
+        </button>
+
+        <!-- AI-analyse resultat -->
+        <div id="pfResult" style="margin-top:1.5rem;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
 function fmt(val) { return (val === null || val === undefined) ? '—' : val; }
 let chatHistory = [];
@@ -699,6 +764,151 @@ function renderWatchlist() {
   }).join('');
 }
 renderWatchlist();
+
+// ===== PORTEFØLJEANALYSE =====
+var portfolio = [];
+
+async function initPortfolio() {
+  var sb = window._sb;
+  if (!sb) return;
+  var plan = await getUserPlan(sb);
+  if (plan !== 'proff') {
+    document.getElementById('portfolioLocked').style.display = 'block';
+    document.getElementById('portfolioActive').style.display = 'none';
+  } else {
+    document.getElementById('portfolioLocked').style.display = 'none';
+    document.getElementById('portfolioActive').style.display = 'block';
+  }
+}
+
+document.getElementById('pfInput').addEventListener('input', function() {
+  var q = this.value.trim().toUpperCase();
+  var list = document.getElementById('pfAcList');
+  if (!q) { list.style.display = 'none'; return; }
+  var matches = osloStocks.filter(function(s) {
+    return s.ticker.startsWith(q) || s.name.toUpperCase().includes(q);
+  }).slice(0, 5);
+  if (!matches.length) { list.style.display = 'none'; return; }
+  list.innerHTML = matches.map(function(s) {
+    return '<div onclick="selectPfStock(\'' + s.ticker + '\',\'' + s.name.replace(/'/g,'') + '\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-family:\'DM Sans\',sans-serif;">' +
+      '<span style="font-size:11px;font-weight:500;color:#1B3A5C;background:#EEE8DA;padding:2px 8px;border-radius:100px;min-width:52px;text-align:center;">' + s.ticker + '</span>' +
+      '<span style="font-size:13px;">' + s.name + '</span></div>';
+  }).join('');
+  list.style.display = 'block';
+});
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#pfInput') && !e.target.closest('#pfAcList')) {
+    document.getElementById('pfAcList').style.display = 'none';
+  }
+});
+
+function selectPfStock(ticker, name) {
+  var input = document.getElementById('pfInput');
+  input.value = ticker + ' — ' + name;
+  input.dataset.ticker = ticker;
+  input.dataset.name = name;
+  document.getElementById('pfAcList').style.display = 'none';
+  document.getElementById('pfPct').focus();
+}
+
+function addToPortfolio() {
+  var input = document.getElementById('pfInput');
+  var pctInput = document.getElementById('pfPct');
+  var ticker = input.dataset.ticker || input.value.trim().toUpperCase().split(' ')[0];
+  var name = input.dataset.name || ticker;
+  var pct = parseFloat(pctInput.value);
+  if (!ticker || isNaN(pct) || pct <= 0 || pct > 100) {
+    pctInput.style.borderColor = '#A32D2D';
+    setTimeout(function() { pctInput.style.borderColor = '#e8e8e8'; }, 1500);
+    return;
+  }
+  var existing = portfolio.findIndex(function(p) { return p.ticker === ticker; });
+  if (existing >= 0) { portfolio[existing].pct = pct; }
+  else {
+    var stockInfo = osloStocks.find(function(s) { return s.ticker === ticker; });
+    portfolio.push({ ticker: ticker, name: name, pct: pct, sector: stockInfo ? stockInfo.sector : 'Ukjent' });
+  }
+  input.value = ''; input.dataset.ticker = ''; input.dataset.name = ''; pctInput.value = '';
+  renderPortfolioList();
+}
+
+function removeFromPortfolio(ticker) {
+  portfolio = portfolio.filter(function(p) { return p.ticker !== ticker; });
+  renderPortfolioList();
+}
+
+function updatePct(ticker, val) {
+  var pct = parseFloat(val);
+  if (isNaN(pct) || pct < 0) return;
+  var item = portfolio.find(function(p) { return p.ticker === ticker; });
+  if (item) { item.pct = pct; renderPortfolioList(); }
+}
+
+function renderPortfolioList() {
+  var list = document.getElementById('pfList');
+  var totalRow = document.getElementById('pfTotalRow');
+  var analyzeBtn = document.getElementById('pfAnalyzeBtn');
+  if (!list) return;
+  if (portfolio.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#aaa;font-size:13px;">Ingen aksjer lagt til ennå — søk opp en aksje og skriv inn prosent</div>';
+    totalRow.style.display = 'none'; analyzeBtn.style.display = 'none';
+    document.getElementById('pfResult').innerHTML = '';
+    return;
+  }
+  var total = portfolio.reduce(function(sum, p) { return sum + p.pct; }, 0);
+  list.innerHTML = '<div style="border:1px solid #e8e8e8;border-radius:12px;overflow:hidden;margin-bottom:4px;">' +
+    portfolio.map(function(p, i) {
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;' + (i < portfolio.length-1 ? 'border-bottom:1px solid #f0f0f0;' : '') + '">' +
+        '<span style="font-size:11px;font-weight:500;color:#1B3A5C;background:#EEE8DA;padding:2px 8px;border-radius:100px;min-width:50px;text-align:center;">' + p.ticker + '</span>' +
+        '<span style="flex:1;font-size:13px;">' + p.name + '</span>' +
+        '<span style="font-size:11px;color:#aaa;">' + p.sector + '</span>' +
+        '<input type="number" value="' + p.pct + '" min="0" max="100" onchange="updatePct(\'' + p.ticker + '\',this.value)" style="width:52px;padding:4px 8px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;text-align:center;outline:none;font-family:\'DM Sans\',sans-serif;" />' +
+        '<span style="font-size:13px;color:#888;">%</span>' +
+        '<button onclick="removeFromPortfolio(\'' + p.ticker + '\')" style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;border:none;cursor:pointer;font-size:11px;color:#aaa;">✕</button>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+  totalRow.style.display = 'block';
+  document.getElementById('pfTotalPct').textContent = total.toFixed(0) + '%';
+  document.getElementById('pfTotalPct').style.color = total > 100 ? '#A32D2D' : (Math.round(total) === 100 ? '#2C7A5C' : '#666');
+  document.getElementById('pfTotalBar').style.width = Math.min(total, 100) + '%';
+  document.getElementById('pfTotalBar').style.background = total > 100 ? '#A32D2D' : (Math.round(total) === 100 ? '#2C7A5C' : '#1B3A5C');
+  analyzeBtn.style.display = portfolio.length >= 2 ? 'block' : 'none';
+}
+
+async function analyzePortfolio() {
+  if (portfolio.length < 2) return;
+  var btn = document.getElementById('pfAnalyzeBtn');
+  btn.textContent = 'Analyserer...'; btn.disabled = true;
+  var result = document.getElementById('pfResult');
+  result.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div><p>AI analyserer porteføljen din...</p></div>';
+  var total = portfolio.reduce(function(sum, p) { return sum + p.pct; }, 0);
+  var portfolioText = portfolio.map(function(p) {
+    return p.ticker + ' (' + p.name + ', ' + p.sector + '): ' + p.pct + '% av porteføljen';
+  }).join('\n');
+  try {
+    var res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål som inkluderer:\n1. Sektoreksponering og diversifisering\n2. Geografisk og valutarisiko\n3. Konsentrasjonsrisiko\n4. Samlede risikoer\n5. Konkrete tips til forbedring\n\nEnkelt norsk uten finansjargong. Gi ALDRI kjøps- eller salgsanbefalinger.' }],
+        context: null
+      })
+    });
+    var data = await res.json();
+    var reply = (data.reply || 'Kunne ikke analysere.').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n\n/g, '</p><p style="margin-bottom:10px;">').replace(/\n/g, '<br>');
+    result.innerHTML = '<div class="card" style="margin-top:1rem;"><div class="card-title">AI Porteføljeanalyse</div><p style="font-size:13px;line-height:1.7;">' + reply + '</p></div>';
+  } catch(e) {
+    result.innerHTML = '<div style="font-size:13px;color:#888;padding:1rem;">Kunne ikke analysere porteføljen akkurat nå.</div>';
+  }
+  btn.textContent = 'Analyser portefølje →'; btn.disabled = false;
+}
+
+window.addEventListener('load', function() {
+  setTimeout(initPortfolio, 800);
+  renderPortfolioList();
+});
 
 // Auth — identisk med borshjelpen.html
 (async function checkAuth() {
