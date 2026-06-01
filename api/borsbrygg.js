@@ -7,9 +7,9 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   const newsApiKey = process.env.NEWS_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY mangler' });
+  if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY mangler' });
 
   // Dagens dato som cache-nøkkel
   const todayKey = new Date().toLocaleDateString('no-NO', { timeZone: 'Europe/Oslo' });
@@ -43,10 +43,21 @@ export default async function handler(req, res) {
         const newsData = await newsRes.json();
         const articles = (newsData.articles || [])
           .filter(a => a.title && a.description && a.source && a.source.name)
-          .slice(0, 12)
-          .map(a => "* [" + a.source.name + "] " + a.title + ": " + a.description);
+          .slice(0, 12);
         if (articles.length) {
-          newsText = "Finansnyheter fra norske medier (inntil 24t gamle):\n" + articles.join("\n");
+          newsText = "Finansnyheter fra norske medier (inntil 24t gamle):\n" + 
+            articles.map(a => 
+              "* [" + a.source.name + "] " + a.title + "\n  Beskrivelse: " + a.description + 
+              (a.publishedAt ? "\n  Publisert: " + new Date(a.publishedAt).toLocaleString('nb-NO', {timeZone:'Europe/Oslo'}) : "")
+            ).join("\n\n");
+          // Store raw articles for structured response
+          req._articles = articles.map(a => ({
+            tittel: a.title,
+            beskrivelse: a.description,
+            kilde: a.source.name,
+            url: a.url,
+            publisert: a.publishedAt
+          }));
         }
       }
     }
@@ -62,7 +73,7 @@ Lag en grundig daglig børsoppsummering BASERT KUN PÅ INFORMASJONEN OVER. Finn 
 
 Svar KUN med gyldig JSON:
 {
-  "hva_skjedde": "4-5 setninger om hva som faktisk skjedde. Konkrete selskaper og tall.",
+  "hva_skjedde": "4-5 setninger om hva som faktisk skjedde basert på nyhetene og kursdata over. Sitér konkrete tall, selskapsnavn og hendelser fra nyhetene.",
   "nyheter": [
     {"tittel": "...", "tekst": "2-3 setninger.", "aksje": "ticker eller null", "kilde": "kildenavn"},
     {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."},
@@ -88,7 +99,7 @@ Regler: Norsk bokmål. Ingen kjøpsanbefalinger. Alltid begge sider. IKKE finn o
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 25000);
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       signal: controller.signal,
       headers: {
@@ -96,7 +107,7 @@ Regler: Norsk bokmål. Ingen kjøpsanbefalinger. Alltid begge sider. IKKE finn o
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'gpt-4o-mini',
         max_tokens: 2500,
         temperature: 0.2,
         messages: [
