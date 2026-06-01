@@ -5,9 +5,9 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Kun POST støttes' });
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   const newsApiKey = process.env.NEWS_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY mangler' });
+  if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY mangler' });
 
   const s = req.body;
   if (!s.ticker) return res.status(400).json({ error: 'Ticker mangler' });
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
     const controller = new AbortController();
     const timeout = setTimeout(function() { controller.abort(); }, 25000);
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       signal: controller.signal,
       method: 'POST',
       headers: {
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
         'Authorization': 'Bearer ' + apiKey
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'gpt-4o-mini',
         max_tokens: 1200,
         temperature: 0.3,
         messages: [
