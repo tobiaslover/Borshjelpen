@@ -38,7 +38,7 @@ REGLER:
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        max_tokens: 600,
+        max_tokens: 1500,
         temperature: 0.5,
         messages: [
           { role: 'system', content: systemPrompt },
