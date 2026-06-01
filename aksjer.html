@@ -888,12 +888,12 @@ async function analyzePortfolio() {
     var cached = JSON.parse(localStorage.getItem(pfKey) || 'null');
     if (cached && (Date.now() - cached.ts) < 24 * 60 * 60 * 1000) {
       var cachedReply = cached.reply
-        .replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="display:flex;align-items:center;gap:8px;margin:1.25rem 0 6px;"><strong style="font-size:14px;">$2</strong></div>')
-        .replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 6px;">$1</div>')
+        .replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>')
+        .replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:3px 0;font-size:13px;line-height:1.6;"><span style="color:#C8A96E;flex-shrink:0;margin-top:1px;">•</span><span>$1</span></div>')
-        .replace(/\n\n/g, '</p><p style="font-size:13px;line-height:1.7;margin-bottom:8px;">')
-        .replace(/\n/g, '<br>');
+        .replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>')
+        .replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>')
+        .replace(/\n/g, '');
     result.innerHTML = '<div class="card" style="margin-top:1rem;">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
           '<div class="card-title" style="margin-bottom:0;">AI Porteføljeanalyse</div>' +
@@ -931,12 +931,12 @@ async function analyzePortfolioFresh() {
     });
     var data = await res.json();
     var reply = (data.reply || 'Kunne ikke analysere.')
-      .replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="display:flex;align-items:center;gap:8px;margin:1.25rem 0 6px;"><strong style="font-size:14px;">$2</strong></div>')
-      .replace(/### (.*?)(\n|$)/g, '<div style="display:flex;align-items:center;gap:8px;margin:1.25rem 0 6px;"><strong style="font-size:14px;">$1</strong></div>')
+      .replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>')
+      .replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:3px 0;font-size:13px;line-height:1.6;"><span style="color:#C8A96E;flex-shrink:0;margin-top:1px;">•</span><span>$1</span></div>')
-      .replace(/\n\n/g, '</p><p style="font-size:13px;line-height:1.7;margin-bottom:8px;">')
-      .replace(/\n/g, '<br>');
+      .replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>')
+      .replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>')
+      .replace(/\n/g, '');
 
     // Lagre analysen i localStorage
     var pfKey = 'pf_analysis_' + portfolio.map(function(p){return p.ticker+p.pct;}).join('_');
