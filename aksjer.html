@@ -501,14 +501,33 @@ function addTyping() {
 function removeTyping() { var e = document.getElementById('typing'); if (e) e.remove(); }
 function askSug(btn) { document.getElementById('chatInput').value = btn.textContent; sendMessage(); }
 
+function showQLockedMsg() {
+  document.getElementById('qBody').innerHTML =
+    '<div style="grid-column:1/-1;padding:2rem;text-align:center;">' +
+      '<div style="font-size:28px;margin-bottom:10px;">🔒</div>' +
+      '<div style="font-weight:500;font-size:14px;margin-bottom:6px;">Kvartalsrapporter er forbeholdt Proff-brukere</div>' +
+      '<div style="font-size:13px;color:#888;margin-bottom:1rem;">Oppgrader for å få AI-oppsummering av siste kvartalsrapport</div>' +
+      '<button onclick="location.href=\'/priser.html\'" style="padding:10px 24px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:13px;font-weight:500;cursor:pointer;">Oppgrader til Proff →</button>' +
+    '</div>';
+}
+
 async function loadQuarterlyReport(s) {
   if (!s) return;
   document.getElementById('quarterlyBox').style.display = 'block';
   document.getElementById('qTitle').textContent = s.name + ' — Kvartalsrapport';
   document.getElementById('qSubtitle').textContent = 'Siste tilgjengelige rapport';
-  document.getElementById('qBody').innerHTML = '<div class="quarterly-loading"><div class="quarterly-spinner"></div>AI analyserer siste kvartalsrapport...</div>';
   var nextDates = {'EQNR':'Juli 2026','DNB':'Juli 2026','AKRBP':'Juli 2026','TEL':'Juli 2026','MOWI':'August 2026','YAR':'Juli 2026','NHY':'Juli 2026','KAHOT':'August 2026'};
   document.getElementById('qNext').textContent = 'Neste rapport: ' + (nextDates[s.ticker] || 'Ikke tilgjengelig');
+
+  // Sjekk plan — kvartalsrapport krever Proff
+  var sb = window._sb;
+  if (!sb) { showQLockedMsg(); return; }
+  var sess = (await sb.auth.getSession()).data.session;
+  if (!sess) { showQLockedMsg(); return; }
+  var plan = await getUserPlan(sb);
+  if (plan !== 'proff') { showQLockedMsg(); return; }
+
+  document.getElementById('qBody').innerHTML = '<div class="quarterly-loading"><div class="quarterly-spinner"></div>AI analyserer siste kvartalsrapport...</div>';
   try {
     var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(s)});
     var ai = await res.json();
