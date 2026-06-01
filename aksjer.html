@@ -522,20 +522,25 @@ async function loadNews(ticker, plan) {
   const sec = document.getElementById('newsSection');
   if (!sec) return;
 
-  // Investor og Proff ser nyheter
+  // Gratis-brukere ser låst boks
   if (plan === 'free') {
-    sec.innerHTML = '<div style="background:#f8f7f4;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">' +
-      '<div>' +
-        '<div style="font-size:11px;font-weight:500;color:#C8A96E;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Børsmeldinger</div>' +
-        '<div style="font-size:13px;color:#888;">Oppgrader til Investor for børsmeldinger per aksje</div>' +
+    sec.innerHTML = '<div class="card" style="margin-bottom:1rem;">' +
+      '<div class="card-title">Børsmeldinger</div>' +
+      '<div style="padding:1.5rem;text-align:center;">' +
+        '<div style="font-size:24px;margin-bottom:8px;">🔒</div>' +
+        '<div style="font-weight:500;font-size:14px;margin-bottom:6px;">Børsmeldinger krever Investor</div>' +
+        '<div style="font-size:13px;color:#888;margin-bottom:1rem;">Få AI-oppsummert nyheter og børsmeldinger per aksje</div>' +
+        '<button onclick="location.href=\'/priser.html\'" style="padding:10px 20px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Oppgrader til Investor →</button>' +
       '</div>' +
-      '<button onclick="location.href=\'/priser.html\'" style="font-size:12px;padding:6px 14px;border-radius:100px;border:none;background:#1B3A5C;color:white;cursor:pointer;white-space:nowrap;font-family:\'DM Sans\',sans-serif;">Oppgrader →</button>' +
     '</div>';
     return;
   }
 
-  sec.innerHTML = '<div style="font-size:11px;font-weight:500;color:#C8A96E;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Børsmeldinger</div>' +
-    '<div style="font-size:13px;color:#aaa;">Henter nyheter...</div>';
+  // Investor/Proff — vis placeholder inntil FMP norsk er tilgjengelig
+  sec.innerHTML = '<div class="card" style="margin-bottom:1rem;">' +
+    '<div class="card-title">Børsmeldinger</div>' +
+    '<div style="font-size:13px;color:#aaa;padding:8px 0;">Henter nyheter...</div>' +
+  '</div>';
 
   try {
     const res = await fetch('/api/news?ticker=' + encodeURIComponent(ticker));
@@ -543,7 +548,10 @@ async function loadNews(ticker, plan) {
     const articles = data.articles || [];
 
     if (articles.length === 0) {
-      sec.innerHTML = '';
+      sec.innerHTML = '<div class="card" style="margin-bottom:1rem;">' +
+        '<div class="card-title">Børsmeldinger</div>' +
+        '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen nyheter tilgjengelig akkurat nå.</div>' +
+      '</div>';
       return;
     }
 
@@ -553,16 +561,19 @@ async function loadNews(ticker, plan) {
         var date = a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('nb-NO', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
         return '<div style="padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
           '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">' +
-            '<a href="' + (a.url || '#') + '" target="_blank" style="font-size:13px;font-weight:500;color:#1B3A5C;text-decoration:none;line-height:1.4;">' + a.title + '</a>' +
+            '<a href="' + (a.url||'#') + '" target="_blank" style="font-size:13px;font-weight:500;color:#1B3A5C;text-decoration:none;line-height:1.4;">' + a.title + '</a>' +
             '<span style="font-size:11px;color:#aaa;white-space:nowrap;flex-shrink:0;">' + date + '</span>' +
           '</div>' +
           (a.summary ? '<div style="font-size:12px;color:#888;line-height:1.5;">' + a.summary + '</div>' : '') +
-          '<div style="font-size:11px;color:#C8A96E;margin-top:4px;">' + (a.source || '') + '</div>' +
+          '<div style="font-size:11px;color:#C8A96E;margin-top:4px;">' + (a.source||'') + '</div>' +
         '</div>';
       }).join('') +
     '</div>';
   } catch(e) {
-    sec.innerHTML = '';
+    sec.innerHTML = '<div class="card" style="margin-bottom:1rem;">' +
+      '<div class="card-title">Børsmeldinger</div>' +
+      '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen nyheter tilgjengelig akkurat nå.</div>' +
+    '</div>';
   }
 }
 
