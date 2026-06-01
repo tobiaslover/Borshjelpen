@@ -139,7 +139,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
       <div class="feature-item"><span class="check">✓</span><span>Børsmeldinger oppsummert</span></div>
       <div class="feature-item"><span class="check">✓</span><span>Læring</span></div>
     </div>
-    <button class="plan-btn" onclick="openModal('investor')">Abonner på Investor →</button>
+    <button id="btn-investor" class="plan-btn" onclick="startCheckout('investor')">Abonner på Investor →</button>
   </div>
 
   <div class="plan-card proff">
@@ -156,7 +156,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
       <div class="feature-item"><span class="check">✓</span><span>Kvartalsrapporter oppsummert</span></div>
       <div class="feature-item"><span class="check">✓</span><span>Porteføljeanalyse</span></div>
     </div>
-    <button class="plan-btn" onclick="openModal('proff')">Abonner på Proff →</button>
+    <button id="btn-proff" class="plan-btn" onclick="startCheckout('proff')">Abonner på Proff →</button>
   </div>
 
 </div>
@@ -187,42 +187,38 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 <script>
 var selectedPlan = 'investor';
 
+async function startCheckout(plan) {
+  const btn = document.getElementById('btn-' + plan);
+  if (btn) { btn.textContent = 'Laster...'; btn.disabled = true; }
+
+  try {
+    // Hent e-post fra innlogget bruker hvis mulig
+    let email = '';
+    if (window._sb) {
+      const sess = (await window._sb.auth.getSession()).data.session;
+      if (sess) email = sess.user.email;
+    }
+
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan, email })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Noe gikk galt. Prøv igjen.');
+      if (btn) { btn.textContent = plan === 'investor' ? 'Abonner på Investor →' : 'Abonner på Proff →'; btn.disabled = false; }
+    }
+  } catch(e) {
+    alert('Noe gikk galt. Prøv igjen.');
+    if (btn) { btn.textContent = plan === 'investor' ? 'Abonner på Investor →' : 'Abonner på Proff →'; btn.disabled = false; }
+  }
+}
+
 function openModal(plan) {
-  selectedPlan = plan;
-  if (plan === 'investor') {
-    document.getElementById('modalIcon').textContent = '🥈';
-    document.getElementById('modalTitle').textContent = 'Investor-plan';
-    document.getElementById('modalBadge').textContent = '79 kr/mnd';
-    document.getElementById('modalBadge').style.background = '#e8e8e8';
-    document.getElementById('modalBadge').style.color = '#333';
-  } else {
-    document.getElementById('modalIcon').textContent = '🏆';
-    document.getElementById('modalTitle').textContent = 'Proff-plan';
-    document.getElementById('modalBadge').textContent = '149 kr/mnd';
-    document.getElementById('modalBadge').style.background = '#FFF0C0';
-    document.getElementById('modalBadge').style.color = '#8B6E3A';
-  }
-  document.getElementById('modalForm').style.display = 'block';
-  document.getElementById('modalSuccess').style.display = 'none';
-  document.getElementById('emailInput').value = '';
-  document.getElementById('modalOverlay').classList.add('open');
-}
-
-function closeModal(e) {
-  if (e.target === document.getElementById('modalOverlay')) {
-    document.getElementById('modalOverlay').classList.remove('open');
-  }
-}
-
-function submitEmail() {
-  var email = document.getElementById('emailInput').value.trim();
-  if (!email || !email.includes('@')) {
-    document.getElementById('emailInput').style.borderColor = '#A32D2D';
-    return;
-  }
-  document.getElementById('confirmedEmail').textContent = email;
-  document.getElementById('modalForm').style.display = 'none';
-  document.getElementById('modalSuccess').style.display = 'block';
+  startCheckout(plan);
 }
 
 // Auth
