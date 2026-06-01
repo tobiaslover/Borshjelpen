@@ -924,7 +924,7 @@ async function analyzePortfolioFresh() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål med disse seksjonene. Bruk IKKE ### eller markdown-headings. Start hver seksjon med en relevant emoji og tittel i fet tekst:\n\n📊 Sektoreksponering og diversifisering\n🌍 Geografisk og valutarisiko\n⚠️ Konsentrasjonsrisiko\n🔍 Samlede risikoer\n💡 Konkrete tips til forbedring\n\nEnkelt norsk uten finansjargong. Gi ALDRI kjøps- eller salgsanbefalinger.' }],
+        messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål med disse seksjonene. Bruk IKKE ### eller markdown-headings. Start hver seksjon med en relevant emoji og tittel i fet tekst:\n\n📊 Sektoreksponering og diversifisering\n📰 Hva skjer nå i disse sektorene — beskriv konkret hva som påvirker hver sektor akkurat nå (oljepriser, renter, geopolitikk, etc.)\n🌍 Geografisk og valutarisiko\n⚠️ Konsentrasjonsrisiko\n🔍 Samlede risikoer\n💡 Konkrete tips til forbedring\n\nVær spesifikk om aktuelle hendelser og trender i hver sektor. Enkelt norsk uten finansjargong. Gi ALDRI kjøps- eller salgsanbefalinger.' }],
         context: null
       })
     });
