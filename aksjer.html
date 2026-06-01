@@ -469,11 +469,15 @@ async function generateAI(s) {
     sec.innerHTML =
       '<div class="card" style="margin-bottom:1rem"><div class="card-title">Hva gjør selskapet?</div><p>' + (ai.hva||'—') + '</p></div>' +
       (ai.aktuelt ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva skjer akkurat nå?</div><p>' + ai.aktuelt + '</p></div>' : '') +
+      '<div id="newsSection"></div>' +
       '<div class="bull-bear"><div class="card bull"><div class="card-title">Bull-case</div>' + bullHtml + '</div><div class="card bear"><div class="card-title">Bear-case</div>' + bearHtml + '</div></div>' +
       '<div class="card" style="margin-bottom:1rem"><div class="card-title">Scenarioer neste 12 måneder</div>' + scenariosHtml + '</div>' +
       '<div class="card" style="margin-bottom:1rem"><div class="card-title">Risiko</div><p style="font-size:13px;line-height:1.7">' + (ai.risiko||'—') + '</p></div>' +
       (ai.historisk ? '<div class="historical-card"><div class="historical-title">📊 Historisk sett</div><div class="historical-text">' + ai.historisk + '</div></div>' : '') +
       (ai.nybegynner_tips ? '<div class="tip-box"><div class="tip-text"><strong>Tips:</strong> ' + ai.nybegynner_tips + '</div></div>' : '');
+
+    // Hent nyheter
+    loadNews(s.ticker, plan);
   } catch(e) {
     var sec = document.getElementById('ai-section');
     if (sec) sec.innerHTML = '<div style="padding:1rem;background:#fff8f0;border-radius:10px;font-size:13px;color:#888;margin-bottom:1rem;">Kunne ikke generere AI-sammendrag.</div>';
@@ -512,6 +516,54 @@ function showQLockedMsg() {
       '<div style="font-size:13px;color:#888;margin-bottom:1rem;">Oppgrader for å få AI-oppsummering av siste kvartalsrapport</div>' +
       '<button onclick="location.href=\'/priser.html\'" style="padding:10px 24px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:13px;font-weight:500;cursor:pointer;">Oppgrader til Proff →</button>' +
     '</div>';
+}
+
+async function loadNews(ticker, plan) {
+  const sec = document.getElementById('newsSection');
+  if (!sec) return;
+
+  // Investor og Proff ser nyheter
+  if (plan === 'free') {
+    sec.innerHTML = '<div style="background:#f8f7f4;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">' +
+      '<div>' +
+        '<div style="font-size:11px;font-weight:500;color:#C8A96E;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Børsmeldinger</div>' +
+        '<div style="font-size:13px;color:#888;">Oppgrader til Investor for børsmeldinger per aksje</div>' +
+      '</div>' +
+      '<button onclick="location.href=\'/priser.html\'" style="font-size:12px;padding:6px 14px;border-radius:100px;border:none;background:#1B3A5C;color:white;cursor:pointer;white-space:nowrap;font-family:\'DM Sans\',sans-serif;">Oppgrader →</button>' +
+    '</div>';
+    return;
+  }
+
+  sec.innerHTML = '<div style="font-size:11px;font-weight:500;color:#C8A96E;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Børsmeldinger</div>' +
+    '<div style="font-size:13px;color:#aaa;">Henter nyheter...</div>';
+
+  try {
+    const res = await fetch('/api/news?ticker=' + encodeURIComponent(ticker));
+    const data = await res.json();
+    const articles = data.articles || [];
+
+    if (articles.length === 0) {
+      sec.innerHTML = '';
+      return;
+    }
+
+    sec.innerHTML = '<div class="card" style="margin-bottom:1rem;">' +
+      '<div class="card-title">Børsmeldinger</div>' +
+      articles.slice(0, 5).map(function(a) {
+        var date = a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('nb-NO', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
+        return '<div style="padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">' +
+            '<a href="' + (a.url || '#') + '" target="_blank" style="font-size:13px;font-weight:500;color:#1B3A5C;text-decoration:none;line-height:1.4;">' + a.title + '</a>' +
+            '<span style="font-size:11px;color:#aaa;white-space:nowrap;flex-shrink:0;">' + date + '</span>' +
+          '</div>' +
+          (a.summary ? '<div style="font-size:12px;color:#888;line-height:1.5;">' + a.summary + '</div>' : '') +
+          '<div style="font-size:11px;color:#C8A96E;margin-top:4px;">' + (a.source || '') + '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  } catch(e) {
+    sec.innerHTML = '';
+  }
 }
 
 async function loadQuarterlyReport(s) {
