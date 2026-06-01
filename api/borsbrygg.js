@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const newsApiKey = process.env.NEWS_API_KEY;
+  const fmpApiKey = process.env.FMP_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY mangler' });
 
   // Dagens dato som cache-nøkkel
@@ -28,35 +28,30 @@ export default async function handler(req, res) {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Oslo'
   });
 
-  // Hent kun aksje- og finansnyheter fra NewsAPI
+  // Hent kun aksje- og finansnyheter fra FMP
   let newsText = '';
   try {
-    if (newsApiKey) {
-      const query = encodeURIComponent(
-        'aksjer OR børs OR Equinor OR DNB OR Telenor OR "Oslo Børs" OR oljepris OR renter OR inflasjon OR aksjemarked'
-      );
+    if (fmpApiKey) {
       const newsRes = await fetch(
-        `https://newsapi.org/v2/everything?q=${query}&language=no&sortBy=publishedAt&pageSize=15`,
-        { headers: { 'X-Api-Key': newsApiKey } }
+        `https://financialmodelingprep.com/api/v3/stock_news?limit=15&apikey=${fmpApiKey}`
       );
       if (newsRes.ok) {
         const newsData = await newsRes.json();
-        const articles = (newsData.articles || [])
-          .filter(a => a.title && a.description && a.source && a.source.name)
+        const articles = (Array.isArray(newsData) ? newsData : [])
+          .filter(a => a.title && a.text)
           .slice(0, 12);
         if (articles.length) {
-          newsText = "Finansnyheter fra norske medier (inntil 24t gamle):\n" + 
+          newsText = "Finansnyheter (inntil 24t gamle):\n" + 
             articles.map(a => 
-              "* [" + a.source.name + "] " + a.title + "\n  Beskrivelse: " + a.description + 
-              (a.publishedAt ? "\n  Publisert: " + new Date(a.publishedAt).toLocaleString('nb-NO', {timeZone:'Europe/Oslo'}) : "")
+              "* [" + (a.site || '') + "] " + a.title + "\n  " + (a.text || '').slice(0, 200) +
+              (a.publishedDate ? "\n  Publisert: " + new Date(a.publishedDate).toLocaleString('nb-NO', {timeZone:'Europe/Oslo'}) : "")
             ).join("\n\n");
-          // Store raw articles for structured response
           req._articles = articles.map(a => ({
             tittel: a.title,
-            beskrivelse: a.description,
-            kilde: a.source.name,
-            url: a.url,
-            publisert: a.publishedAt
+            beskrivelse: (a.text || '').slice(0, 200),
+            kilde: a.site || '',
+            url: a.url || '',
+            publisert: a.publishedDate || ''
           }));
         }
       }
