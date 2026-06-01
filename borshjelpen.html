@@ -449,6 +449,16 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   Kursdata levert av Financial Modeling Prep · Ikke finansiell rådgivning
 </footer>
 
+<script>
+function openMobileMenu() {
+  document.getElementById('mobileMenu').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMobileMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.body.style.overflow = '';
+}
+</script>
 </body>
 <script>
 const heroTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
