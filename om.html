@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Om oss — Børshjelpen</title>
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
+.logo span { color: #C8A96E; }
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #666; text-decoration: none; }
+.nav-links a:hover { color: #1B3A5C; }
+.nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+.hero { background: #1B3A5C; padding: 5rem 2rem; text-align: center; }
+.hero-label { font-size: 12px; color: #C8A96E; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; }
+.hero-title { font-family: 'Playfair Display', serif; font-size: 48px; color: white; font-weight: 700; margin-bottom: 1rem; line-height: 1.1; }
+.hero-title em { font-style: italic; font-weight: 400; color: #C8A96E; }
+.hero-sub { font-size: 16px; color: rgba(255,255,255,0.55); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+.content { max-width: 700px; margin: 0 auto; padding: 4rem 2rem; }
+
+.ingress { font-family: 'Playfair Display', serif; font-size: 22px; line-height: 1.6; color: #1B3A5C; margin-bottom: 2.5rem; font-style: italic; }
+
+p { font-size: 15px; line-height: 1.9; color: #444; margin-bottom: 1.5rem; }
+
+.values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 3rem 0; }
+.value-card { background: #f8f7f4; border-radius: 14px; padding: 1.5rem; }
+.value-icon { font-size: 24px; margin-bottom: 10px; }
+.value-title { font-size: 14px; font-weight: 600; color: #1B3A5C; margin-bottom: 6px; }
+.value-text { font-size: 13px; color: #666; line-height: 1.6; }
+
+.divider { width: 40px; height: 2px; background: #C8A96E; margin: 2.5rem 0; }
+
+.cta-box { background: #1B3A5C; border-radius: 16px; padding: 2.5rem; text-align: center; margin-top: 3rem; }
+.cta-title { font-family: 'Playfair Display', serif; font-size: 26px; color: white; margin-bottom: 8px; }
+.cta-sub { font-size: 14px; color: rgba(255,255,255,0.55); margin-bottom: 1.5rem; }
+.cta-btn { background: #C8A96E; color: #1B3A5C; padding: 12px 28px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
+.cta-email { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 1rem; }
+.cta-email a { color: rgba(255,255,255,0.6); }
+
+@media (max-width: 600px) { .values { grid-template-columns: 1fr; } .hero-title { font-size: 34px; } }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <div class="nav-links">
+    <a href="/aksjer.html">Aksjer</a>
+    <a href="#">Lær</a>
+    <a href="/borsbrygg.html">Børsbrygg</a>
+    <a href="/kontakt.html">Kontakt</a>
+    <a href="/om.html" style="color:#1B3A5C;font-weight:500;">Om oss</a>
+    <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
+      <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
+    </div>
+    <div id="navUser" style="display:none;align-items:center;gap:8px;">
+      <div onclick="location.href='/profil.html'" style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;border:1px solid #e8e8e8;cursor:pointer;">
+        <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+        <span id="navName" style="font-size:13px;font-weight:500;color:#1a1a1a;">Min side</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-label">Om oss</div>
+  <div class="hero-title">Børsen.<br><em>Endelig forståelig.</em></div>
+  <div class="hero-sub">Vi tror at alle fortjener å forstå hva som skjer med pengene sine.</div>
+</div>
+
+<div class="content">
+
+  <p class="ingress">Børsen har lenge vært forbeholdt de som kan finanssjargong, har tid til å lese lange rapporter, eller råd til en privatrådgiver. Det mener vi er feil.</p>
+
+  <p>Aksjer og investeringer handler om fremtiden din — og den fremtiden bør du kunne forstå selv.</p>
+
+  <p>Børshjelpen ble til fordi vi savnet noe enkelt. Et sted der mannen i gata kan slå opp en aksje og faktisk forstå hva selskapet gjør, hva som påvirker kursen, og hvilke risikoer som finnes — uten å måtte ha en finansgrad for å henge med.</p>
+
+  <p>Vi bruker kunstig intelligens til å oversette komplisert finansinformasjon til vanlig norsk. Ikke for å gi deg tips om hva du skal kjøpe. Men for å gi deg kunnskapen du trenger til å ta egne, informerte valg.</p>
+
+  <div class="divider"></div>
+
+  <div class="values">
+    <div class="value-card">
+      <div class="value-icon">⚖️</div>
+      <div class="value-title">Alltid begge sider</div>
+      <div class="value-text">Vi presenterer alltid bull- og bear-case. Ingen ensidig optimisme.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-icon">🚫</div>
+      <div class="value-title">Ingen kjøpsanbefalinger</div>
+      <div class="value-text">Vi gir deg informasjon, ikke råd. Beslutningene er alltid dine.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-icon">🇳🇴</div>
+      <div class="value-title">Norsk, for nordmenn</div>
+      <div class="value-text">Bygget i Norge, for Oslo Børs, på norsk — uten finanssjargong.</div>
+    </div>
+  </div>
+
+  <p>Det er ikke fordi vi må. Det er fordi vi mener det er den eneste rette måten å drive en finanstjeneste på.</p>
+
+  <p>Børshjelpen er bygget og driftet fra Norge, for norske investorer — fra nybegynneren som nettopp hørte om aksjer for første gang, til den erfarne som vil ha en rask oppdatering på Oslo Børs.</p>
+
+  <div class="cta-box">
+    <div class="cta-title">Klar til å forstå børsen?</div>
+    <div class="cta-sub">Gratis å komme i gang. Ingen bindingstid.</div>
+    <a href="/auth.html" class="cta-btn">Start gratis →</a>
+    <div class="cta-email">Spørsmål? <a href="mailto:kontakt@borshjelpen.no">kontakt@borshjelpen.no</a></div>
+  </div>
+
+</div>
+
+<script>
+(async function checkAuth() {
+  try {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    document.head.appendChild(script);
+    await new Promise(function(r) { script.onload = r; });
+    var sb = supabase.createClient(
+      'https://twckvtwzyadevqbyehnu.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
+    );
+    var sess = (await sb.auth.getSession()).data.session;
+    if (sess) {
+      var name = (sess.user.user_metadata && sess.user.user_metadata.full_name) || sess.user.email.split('@')[0];
+      var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      document.getElementById('navAuth').style.display = 'none';
+      document.getElementById('navUser').style.display = 'flex';
+      document.getElementById('navAv').textContent = initials;
+      document.getElementById('navName').textContent = name.split(' ')[0];
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>
