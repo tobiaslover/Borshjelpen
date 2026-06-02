@@ -9,7 +9,6 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; min-height: 100vh; }
-
 nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: white; border-bottom: 1px solid #e8e8e8; gap: 1.5rem; }
 .logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; margin-right: auto; }
 .logo span { color: #C8A96E; }
@@ -20,7 +19,6 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 .user-pill:hover { border-color: #1B3A5C; }
 .user-av { width: 30px; height: 30px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #C8A96E; font-weight: 500; font-family: 'Tenor Sans', sans-serif; }
 .user-name { font-size: 13px; font-weight: 500; }
-
 .dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 2rem; background: white; border: 1px solid #e8e8e8; border-radius: 12px; padding: .5rem 0; width: 220px; z-index: 100; }
 .dropdown.open { display: block; }
 .dd-header { padding: .75rem 1rem .5rem; border-bottom: 1px solid #f0f0f0; margin-bottom: .25rem; }
@@ -31,24 +29,19 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 .dd-item:hover { background: #f8f7f4; }
 .dd-item.danger { color: #A32D2D; }
 .dd-sep { height: 1px; background: #f0f0f0; margin: .25rem 0; }
-
 .page { max-width: 800px; margin: 0 auto; padding: 2rem; }
-
 .profile-hero { display: flex; align-items: center; gap: 18px; padding: 1.5rem; background: white; border-radius: 14px; border: 1px solid #e8e8e8; margin-bottom: 1.5rem; }
 .profile-av-lg { width: 64px; height: 64px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #C8A96E; font-family: 'Tenor Sans', sans-serif; flex-shrink: 0; }
 .profile-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
 .profile-email { font-size: 13px; color: #888; margin-top: 3px; }
 .profile-plan { display: inline-flex; align-items: center; gap: 5px; background: #EEE8DA; color: #8B6E3A; font-size: 11px; padding: 3px 10px; border-radius: 100px; margin-top: 6px; }
 .edit-btn { margin-left: auto; padding: 8px 16px; border-radius: 100px; border: 1px solid #e8e8e8; background: none; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; color: #666; }
-
 .section-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .75rem; margin-top: 1.5rem; }
-
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: .5rem; }
 .stat-card { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1rem; text-align: center; }
 .stat-num { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #1B3A5C; }
 .stat-num.gold { color: #C8A96E; }
 .stat-lbl { font-size: 11px; color: #888; margin-top: 3px; }
-
 .watch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .wcard { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1rem; cursor: pointer; transition: border-color .15s; }
 .wcard:hover { border-color: #1B3A5C; }
@@ -60,20 +53,12 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 .wp { font-size: 14px; font-weight: 500; }
 .badge-up { font-size: 11px; background: #1A5C3A; color: #6ECFA0; padding: 2px 7px; border-radius: 100px; font-weight: 500; }
 .badge-down { font-size: 11px; background: #5C1B1B; color: #F09595; padding: 2px 7px; border-radius: 100px; font-weight: 500; }
-
 .activity-list { background: white; border: 1px solid #e8e8e8; border-radius: 12px; overflow: hidden; }
 .act-row { display: flex; align-items: center; gap: 12px; padding: 12px 1.25rem; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
 .act-row:last-child { border-bottom: none; }
 .act-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
 .act-text { flex: 1; }
 .act-time { font-size: 11px; color: #aaa; }
-
-.upgrade-card { background: #1B3A5C; border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-.uc-title { font-family: 'Playfair Display', serif; font-size: 18px; color: white; margin-bottom: 4px; }
-.uc-sub { font-size: 13px; color: rgba(255,255,255,.6); }
-.uc-features { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
-.uc-feat { font-size: 12px; color: rgba(255,255,255,.7); display: flex; align-items: center; gap: 6px; }
-.uc-btn { background: #C8A96E; color: #1B3A5C; border: none; border-radius: 100px; padding: 10px 22px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -83,7 +68,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
   <div class="nav-tabs">
     <a href="borshjelpen.html" class="ntab">Hjem</a>
     <a href="aksjer.html" class="ntab">Aksjer</a>
-    <a href="#" class="ntab">Lær</a>
+    <a href="laer.html" class="ntab">Lær</a>
     <a href="borsbrygg.html" class="ntab">Børsbrygg</a>
     <a href="kontakt.html" class="ntab">Kontakt</a>
   </div>
@@ -100,8 +85,6 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
     </div>
     <a href="profil.html" class="dd-item">👤 Min profil</a>
     <a href="aksjer.html" class="dd-item">📈 Aksjer</a>
-    <div class="dd-item">🔔 Varsler</div>
-    <div class="dd-item">⚙️ Innstillinger</div>
     <div class="dd-sep"></div>
     <div class="dd-item danger" onclick="doLogout()">🚪 Logg ut</div>
   </div>
@@ -114,8 +97,8 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
       <div class="profile-name" id="profileName">Laster...</div>
       <div class="profile-email" id="profileEmail"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
-        <div class="profile-plan" style="background:#E6EEF5;color:#1B3A5C;border-color:#b0cce0;">🔵 Gratis</div>
-        <div class="profile-plan" id="profilePlan" style="background:#1B3A5C;color:#C8A96E;border-color:#1B3A5C;">🌱 Nybegynner</div>
+        <div class="profile-plan" style="background:#E6EEF5;color:#1B3A5C;">🔵 Gratis</div>
+        <div class="profile-plan" id="profilePlan" style="background:#1B3A5C;color:#C8A96E;">🌱 Nybegynner</div>
       </div>
     </div>
     <button class="edit-btn">Rediger profil</button>
@@ -155,7 +138,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
           <div style="font-size:12px;color:#555;">✓ AI-chat — 5 spørsmål per dag</div>
           <div style="font-size:12px;color:#555;">✓ Watchlist — 2 aksjer</div>
           <div style="font-size:12px;color:#555;">✓ Børsbrygg</div>
-          <div style="font-size:12px;color:#555;">✓ Læring — under utvikling — under utvikling</div>
+          <div style="font-size:12px;color:#555;">✓ Læring</div>
         </div>
         <div style="font-size:12px;color:#1B3A5C;font-weight:500;text-align:center;">Din nåværende plan</div>
       </div>
@@ -171,7 +154,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
           <div style="font-size:12px;color:#444;">✓ Watchlist — opptil 10 aksjer</div>
           <div style="font-size:12px;color:#444;">✓ Børsbrygg</div>
           <div style="font-size:12px;color:#444;">✓ Børsmeldinger oppsummert</div>
-          <div style="font-size:12px;color:#444;">✓ Læring — under utvikling</div>
+          <div style="font-size:12px;color:#444;">✓ Læring</div>
         </div>
         <button onclick="location.href='/priser.html'" style="width:100%;padding:9px;border-radius:100px;border:none;background:#888;color:white;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Abonner →</button>
       </div>
@@ -186,7 +169,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
           <div style="font-size:12px;color:#3a2800;">✓ Watchlist — ubegrenset</div>
           <div style="font-size:12px;color:#555;">✓ Børsbrygg</div>
           <div style="font-size:12px;color:#555;">✓ Børsmeldinger oppsummert</div>
-          <div style="font-size:12px;color:#555;">✓ Læring — under utvikling</div>
+          <div style="font-size:12px;color:#555;">✓ Læring</div>
           <div style="font-size:12px;color:#555;">✓ Kvartalsrapporter oppsummert</div>
           <div style="font-size:12px;color:#555;">✓ Porteføljeanalyse</div>
         </div>
@@ -201,46 +184,33 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
       <button onclick="showCancelModal()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;">Avslutt abonnement</button>
     </div>
   </div>
-<!-- Avslutt abonnement modal -->
+</div>
+
 <div id="cancelModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:white;border-radius:20px;padding:2.5rem;max-width:400px;width:100%;text-align:center;">
     <div style="font-size:36px;margin-bottom:1rem;">😢</div>
     <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;">Avslutt abonnement</div>
-    <p style="font-size:14px;color:#666;margin-bottom:1.5rem;line-height:1.6;">Betalingsløsning er under utvikling. Send en e-post til oss så avslutter vi abonnementet ditt umiddelbart.</p>
-    <a href="mailto:hei@borshjelpen.no?subject=Avslutt abonnement" style="display:block;width:100%;padding:12px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;margin-bottom:10px;">Send e-post →</a>
+    <p style="font-size:14px;color:#666;margin-bottom:1.5rem;line-height:1.6;">Send en e-post til oss så avslutter vi abonnementet ditt umiddelbart.</p>
+    <a href="mailto:kontakt@borshjelpen.no?subject=Avslutt abonnement" style="display:block;width:100%;padding:12px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;margin-bottom:10px;">Send e-post →</a>
     <button onclick="document.getElementById('cancelModal').style.display='none'" style="background:none;border:none;font-size:13px;color:#aaa;cursor:pointer;font-family:'DM Sans',sans-serif;">Lukk</button>
   </div>
 </div>
 
 <script>
-function showCancelModal() {
-  document.getElementById('cancelModal').style.display = 'flex';
-}
+function showCancelModal() { document.getElementById('cancelModal').style.display = 'flex'; }
 
 const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function getInitials(name) {
-  if (!name) return '?';
-  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-}
+function getInitials(name) { if (!name) return '?'; return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2); }
 
 async function loadUser() {
-  // Prøv getSession først
   const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    renderUser(session.user);
-    return;
-  }
-  // Fallback: vent på auth state change
+  if (session) { renderUser(session.user); return; }
   sb.auth.onAuthStateChange(function(event, session) {
-    if (session) {
-      renderUser(session.user);
-    } else {
-      window.location.href = 'auth.html';
-    }
+    if (session) { renderUser(session.user); } else { window.location.href = 'auth.html'; }
   });
 }
 
@@ -261,22 +231,13 @@ function renderUser(user) {
 
 async function loadStats(userId) {
   try {
-    const { data } = await sb
-      .from('user_activity')
-      .select('type, xp')
-      .eq('user_id', userId);
-
+    const { data } = await sb.from('user_activity').select('type, xp').eq('user_id', userId);
     const all = data || [];
-    const searches = all.filter(function(d) { return d.type === 'search'; }).length;
-    const chats = all.filter(function(d) { return d.type === 'chat'; }).length;
-    const news = all.filter(function(d) { return d.type === 'borsbrygg'; }).length;
-    const xp = all.reduce(function(sum, d) { return sum + (d.xp || 0); }, 0);
-
-    document.getElementById('statSearch').textContent = searches;
-    document.getElementById('statAI').textContent = chats;
-    document.getElementById('statNews').textContent = news;
+    document.getElementById('statSearch').textContent = all.filter(d => d.type === 'search').length;
+    document.getElementById('statAI').textContent = all.filter(d => d.type === 'chat').length;
+    document.getElementById('statNews').textContent = all.filter(d => d.type === 'borsbrygg').length;
+    const xp = all.reduce((sum, d) => sum + (d.xp || 0), 0);
     document.getElementById('statXP').textContent = xp;
-
     let level = '🌱 Nybegynner';
     if (xp >= 1000) level = '🏆 Proff';
     else if (xp >= 500) level = '🔍 Analytiker';
@@ -291,10 +252,7 @@ function loadWatchlist() {
     const list = JSON.parse(localStorage.getItem('bh_watchlist') || '[]');
     const grid = document.getElementById('watchGrid');
     if (list.length === 0) {
-      grid.innerHTML = '<div class="wcard add" onclick="location.href=\'aksjer.html\'">' +
-        '<span style="font-size:22px">+</span>' +
-        '<span style="font-size:12px">Legg til aksje</span>' +
-        '</div>';
+      grid.innerHTML = '<div class="wcard add" onclick="location.href=\'aksjer.html\'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
       return;
     }
     grid.innerHTML = list.map(function(s) {
@@ -302,34 +260,20 @@ function loadWatchlist() {
       const cls = s.up ? 'badge-up' : 'badge-down';
       const priceStr = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
       return '<div class="wcard" onclick="location.href=\'aksjer.html?ticker=' + s.ticker + '\'">' +
-        '<div class="wt">' + s.ticker + '.OL</div>' +
-        '<div class="wn">' + s.name.split(' ')[0] + '</div>' +
-        '<div class="wrow"><span class="wp">' + priceStr + ' kr</span>' +
-        '<span class="' + cls + '">' + sign + s.changePct + '%</span></div>' +
-        '</div>';
-    }).join('') +
-    '<div class="wcard add" onclick="location.href=\'aksjer.html\'">' +
-      '<span style="font-size:22px">+</span>' +
-      '<span style="font-size:12px">Legg til aksje</span>' +
-    '</div>';
+        '<div class="wt">' + s.ticker + '.OL</div><div class="wn">' + s.name.split(' ')[0] + '</div>' +
+        '<div class="wrow"><span class="wp">' + priceStr + ' kr</span><span class="' + cls + '">' + sign + s.changePct + '%</span></div></div>';
+    }).join('') + '<div class="wcard add" onclick="location.href=\'aksjer.html\'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
   } catch(e) {}
 }
 
 async function loadActivity(userId) {
   const list = document.getElementById('activityList');
   try {
-    const { data, error } = await sb
-      .from('user_activity')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(10);
-
+    const { data, error } = await sb.from('user_activity').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10);
     if (error || !data || data.length === 0) {
       list.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#aaa;font-size:13px;">Ingen aktivitet ennå — søk på en aksje for å komme i gang!</div>';
       return;
     }
-
     list.innerHTML = data.map(function(item) {
       const date = new Date(item.created_at);
       const now = new Date();
@@ -341,33 +285,21 @@ async function loadActivity(userId) {
       else if (diffH < 24) timeStr = 'I dag ' + date.toLocaleTimeString('nb-NO', {hour:'2-digit', minute:'2-digit'});
       else if (diffH < 48) timeStr = 'I går ' + date.toLocaleTimeString('nb-NO', {hour:'2-digit', minute:'2-digit'});
       else timeStr = date.toLocaleDateString('nb-NO', {day:'numeric', month:'short'});
-
       return '<div class="act-row" onclick="location.href=\'aksjer.html?ticker=' + item.ticker + '\'" style="cursor:pointer">' +
         '<div class="act-icon" style="background:#E1F5EE">📊</div>' +
         '<div class="act-text">Søkte opp <strong>' + item.name + ' (' + item.ticker + ')</strong></div>' +
-        '<div class="act-time">' + timeStr + '</div>' +
-      '</div>';
+        '<div class="act-time">' + timeStr + '</div></div>';
     }).join('');
   } catch(e) {
     list.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#aaa;font-size:13px;">Kunne ikke laste aktivitet.</div>';
   }
 }
 
-function toggleDropdown() {
-  document.getElementById('dropdown').classList.toggle('open');
-}
-
+function toggleDropdown() { document.getElementById('dropdown').classList.toggle('open'); }
 document.addEventListener('click', e => {
-  if (!e.target.closest('.user-pill') && !e.target.closest('.dropdown')) {
-    document.getElementById('dropdown').classList.remove('open');
-  }
+  if (!e.target.closest('.user-pill') && !e.target.closest('.dropdown')) document.getElementById('dropdown').classList.remove('open');
 });
-
-async function doLogout() {
-  await sb.auth.signOut();
-  window.location.href = 'auth.html';
-}
-
+async function doLogout() { await sb.auth.signOut(); window.location.href = 'auth.html'; }
 loadUser();
 </script>
 </body>
