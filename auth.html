@@ -168,12 +168,32 @@ async function doForgot() {
   const email = document.getElementById('forgot-email').value.trim();
   if (!email) { showMsg('Skriv inn e-postadressen din.', 'error'); return; }
   setLoading('btn-forgot', true, 'Send tilbakestillingslenke');
-  const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://borshjelpen.vercel.app/auth.html?type=recovery'
-  });
-  setLoading('btn-forgot', false, 'Send tilbakestillingslenke');
-  if (error) { showMsg(error.message, 'error'); return; }
-  showMsg('Vi har sendt en lenke til ' + email + '. Sjekk innboksen din.', 'success');
+
+  // Sjekk om e-posten finnes ved å prøve å logge inn med feil passord
+  // Supabase gir ulik feil om brukeren ikke finnes vs. feil passord
+  const { error: checkError } = await sb.auth.signInWithPassword({ email, password: '___CHECK_ONLY___' });
+  
+  if (checkError && checkError.message.includes('Invalid login credentials')) {
+    // Feil passord = brukeren finnes — send reset-lenke
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://borshjelpen.vercel.app/auth.html?type=recovery'
+    });
+    setLoading('btn-forgot', false, 'Send tilbakestillingslenke');
+    if (error) { showMsg(error.message, 'error'); return; }
+    showMsg('Vi har sendt en lenke til ' + email + '. Sjekk innboksen din.', 'success');
+  } else if (checkError && (checkError.message.includes('Email not confirmed') || checkError.message.includes('email'))) {
+    // E-post ikke bekreftet — send reset-lenke likevel
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://borshjelpen.vercel.app/auth.html?type=recovery'
+    });
+    setLoading('btn-forgot', false, 'Send tilbakestillingslenke');
+    if (error) { showMsg(error.message, 'error'); return; }
+    showMsg('Vi har sendt en lenke til ' + email + '. Sjekk innboksen din.', 'success');
+  } else {
+    // Brukeren finnes ikke
+    setLoading('btn-forgot', false, 'Send tilbakestillingslenke');
+    showMsg('Vi finner ingen konto med denne e-postadressen. Er du sikker på at du har registrert deg?', 'error');
+  }
 }
 
 async function doSignup() {
