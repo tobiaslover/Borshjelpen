@@ -38,12 +38,14 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .msg { font-size: 13px; padding: 10px 12px; border-radius: 8px; margin-bottom: 1rem; display: none; }
 .msg.error { background: #FCEBEB; color: #A32D2D; }
 .msg.success { background: #E1F5EE; color: #0F6E56; }
+.forgot-link { font-size: 12px; color: #1B3A5C; cursor: pointer; text-align: right; margin-top: -6px; margin-bottom: 1rem; display: block; }
+.forgot-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <a href="/borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
 </nav>
 
 <div class="main">
@@ -60,9 +62,14 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 
       <div id="msg" class="msg"></div>
 
+      <!-- LOGG INN -->
       <div id="form-login">
         <div class="field"><label>E-post</label><input type="email" id="login-email" placeholder="din@epost.no" /></div>
-        <div class="field"><label>Passord</label><input type="password" id="login-pass" placeholder="••••••••" /></div>
+        <div class="field">
+          <label>Passord</label>
+          <input type="password" id="login-pass" placeholder="••••••••" />
+        </div>
+        <span class="forgot-link" onclick="showForgotForm()">Glemt passord?</span>
         <button class="btn-main" id="btn-login" onclick="doLogin()">Logg inn</button>
         <div class="divider"><div class="divider-line"></div>eller<div class="divider-line"></div></div>
         <button class="btn-google" onclick="doGoogle()">
@@ -72,6 +79,15 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
         <div class="footer-note">Ikke bruker? <span onclick="switchTab('signup')">Registrer deg gratis</span></div>
       </div>
 
+      <!-- GLEMT PASSORD -->
+      <div id="form-forgot" style="display:none">
+        <p style="font-size:14px;color:#666;margin-bottom:1.25rem;line-height:1.6;">Skriv inn e-posten din så sender vi en lenke for å tilbakestille passordet.</p>
+        <div class="field"><label>E-post</label><input type="email" id="forgot-email" placeholder="din@epost.no" /></div>
+        <button class="btn-main" id="btn-forgot" onclick="doForgot()">Send tilbakestillingslenke</button>
+        <div class="footer-note" style="margin-top:1rem;"><span onclick="switchTab('login')">← Tilbake til innlogging</span></div>
+      </div>
+
+      <!-- REGISTRER -->
       <div id="form-signup" style="display:none">
         <div class="field"><label>Navn</label><input type="text" id="signup-name" placeholder="Ditt fulle navn" /></div>
         <div class="field"><label>E-post</label><input type="email" id="signup-email" placeholder="din@epost.no" /></div>
@@ -90,6 +106,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
         </button>
         <div class="footer-note">Har du konto? <span onclick="switchTab('login')">Logg inn</span></div>
       </div>
+
     </div>
   </div>
 </div>
@@ -105,7 +122,16 @@ function switchTab(tab) {
   document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
   document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('form-forgot').style.display = 'none';
   showMsg('', '');
+}
+
+function showForgotForm() {
+  document.getElementById('form-login').style.display = 'none';
+  document.getElementById('form-forgot').style.display = 'block';
+  showMsg('', '');
+  var email = document.getElementById('login-email').value;
+  if (email) document.getElementById('forgot-email').value = email;
 }
 
 function showMsg(text, type) {
@@ -115,34 +141,39 @@ function showMsg(text, type) {
   el.style.display = text ? 'block' : 'none';
 }
 
-function setLoading(btnId, loading) {
+function setLoading(btnId, loading, label) {
   const btn = document.getElementById(btnId);
   btn.disabled = loading;
-  btn.textContent = loading ? 'Laster...' : (btnId === 'btn-login' ? 'Logg inn' : 'Opprett konto');
+  btn.textContent = loading ? 'Laster...' : label;
 }
 
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-pass').value;
   if (!email || !pass) { showMsg('Fyll inn e-post og passord.', 'error'); return; }
-  setLoading('btn-login', true);
+  setLoading('btn-login', true, 'Logg inn');
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-  setLoading('btn-login', false);
+  setLoading('btn-login', false, 'Logg inn');
   if (error) { showMsg(error.message, 'error'); return; }
-  // Logg innlogging med XP
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
-      await sb.from('user_activity').insert({
-        user_id: session.user.id,
-        type: 'login',
-        ticker: null,
-        name: 'Daglig innlogging',
-        xp: 3
-      });
+      await sb.from('user_activity').insert({ user_id: session.user.id, type: 'login', ticker: null, name: 'Daglig innlogging', xp: 3 });
     }
   } catch(e) {}
-  window.location.href = 'borshjelpen.html';
+  window.location.href = '/borshjelpen.html';
+}
+
+async function doForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) { showMsg('Skriv inn e-postadressen din.', 'error'); return; }
+  setLoading('btn-forgot', true, 'Send tilbakestillingslenke');
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://borshjelpen.vercel.app/auth.html?type=recovery'
+  });
+  setLoading('btn-forgot', false, 'Send tilbakestillingslenke');
+  if (error) { showMsg(error.message, 'error'); return; }
+  showMsg('Vi har sendt en lenke til ' + email + '. Sjekk innboksen din.', 'success');
 }
 
 async function doSignup() {
@@ -150,7 +181,6 @@ async function doSignup() {
   const email = document.getElementById('signup-email').value.trim();
   const pass = document.getElementById('signup-pass').value;
   const termsChecked = document.getElementById('terms-check').checked;
-
   if (!termsChecked) {
     showMsg('Du må godta vilkårene og personvernerklæringen for å opprette konto.', 'error');
     document.getElementById('terms-check').style.outline = '2px solid #A32D2D';
@@ -159,15 +189,12 @@ async function doSignup() {
   }
   if (!name || !email || !pass) { showMsg('Fyll inn alle feltene.', 'error'); return; }
   if (pass.length < 8) { showMsg('Passordet må være minst 8 tegn.', 'error'); return; }
-  setLoading('btn-signup', true);
+  setLoading('btn-signup', true, 'Opprett konto');
   const { error } = await sb.auth.signUp({
     email, password: pass,
-    options: {
-      data: { full_name: name },
-      emailRedirectTo: 'https://borshjelpen.vercel.app/auth.html'
-    }
+    options: { data: { full_name: name }, emailRedirectTo: 'https://borshjelpen.vercel.app/auth.html' }
   });
-  setLoading('btn-signup', false);
+  setLoading('btn-signup', false, 'Opprett konto');
   if (error) { showMsg(error.message, 'error'); return; }
   showMsg('Konto opprettet! Sjekk e-posten din for bekreftelse.', 'success');
 }
@@ -179,37 +206,65 @@ async function doGoogle() {
   });
 }
 
-sb.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-    if (session) window.location.href = 'borshjelpen.html';
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    // Vis skjema for nytt passord
+    document.getElementById('form-login').style.display = 'none';
+    document.getElementById('form-forgot').style.display = 'none';
+    document.getElementById('form-signup').style.display = 'none';
+    document.getElementById('tab-login').style.display = 'none';
+    document.getElementById('tab-signup').style.display = 'none';
+    document.querySelector('.card-body').insertAdjacentHTML('afterbegin', `
+      <div id="form-reset">
+        <p style="font-size:14px;color:#666;margin-bottom:1.25rem;line-height:1.6;">Skriv inn ditt nye passord.</p>
+        <div id="msg-reset" class="msg" style="display:none;"></div>
+        <div class="field"><label>Nytt passord</label><input type="password" id="new-pass" placeholder="Minst 8 tegn" /></div>
+        <div class="field"><label>Gjenta passord</label><input type="password" id="new-pass2" placeholder="Minst 8 tegn" /></div>
+        <button class="btn-main" id="btn-reset" onclick="doResetPassword()">Lagre nytt passord</button>
+      </div>
+    `);
+    return;
+  }
+  if (event === 'SIGNED_IN' && session) {
+    if (!window.location.search.includes('type=recovery')) {
+      window.location.href = '/borshjelpen.html';
+    }
   }
 });
 
-// Håndter e-postbekreftelse fra Supabase
+async function doResetPassword() {
+  const pass = document.getElementById('new-pass').value;
+  const pass2 = document.getElementById('new-pass2').value;
+  const msgEl = document.getElementById('msg-reset');
+  if (pass.length < 8) { msgEl.textContent = 'Passordet må være minst 8 tegn.'; msgEl.className = 'msg error'; msgEl.style.display = 'block'; return; }
+  if (pass !== pass2) { msgEl.textContent = 'Passordene er ikke like.'; msgEl.className = 'msg error'; msgEl.style.display = 'block'; return; }
+  const btn = document.getElementById('btn-reset');
+  btn.disabled = true; btn.textContent = 'Lagrer...';
+  const { error } = await sb.auth.updateUser({ password: pass });
+  if (error) {
+    msgEl.textContent = error.message; msgEl.className = 'msg error'; msgEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Lagre nytt passord';
+    return;
+  }
+  msgEl.textContent = 'Passordet er oppdatert! Du logges inn...'; msgEl.className = 'msg success'; msgEl.style.display = 'block';
+  setTimeout(function() { window.location.href = '/borshjelpen.html'; }, 1500);
+}
+
 (async function handleEmailConfirmation() {
   const params = new URLSearchParams(window.location.search);
   const hashParams = new URLSearchParams(window.location.hash.replace('#', ''));
-
   const token_hash = params.get('token_hash') || hashParams.get('token_hash');
   const type = params.get('type') || hashParams.get('type');
   const access_token = hashParams.get('access_token');
   const refresh_token = hashParams.get('refresh_token');
-
   if (token_hash && type) {
-    // Ny Supabase bekreftelsesmetode
     const { error } = await sb.auth.verifyOtp({ token_hash, type });
-    if (!error) {
-      window.location.href = 'borshjelpen.html';
-    } else {
-      console.error('Bekreftelse feil:', error);
-    }
+    if (!error && type !== 'recovery') window.location.href = '/borshjelpen.html';
   } else if (access_token) {
-    // Gammel metode med access_token i hash
     await sb.auth.setSession({ access_token, refresh_token });
-    window.location.href = 'borshjelpen.html';
+    if (type !== 'recovery') window.location.href = '/borshjelpen.html';
   }
 })();
-
 </script>
 </body>
 </html>
