@@ -36,13 +36,14 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 .profile-email { font-size: 13px; color: #888; margin-top: 3px; }
 .profile-plan { display: inline-flex; align-items: center; gap: 5px; background: #EEE8DA; color: #8B6E3A; font-size: 11px; padding: 3px 10px; border-radius: 100px; margin-top: 6px; }
 .edit-btn { margin-left: auto; padding: 8px 16px; border-radius: 100px; border: 1px solid #e8e8e8; background: none; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; color: #666; }
+.edit-btn:hover { border-color: #1B3A5C; color: #1B3A5C; }
 .section-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .75rem; margin-top: 1.5rem; }
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: .5rem; }
+.stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: .5rem; }
 .stat-card { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1rem; text-align: center; }
 .stat-num { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #1B3A5C; }
 .stat-num.gold { color: #C8A96E; }
 .stat-lbl { font-size: 11px; color: #888; margin-top: 3px; }
-.watch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.watch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .wcard { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1rem; cursor: pointer; transition: border-color .15s; }
 .wcard:hover { border-color: #1B3A5C; }
 .wcard.add { border-style: dashed; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; color: #aaa; }
@@ -59,6 +60,19 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 .act-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
 .act-text { flex: 1; }
 .act-time { font-size: 11px; color: #aaa; }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; padding: 1rem; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 100%; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 1rem; }
+.modal-field { margin-bottom: 1rem; }
+.modal-field label { display: block; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.modal-field input { width: 100%; padding: 10px 14px; border: 1px solid #e8e8e8; border-radius: 10px; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; }
+.modal-field input:focus { border-color: #1B3A5C; }
+.modal-actions { display: flex; gap: 8px; margin-top: 1.25rem; }
+.modal-save { flex: 1; padding: 11px; border-radius: 100px; border: none; background: #1B3A5C; color: white; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.modal-cancel { flex: 1; padding: 11px; border-radius: 100px; border: 1px solid #e8e8e8; background: none; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; color: #666; }
 </style>
 </head>
 <body>
@@ -90,6 +104,45 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
   </div>
 </nav>
 
+<!-- Rediger profil modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <div class="modal-title">Rediger profil</div>
+    <div class="modal-field">
+      <label>Navn</label>
+      <input type="text" id="editName" placeholder="Ditt fulle navn" />
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeEditModal()">Avbryt</button>
+      <button class="modal-save" onclick="saveProfile()">Lagre</button>
+    </div>
+  </div>
+</div>
+
+<!-- Avslutt abonnement modal -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal-box" style="text-align:center;">
+    <div style="font-size:36px;margin-bottom:1rem;">😢</div>
+    <div class="modal-title">Avslutt abonnement</div>
+    <p style="font-size:14px;color:#666;margin-bottom:1.5rem;line-height:1.6;">Abonnementet avsluttes ved slutten av inneværende betalingsperiode. Du beholder tilgang til da.</p>
+    <button id="confirmCancelBtn" onclick="confirmCancel()" style="width:100%;padding:12px;border-radius:100px;border:none;background:#A32D2D;color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;">Bekreft avslutning</button>
+    <button onclick="closeCancelModal()" style="width:100%;padding:12px;border-radius:100px;border:1px solid #e8e8e8;background:none;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;color:#666;">Avbryt</button>
+  </div>
+</div>
+
+<!-- Slett konto modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box" style="text-align:center;">
+    <div style="font-size:36px;margin-bottom:1rem;">⚠️</div>
+    <div class="modal-title">Slett konto</div>
+    <p style="font-size:14px;color:#666;margin-bottom:8px;line-height:1.6;">Dette er permanent og kan ikke angres. Kontoen din, all aktivitetsdata og abonnementet hos Stripe slettes umiddelbart.</p>
+    <p style="font-size:13px;color:#A32D2D;margin-bottom:1.5rem;">Skriv <strong>SLETT</strong> for å bekrefte:</p>
+    <input type="text" id="deleteConfirmInput" placeholder="SLETT" style="width:100%;padding:10px 14px;border:1px solid #e8e8e8;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:1rem;text-align:center;" />
+    <button id="confirmDeleteBtn" onclick="confirmDelete()" style="width:100%;padding:12px;border-radius:100px;border:none;background:#A32D2D;color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;">Slett konto permanent</button>
+    <button onclick="closeDeleteModal()" style="width:100%;padding:12px;border-radius:100px;border:1px solid #e8e8e8;background:none;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;color:#666;">Avbryt</button>
+  </div>
+</div>
+
 <div class="page">
   <div class="profile-hero">
     <div class="profile-av-lg" id="profileAv">?</div>
@@ -101,7 +154,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
         <div class="profile-plan" id="profilePlan" style="background:#1B3A5C;color:#C8A96E;">🌱 Nybegynner</div>
       </div>
     </div>
-    <button class="edit-btn">Rediger profil</button>
+    <button class="edit-btn" onclick="openEditModal()">Rediger profil</button>
   </div>
 
   <div class="section-label">Aktivitet</div>
@@ -127,7 +180,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 
   <div style="margin-top:1.5rem;">
     <div class="section-label" style="margin-bottom:1rem;">Oppgrader abonnement</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+    <div style="display:grid;grid-template-columns:1fr;gap:1rem;">
 
       <div style="background:#E6EEF5;border:2px solid #b0cce0;border-radius:16px;padding:1.25rem;">
         <div style="font-size:11px;color:#1B3A5C;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Gratis</div>
@@ -179,30 +232,21 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
     </div>
     <p style="font-size:11px;color:#aaa;text-align:center;margin-top:1rem;">Ingen bindingstid · Avslutt når som helst</p>
 
-    <div style="text-align:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e8e8e8;">
-      <p style="font-size:13px;color:#aaa;margin-bottom:12px;">Har du et aktivt abonnement?</p>
+    <!-- Kontohandlinger -->
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e8e8e8;display:flex;flex-direction:column;gap:8px;">
       <button onclick="showCancelModal()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;">Avslutt abonnement</button>
+      <button onclick="showDeleteModal()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #ffcccc;background:none;color:#A32D2D;cursor:pointer;font-family:'DM Sans',sans-serif;">Slett konto</button>
     </div>
   </div>
 </div>
 
-<div id="cancelModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
-  <div style="background:white;border-radius:20px;padding:2.5rem;max-width:400px;width:100%;text-align:center;">
-    <div style="font-size:36px;margin-bottom:1rem;">😢</div>
-    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;">Avslutt abonnement</div>
-    <p style="font-size:14px;color:#666;margin-bottom:1.5rem;line-height:1.6;">Send en e-post til oss så avslutter vi abonnementet ditt umiddelbart.</p>
-    <a href="mailto:kontakt@borshjelpen.no?subject=Avslutt abonnement" style="display:block;width:100%;padding:12px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;margin-bottom:10px;">Send e-post →</a>
-    <button onclick="document.getElementById('cancelModal').style.display='none'" style="background:none;border:none;font-size:13px;color:#aaa;cursor:pointer;font-family:'DM Sans',sans-serif;">Lukk</button>
-  </div>
-</div>
-
 <script>
-function showCancelModal() { document.getElementById('cancelModal').style.display = 'flex'; }
-
 const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
 
 function getInitials(name) { if (!name) return '?'; return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2); }
 
@@ -215,6 +259,7 @@ async function loadUser() {
 }
 
 function renderUser(user) {
+  currentUser = user;
   const name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
   const initials = getInitials(name);
   document.getElementById('navAv').textContent = initials;
@@ -224,6 +269,7 @@ function renderUser(user) {
   document.getElementById('profileAv').textContent = initials;
   document.getElementById('profileName').textContent = name;
   document.getElementById('profileEmail').textContent = user.email;
+  document.getElementById('editName').value = name;
   loadActivity(user.id);
   loadStats(user.id);
   loadWatchlist();
@@ -260,7 +306,7 @@ function loadWatchlist() {
       const cls = s.up ? 'badge-up' : 'badge-down';
       const priceStr = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
       return '<div class="wcard" onclick="location.href=\'aksjer.html?ticker=' + s.ticker + '\'">' +
-        '<div class="wt">' + s.ticker + '.OL</div><div class="wn">' + s.name.split(' ')[0] + '</div>' +
+        '<div class="wt">' + s.ticker + '</div><div class="wn">' + s.name.split(' ')[0] + '</div>' +
         '<div class="wrow"><span class="wp">' + priceStr + ' kr</span><span class="' + cls + '">' + sign + s.changePct + '%</span></div></div>';
     }).join('') + '<div class="wcard add" onclick="location.href=\'aksjer.html\'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
   } catch(e) {}
@@ -295,11 +341,103 @@ async function loadActivity(userId) {
   }
 }
 
+// === REDIGER PROFIL ===
+function openEditModal() {
+  document.getElementById('editModal').classList.add('open');
+}
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('open');
+}
+async function saveProfile() {
+  const newName = document.getElementById('editName').value.trim();
+  if (!newName) return;
+  const btn = document.querySelector('#editModal .modal-save');
+  btn.textContent = 'Lagrer...'; btn.disabled = true;
+  try {
+    await sb.auth.updateUser({ data: { full_name: newName } });
+    document.getElementById('profileName').textContent = newName;
+    document.getElementById('navName').textContent = newName.split(' ')[0];
+    document.getElementById('ddName').textContent = newName;
+    const initials = getInitials(newName);
+    document.getElementById('profileAv').textContent = initials;
+    document.getElementById('navAv').textContent = initials;
+    closeEditModal();
+  } catch(e) {
+    alert('Noe gikk galt. Prøv igjen.');
+  }
+  btn.textContent = 'Lagre'; btn.disabled = false;
+}
+
+// === AVSLUTT ABONNEMENT ===
+function showCancelModal() { document.getElementById('cancelModal').classList.add('open'); }
+function closeCancelModal() { document.getElementById('cancelModal').classList.remove('open'); }
+async function confirmCancel() {
+  if (!currentUser) return;
+  const btn = document.getElementById('confirmCancelBtn');
+  btn.textContent = 'Avslutter...'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/cancel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUser.id })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      closeCancelModal();
+      alert('Abonnementet er avsluttet. Du beholder tilgang til betalingsperioden er over.');
+    } else {
+      alert('Feil: ' + (data.error || 'Noe gikk galt'));
+    }
+  } catch(e) {
+    alert('Noe gikk galt. Kontakt kontakt@borshjelpen.no');
+  }
+  btn.textContent = 'Bekreft avslutning'; btn.disabled = false;
+}
+
+// === SLETT KONTO ===
+function showDeleteModal() { document.getElementById('deleteModal').classList.add('open'); }
+function closeDeleteModal() {
+  document.getElementById('deleteModal').classList.remove('open');
+  document.getElementById('deleteConfirmInput').value = '';
+}
+async function confirmDelete() {
+  const input = document.getElementById('deleteConfirmInput').value.trim();
+  if (input !== 'SLETT') {
+    alert('Skriv SLETT for å bekrefte.');
+    return;
+  }
+  if (!currentUser) return;
+  const btn = document.getElementById('confirmDeleteBtn');
+  btn.textContent = 'Sletter...'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/delete-account', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUser.id })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      await sb.auth.signOut();
+      window.location.href = '/borshjelpen.html';
+    } else {
+      alert('Feil: ' + (data.error || 'Noe gikk galt'));
+      btn.textContent = 'Slett konto permanent'; btn.disabled = false;
+    }
+  } catch(e) {
+    alert('Noe gikk galt. Kontakt kontakt@borshjelpen.no');
+    btn.textContent = 'Slett konto permanent'; btn.disabled = false;
+  }
+}
+
 function toggleDropdown() { document.getElementById('dropdown').classList.toggle('open'); }
 document.addEventListener('click', e => {
   if (!e.target.closest('.user-pill') && !e.target.closest('.dropdown')) document.getElementById('dropdown').classList.remove('open');
+  if (e.target === document.getElementById('editModal')) closeEditModal();
+  if (e.target === document.getElementById('cancelModal')) closeCancelModal();
+  if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
 });
 async function doLogout() { await sb.auth.signOut(); window.location.href = 'auth.html'; }
+
 loadUser();
 </script>
 </body>
