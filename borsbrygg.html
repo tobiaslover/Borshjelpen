@@ -9,8 +9,6 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; min-height: 100vh; }
-
-/* NAV */
 .nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; background: white; }
 .logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
 .logo span { color: #C8A96E; }
@@ -18,19 +16,12 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .nav-links a { font-size: 14px; color: #666; text-decoration: none; }
 .nav-links a:hover { color: #1B3A5C; }
 .nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-.mobile-nav-DISABLED { display: none; background: white; border-bottom: 1px solid #e8e8e8; }
-.mobile-nav a { flex: 1; text-align: center; padding: 10px 4px; font-size: 12px; color: #666; text-decoration: none; border-bottom: 2px solid transparent; font-family: 'DM Sans', sans-serif; }
-.mobile-nav a.active { color: #1B3A5C; border-bottom-color: #1B3A5C; font-weight: 500; }
-
-/* HERO — locked */
 .bb-hero { background: #1B3A5C; padding: 4rem 2rem; text-align: center; }
 .bb-tag { display: inline-block; background: rgba(200,169,110,.2); color: #C8A96E; font-size: 11px; font-weight: 500; padding: 5px 14px; border-radius: 100px; border: 1px solid rgba(200,169,110,.3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1.25rem; }
 .bb-title { font-family: 'Playfair Display', serif; font-size: 42px; color: white; font-weight: 700; margin-bottom: 1rem; line-height: 1.2; }
 .bb-sub { font-size: 16px; color: rgba(255,255,255,.65); max-width: 520px; margin: 0 auto 2rem; line-height: 1.7; }
 .bb-features { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
 .bb-feat { font-size: 14px; color: rgba(255,255,255,.75); display: flex; align-items: center; gap: 6px; }
-
-/* PRICING */
 .bb-pricing { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; max-width: 800px; margin: 0 auto; }
 .price-card { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 16px; padding: 1.5rem; text-align: left; }
 .price-card.featured { background: white; position: relative; }
@@ -46,15 +37,11 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .price-card.featured .price-item { color: #555; }
 .price-btn { width: 100%; padding: 10px; border-radius: 100px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1px solid rgba(255,255,255,.3); background: none; color: white; }
 .price-btn.featured-btn { border: none; background: #1B3A5C; color: white; }
-
-/* SUBSCRIBER VIEW */
 .bb-content { max-width: 860px; margin: 2rem auto; padding: 0 2rem; }
 .bb-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .bb-header-left h1 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
 .bb-header-left p { font-size: 13px; color: #888; margin-top: 3px; }
 .bb-today-badge { background: #1B3A5C; color: #C8A96E; font-size: 11px; padding: 5px 12px; border-radius: 100px; font-weight: 500; }
-
-/* Today's edition */
 .edition-card { background: white; border-radius: 16px; border: 1px solid #e8e8e8; overflow: hidden; margin-bottom: 1.5rem; }
 .edition-header { background: #1B3A5C; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; }
 .edition-logo { font-family: 'Tenor Sans', sans-serif; font-size: 14px; letter-spacing: 2px; color: #C8A96E; text-transform: uppercase; }
@@ -64,14 +51,11 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .edition-loading { padding: 2rem; text-align: center; color: #aaa; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .edition-spinner { width: 20px; height: 20px; border: 2px solid #e8e8e8; border-top-color: #C8A96E; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 .story { padding: 1rem 0; border-bottom: 1px solid #f0f0f0; }
 .story:last-child { border-bottom: none; padding-bottom: 0; }
 .story-tag { font-size: 10px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
 .story-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
 .story-text { font-size: 14px; color: #555; line-height: 1.7; }
-
-/* Archive */
 .archive-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .75rem; }
 .archive-list { background: white; border-radius: 12px; border: 1px solid #e8e8e8; overflow: hidden; }
 .archive-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: background .15s; }
@@ -80,18 +64,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .archive-title { font-size: 14px; font-weight: 500; }
 .archive-date { font-size: 12px; color: #aaa; }
 .archive-arrow { color: #C8A96E; font-size: 14px; }
-
-@media (max-width: 768px) {
-  .nav-links a { display: none; }
-  .mobile-nav-DISABLED { display: flex; }
-  .bb-hero { padding: 2.5rem 1rem; }
-  .bb-title { font-size: 28px; }
-  .bb-pricing { grid-template-columns: 1fr; }
-  .bb-features { flex-direction: column; align-items: center; gap: 10px; }
-  .bb-content { padding: 0 1rem; }
-  .bb-header-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
-}
-
 .wl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
 .wl-card { background: white; border-radius: 12px; border: 1px solid #e8e8e8; overflow: hidden; }
 .wl-header { padding: .75rem 1rem; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
@@ -103,27 +75,16 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .wl-pct { font-size: 13px; font-weight: 500; }
 .wl-pct.up { color: #2C7A5C; }
 .wl-pct.down { color: #A32D2D; }
-
-/* Hamburger mobil nav */
 .hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; position: relative; }
 .hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
-.mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 99999; flex-direction: column; padding: 1.5rem 2rem; overflow-y: auto; }
-.mobile-menu.open { display: flex; }
-.mobile-menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-.mobile-menu-logo { font-family: 'Tenor Sans', sans-serif; font-size: 16px; letter-spacing: 2.5px; text-transform: uppercase; color: #1a1a1a; text-decoration: none; }
-.mobile-menu-logo span { color: #C8A96E; }
-.mobile-menu-close { background: none; border: none; font-size: 28px; cursor: pointer; color: #666; line-height: 1; padding: 4px; }
-.mobile-menu-links { display: flex; flex-direction: column; gap: 0; flex: 1; }
-.mobile-menu-links a { font-size: 26px; font-family: 'Playfair Display', serif; font-weight: 700; color: #1B3A5C; text-decoration: none; padding: 16px 0; border-bottom: 1px solid #f0f0f0; display: block; }
-.mobile-menu-links a:active { color: #C8A96E; }
-.mobile-menu-footer { padding-top: 1.5rem; display: flex; gap: 8px; flex-direction: column; }
-.mobile-menu-btn { width: 100%; padding: 14px; border-radius: 100px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; border: none; }
-.mobile-menu-login { background: none; border: 1px solid #e8e8e8 !important; color: #666; }
-.mobile-menu-register { background: #1B3A5C; color: white; }
-.mobile-menu-user { display: none; align-items: center; gap: 12px; padding: 12px 16px; background: #f8f7f4; border-radius: 12px; cursor: pointer; }
-.mobile-menu-av { width: 40px; height: 40px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #C8A96E; font-weight: 500; font-family: 'Tenor Sans', sans-serif; flex-shrink: 0; }
-.mobile-menu-username { font-size: 15px; font-weight: 500; }
 @media (max-width: 768px) {
+  .nav-links a { display: none; }
+  .bb-hero { padding: 2.5rem 1rem; }
+  .bb-title { font-size: 28px; }
+  .bb-pricing { grid-template-columns: 1fr; }
+  .bb-features { flex-direction: column; align-items: center; gap: 10px; }
+  .bb-content { padding: 0 1rem; }
+  .bb-header-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
   .hamburger-btn { display: block; }
   .nav-links { display: none !important; }
 }
@@ -153,7 +114,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   <button class="hamburger-btn" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
 
-<!-- Mobil hamburgermeny -->
 <div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
     <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;" onclick="closeMobileMenu()">Børs<span style="color:#C8A96E;">hjelpen</span></a>
@@ -179,8 +139,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   </div>
 </div>
 
-
-
 <!-- LOCKED VIEW -->
 <div id="lockedView" style="display:none">
   <div class="bb-hero">
@@ -203,7 +161,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
           <div class="price-item">✓ AI-chat — 5 spørsmål per dag</div>
           <div class="price-item">✓ Watchlist — 2 aksjer</div>
           <div class="price-item">✓ Børsbrygg</div>
-          <div class="price-item">✓ Læring — under utvikling — under utvikling</div>
+          <div class="price-item">✓ Læring</div>
         </div>
         <button class="price-btn" onclick="location.href='/auth.html'">Start gratis →</button>
       </div>
@@ -217,7 +175,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
           <div class="price-item">✓ Watchlist — opptil 10 aksjer</div>
           <div class="price-item">✓ Børsbrygg</div>
           <div class="price-item">✓ Børsmeldinger oppsummert</div>
-          <div class="price-item">✓ Læring — under utvikling</div>
+          <div class="price-item">✓ Læring</div>
         </div>
         <button class="price-btn featured-btn" onclick="location.href='/priser.html'">Abonner →</button>
       </div>
@@ -231,7 +189,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
           <div class="price-item">✓ Watchlist — ubegrenset</div>
           <div class="price-item">✓ Børsbrygg</div>
           <div class="price-item">✓ Børsmeldinger oppsummert</div>
-          <div class="price-item">✓ Læring — under utvikling</div>
+          <div class="price-item">✓ Læring</div>
           <div class="price-item">✓ Kvartalsrapporter oppsummert</div>
           <div class="price-item">✓ Porteføljeanalyse</div>
         </div>
@@ -252,7 +210,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
       </div>
       <div class="bb-today-badge">Dagens utgave</div>
     </div>
-
     <div class="edition-card">
       <div class="edition-header">
         <div>
@@ -262,13 +219,9 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
         </div>
       </div>
       <div class="edition-body" id="editionBody">
-        <div class="edition-loading">
-          <div class="edition-spinner"></div>
-          AI genererer dagens oppsummering...
-        </div>
+        <div class="edition-loading"><div class="edition-spinner"></div>AI genererer dagens oppsummering...</div>
       </div>
     </div>
-
     <div class="archive-label" style="margin-top:1.5rem;">Gårsdagens vinnere og tapere</div>
     <div class="wl-grid">
       <div class="wl-card">
@@ -280,191 +233,76 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
         <div id="losersList"><div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Laster...</div></div>
       </div>
     </div>
-
     <div class="archive-label">Tidligere utgaver</div>
     <div class="archive-list" id="archiveList">
-      <div class="archive-item">
-        <div>
-          <div class="archive-title">Equinor opp 2% — oljeprisen driver børsen</div>
-          <div class="archive-date">Torsdag 29. mai 2026</div>
-        </div>
-        <div class="archive-arrow">→</div>
-      </div>
-      <div class="archive-item">
-        <div>
-          <div class="archive-title">DNB med sterk kvartal — men renten bekymrer</div>
-          <div class="archive-date">Onsdag 28. mai 2026</div>
-        </div>
-        <div class="archive-arrow">→</div>
-      </div>
-      <div class="archive-item">
-        <div>
-          <div class="archive-title">Oslo Børs ned 1.2% — Fed-tale skapte uro</div>
-          <div class="archive-date">Tirsdag 27. mai 2026</div>
-        </div>
-        <div class="archive-arrow">→</div>
-      </div>
+      <div class="archive-item"><div><div class="archive-title">Equinor opp 2% — oljeprisen driver børsen</div><div class="archive-date">Torsdag 29. mai 2026</div></div><div class="archive-arrow">→</div></div>
+      <div class="archive-item"><div><div class="archive-title">DNB med sterk kvartal — men renten bekymrer</div><div class="archive-date">Onsdag 28. mai 2026</div></div><div class="archive-arrow">→</div></div>
+      <div class="archive-item"><div><div class="archive-title">Oslo Børs ned 1.2% — Fed-tale skapte uro</div><div class="archive-date">Tirsdag 27. mai 2026</div></div><div class="archive-arrow">→</div></div>
     </div>
   </div>
 </div>
 
 <script>
-// Sett dato
 const today = new Date().toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'Europe/Oslo'});
 const todayCap = today.charAt(0).toUpperCase() + today.slice(1);
 if (document.getElementById('bbTodayDate')) document.getElementById('bbTodayDate').textContent = todayCap;
 if (document.getElementById('editionDate')) document.getElementById('editionDate').textContent = todayCap;
 
-// Watchlist for AI
 const watchlist = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
 
 async function loadBorsbrygg() {
   try {
-    const results = await Promise.all(
-      watchlist.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null))
-    );
+    const results = await Promise.all(watchlist.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null)));
     const valid = results.filter(r => r && !r.error);
-    if (!valid.length) {
-      document.getElementById('editionBody').innerHTML = '<div class="edition-loading">Kunne ikke hente kursdata. Prøv igjen senere.</div>';
-      return;
-    }
-
+    if (!valid.length) { document.getElementById('editionBody').innerHTML = '<div class="edition-loading">Kunne ikke hente kursdata. Prøv igjen senere.</div>'; return; }
     const sorted = [...valid].sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
-    const winner = sorted[0];
-    const loser = sorted[sorted.length - 1];
+    const winner = sorted[0]; const loser = sorted[sorted.length - 1];
     const title = winner.name.split(' ')[0] + ' opp ' + winner.changePct + '% — ' + loser.name.split(' ')[0] + ' ned ' + Math.abs(loser.changePct) + '%';
     document.getElementById('editionTitle').textContent = title;
-
-    const stockSummary = valid.map(s => {
-      const sign = parseFloat(s.changePct) >= 0 ? '+' : '';
-      return s.name + ' (' + s.ticker + '): ' + s.price + ' NOK, ' + sign + s.changePct + '%';
-    }).join(', ');
-
-    const res = await fetch('/api/borsbrygg', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stockSummary })
-    });
+    const stockSummary = valid.map(s => { const sign = parseFloat(s.changePct) >= 0 ? '+' : ''; return s.name + ' (' + s.ticker + '): ' + s.price + ' NOK, ' + sign + s.changePct + '%'; }).join(', ');
+    const res = await fetch('/api/borsbrygg', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stockSummary }) });
     const ai = await res.json();
     if (ai.error) throw new Error(ai.error);
-
     document.getElementById('editionBody').innerHTML =
-
-      // 1. Hva skjedde
-      '<div class="story">' +
-        '<div class="story-tag">📊 Hva skjedde i dag</div>' +
-        '<div class="story-title">' + title + '</div>' +
-        '<div class="story-text">' + (ai.hva_skjedde || '') + '</div>' +
-      '</div>' +
-
-      // 2. Globale faktorer
-      '<div class="story">' +
-        '<div class="story-tag">🌍 Globale faktorer</div>' +
-        '<div class="story-title">Slik påvirket verden Oslo Børs</div>' +
-        '<div class="story-text">' + (ai.globale_faktorer || '') + '</div>' +
-      '</div>' +
-
-      // 3. Viktige nyheter
-      '<div class="story">' +
-        '<div class="story-tag">📰 Viktige nyheter</div>' +
-        '<div class="story-title">Dette bør du vite</div>' +
-        '<div class="story-text">' +
-          (ai.nyheter || []).map(n =>
-            '<div style="margin-bottom:1rem;padding:1rem;background:#f8f7f4;border-radius:10px;">' +
-              '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
-                '<div style="font-weight:500;font-size:14px;">' + n.tittel + '</div>' +
-                '<div style="display:flex;gap:4px;flex-shrink:0;">' +
-                  (n.aksje ? '<span style="background:#1B3A5C;color:#C8A96E;font-size:10px;padding:2px 8px;border-radius:100px;">' + n.aksje + '</span>' : '') +
-                  (n.kilde ? '<span style="background:#f0f0f0;color:#888;font-size:10px;padding:2px 8px;border-radius:100px;">' + n.kilde + '</span>' : '') +
-                '</div>' +
-              '</div>' +
-              '<div style="font-size:13px;color:#555;line-height:1.6;">' + n.tekst + '</div>' +
-            '</div>'
-          ).join('') +
-        '</div>' +
-      '</div>' +
-
-      // 4. Aksje-påvirkning
-      '<div class="story">' +
-        '<div class="story-tag">📈 Hvordan påvirker dette aksjene</div>' +
-        '<div class="story-title">Slik kan det slå ut fremover</div>' +
-        '<div class="story-text">' +
-          (ai.aksje_påvirkning || []).map(a => {
-            const stock = valid.find(s => s.ticker === a.ticker);
-            const sign = stock && parseFloat(stock.changePct) >= 0 ? '+' : '';
-            const color = stock && parseFloat(stock.changePct) >= 0 ? '#2C7A5C' : '#A32D2D';
-            const pct = stock ? sign + stock.changePct + '%' : '';
-            return '<div style="padding:12px 0;border-bottom:1px solid #f0f0f0;">' +
-              '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
-                '<span style="font-weight:500;">' + a.navn + '</span>' +
-                '<span style="color:' + color + ';font-size:13px;font-weight:500;">' + pct + '</span>' +
-              '</div>' +
-              '<div style="font-size:13px;color:#555;line-height:1.6;">' + a.forklaring + '</div>' +
-            '</div>';
-          }).join('') +
-        '</div>' +
-      '</div>' +
-
-      // 5. Risiko
-      '<div class="story">' +
-        '<div class="story-tag">⚠️ Risiko og muligheter</div>' +
-        '<div class="story-title">Hold øye med dette</div>' +
-        '<div class="story-text">' + (ai.risiko || '') + '</div>' +
-      '</div>' +
-
-      // 6. Tips
-      '<div class="story">' +
-        '<div class="story-tag">💡 Tips til nybegynnere</div>' +
-        '<div class="story-title">' + (ai.nybegynner_tips || '') + '</div>' +
-        '<div class="story-text" style="font-size:12px;color:#aaa;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0;">Kursdata fra Yahoo Finance · Forsinket ca. 15 min · Ikke finansiell rådgivning · Gjør alltid egne vurderinger.</div>' +
-      '</div>';
-
+      '<div class="story"><div class="story-tag">📊 Hva skjedde i dag</div><div class="story-title">' + title + '</div><div class="story-text">' + (ai.hva_skjedde || '') + '</div></div>' +
+      '<div class="story"><div class="story-tag">🌍 Globale faktorer</div><div class="story-title">Slik påvirket verden Oslo Børs</div><div class="story-text">' + (ai.globale_faktorer || '') + '</div></div>' +
+      '<div class="story"><div class="story-tag">📰 Viktige nyheter</div><div class="story-title">Dette bør du vite</div><div class="story-text">' +
+        (ai.nyheter || []).map(n => '<div style="margin-bottom:1rem;padding:1rem;background:#f8f7f4;border-radius:10px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;"><div style="font-weight:500;font-size:14px;">' + n.tittel + '</div><div style="display:flex;gap:4px;flex-shrink:0;">' + (n.aksje ? '<span style="background:#1B3A5C;color:#C8A96E;font-size:10px;padding:2px 8px;border-radius:100px;">' + n.aksje + '</span>' : '') + (n.kilde ? '<span style="background:#f0f0f0;color:#888;font-size:10px;padding:2px 8px;border-radius:100px;">' + n.kilde + '</span>' : '') + '</div></div><div style="font-size:13px;color:#555;line-height:1.6;">' + n.tekst + '</div></div>').join('') +
+      '</div></div>' +
+      '<div class="story"><div class="story-tag">📈 Hvordan påvirker dette aksjene</div><div class="story-title">Slik kan det slå ut fremover</div><div class="story-text">' +
+        (ai.aksje_påvirkning || []).map(a => { const stock = valid.find(s => s.ticker === a.ticker); const sign = stock && parseFloat(stock.changePct) >= 0 ? '+' : ''; const color = stock && parseFloat(stock.changePct) >= 0 ? '#2C7A5C' : '#A32D2D'; const pct = stock ? sign + stock.changePct + '%' : ''; return '<div style="padding:12px 0;border-bottom:1px solid #f0f0f0;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-weight:500;">' + a.navn + '</span><span style="color:' + color + ';font-size:13px;font-weight:500;">' + pct + '</span></div><div style="font-size:13px;color:#555;line-height:1.6;">' + a.forklaring + '</div></div>'; }).join('') +
+      '</div></div>' +
+      '<div class="story"><div class="story-tag">⚠️ Risiko og muligheter</div><div class="story-title">Hold øye med dette</div><div class="story-text">' + (ai.risiko || '') + '</div></div>' +
+      '<div class="story"><div class="story-tag">💡 Tips til nybegynnere</div><div class="story-title">' + (ai.nybegynner_tips || '') + '</div><div class="story-text" style="font-size:12px;color:#aaa;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0;">Kursdata fra Yahoo Finance · Forsinket ca. 15 min · Ikke finansiell rådgivning · Gjør alltid egne vurderinger.</div></div>';
   } catch(e) {
     document.getElementById('editionBody').innerHTML = '<div class="edition-loading">Kunne ikke laste innhold: ' + e.message + '</div>';
   }
 }
 
-// Last innhold direkte for testing
 loadBorsbrygg();
 loadWinnersLosers();
 
 async function loadWinnersLosers() {
   const allTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT','KOG','SALM','ORK','STB','GJF','NAS','SUBC'];
   try {
-    const results = await Promise.all(
-      allTickers.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null))
-    );
-    const valid = results
-      .filter(r => r && !r.error && r.changePct !== undefined)
-      .sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
-
-    const winners = valid.slice(0, 3);
-    const losers = valid.slice(-3).reverse();
-
-    function renderItem(s) {
-      const sign = parseFloat(s.changePct) >= 0 ? '+' : '';
-      const cls = parseFloat(s.changePct) >= 0 ? 'up' : 'down';
-      return '<div class="wl-item">' +
-        '<div><div class="wl-name">' + s.name.split(' ')[0] + '</div><div class="wl-ticker">' + s.ticker + '</div></div>' +
-        '<div class="wl-pct ' + cls + '">' + sign + s.changePct + '%</div>' +
-        '</div>';
-    }
-
+    const results = await Promise.all(allTickers.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null)));
+    const valid = results.filter(r => r && !r.error && r.changePct !== undefined).sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
+    const winners = valid.slice(0, 3); const losers = valid.slice(-3).reverse();
+    function renderItem(s) { const sign = parseFloat(s.changePct) >= 0 ? '+' : ''; const cls = parseFloat(s.changePct) >= 0 ? 'up' : 'down'; return '<div class="wl-item"><div><div class="wl-name">' + s.name.split(' ')[0] + '</div><div class="wl-ticker">' + s.ticker + '</div></div><div class="wl-pct ' + cls + '">' + sign + s.changePct + '%</div></div>'; }
     document.getElementById('winnersList').innerHTML = winners.map(renderItem).join('') || '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
     document.getElementById('losersList').innerHTML = losers.map(renderItem).join('') || '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
-
   } catch(e) {
     document.getElementById('winnersList').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Kunne ikke laste data</div>';
     document.getElementById('losersList').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Kunne ikke laste data</div>';
   }
 }
+
 const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
 
 (async function checkAuth() {
   try {
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     function applyBbSession(user) {
       const name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
       const initials = name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0,2);
@@ -472,51 +310,22 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
       document.getElementById('navUser').style.display = 'flex';
       document.getElementById('navAv').textContent = initials;
       document.getElementById('navName').textContent = name.split(' ')[0];
-    if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
+      if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
     }
-
-    sb.auth.onAuthStateChange(function(event, session) {
-      if (session) applyBbSession(session.user);
-    });
-
+    sb.auth.onAuthStateChange(function(event, session) { if (session) applyBbSession(session.user); });
     const { data: { session } } = await sb.auth.getSession();
-
     if (session) {
-      const user = session.user;
-      applyBbSession(user);
-
-      // Abonnenter ser innhold — bytt til Stripe-sjekk ved lansering
-      const isSubscriber = true;
-      if (isSubscriber) {
-        document.getElementById('lockedView').style.display = 'none';
-        document.getElementById('subscriberView').style.display = 'block';
-        loadBorsbrygg();
-        // Logg Børsbrygg-lesing med 5 XP
-        try {
-          await sb.from('user_activity').insert({
-            user_id: user.id,
-            type: 'borsbrygg',
-            ticker: null,
-            name: 'Børsbrygg lest',
-            xp: 5
-          });
-        } catch(e) {}
-      }
+      applyBbSession(session.user);
+      document.getElementById('lockedView').style.display = 'none';
+      document.getElementById('subscriberView').style.display = 'block';
+      loadBorsbrygg();
+      try { await sb.from('user_activity').insert({ user_id: session.user.id, type: 'borsbrygg', ticker: null, name: 'Børsbrygg lest', xp: 5 }); } catch(e) {}
     }
   } catch(e) {}
 })();
-</script>
-<script>
-function openMobileMenu() {
-  var m = document.getElementById('mobileMenu');
-  m.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-function closeMobileMenu() {
-  var m = document.getElementById('mobileMenu');
-  m.style.display = 'none';
-  document.body.style.overflow = '';
-}
+
+function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
 </body>
 </html>
