@@ -15,71 +15,43 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .nav-links a { font-size: 14px; color: #666; text-decoration: none; }
 .nav-links a:hover { color: #1B3A5C; }
 .nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 200; position: relative; }
+.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
+@media (max-width: 768px) { .hamburger-btn { display: block; } .nav-links { display: none !important; } }
 .hero { background: #1B3A5C; padding: 5rem 2rem; text-align: center; }
 .hero-label { font-size: 12px; color: #C8A96E; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; }
 .hero-title { font-family: 'Playfair Display', serif; font-size: 48px; color: white; font-weight: 700; margin-bottom: 1rem; line-height: 1.1; }
 .hero-title em { font-style: italic; font-weight: 400; color: #C8A96E; }
 .hero-sub { font-size: 16px; color: rgba(255,255,255,0.55); max-width: 500px; margin: 0 auto; line-height: 1.7; }
-
 .content { max-width: 700px; margin: 0 auto; padding: 4rem 2rem; }
-
 .ingress { font-family: 'Playfair Display', serif; font-size: 22px; line-height: 1.6; color: #1B3A5C; margin-bottom: 2.5rem; font-style: italic; }
-
 p { font-size: 15px; line-height: 1.9; color: #444; margin-bottom: 1.5rem; }
-
 .values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 3rem 0; }
 .value-card { background: #f8f7f4; border-radius: 14px; padding: 1.5rem; }
 .value-icon { font-size: 24px; margin-bottom: 10px; }
 .value-title { font-size: 14px; font-weight: 600; color: #1B3A5C; margin-bottom: 6px; }
 .value-text { font-size: 13px; color: #666; line-height: 1.6; }
-
 .divider { width: 40px; height: 2px; background: #C8A96E; margin: 2.5rem 0; }
-
 .cta-box { background: #1B3A5C; border-radius: 16px; padding: 2.5rem; text-align: center; margin-top: 3rem; }
 .cta-title { font-family: 'Playfair Display', serif; font-size: 26px; color: white; margin-bottom: 8px; }
 .cta-sub { font-size: 14px; color: rgba(255,255,255,0.55); margin-bottom: 1.5rem; }
 .cta-btn { background: #C8A96E; color: #1B3A5C; padding: 12px 28px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
 .cta-email { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 1rem; }
 .cta-email a { color: rgba(255,255,255,0.6); }
-
 @media (max-width: 600px) { .values { grid-template-columns: 1fr; } .hero-title { font-size: 34px; } }
-
-/* Hamburger mobil nav */
-.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; position: relative; }
-.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
-.mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 99999; flex-direction: column; padding: 1.5rem 2rem; overflow-y: auto; }
-.mobile-menu.open { display: flex; }
-.mobile-menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-.mobile-menu-logo { font-family: 'Tenor Sans', sans-serif; font-size: 16px; letter-spacing: 2.5px; text-transform: uppercase; color: #1a1a1a; text-decoration: none; }
-.mobile-menu-logo span { color: #C8A96E; }
-.mobile-menu-close { background: none; border: none; font-size: 28px; cursor: pointer; color: #666; line-height: 1; padding: 4px; }
-.mobile-menu-links { display: flex; flex-direction: column; gap: 0; flex: 1; }
-.mobile-menu-links a { font-size: 26px; font-family: 'Playfair Display', serif; font-weight: 700; color: #1B3A5C; text-decoration: none; padding: 16px 0; border-bottom: 1px solid #f0f0f0; display: block; }
-.mobile-menu-links a:active { color: #C8A96E; }
-.mobile-menu-footer { padding-top: 1.5rem; display: flex; gap: 8px; flex-direction: column; }
-.mobile-menu-btn { width: 100%; padding: 14px; border-radius: 100px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; border: none; }
-.mobile-menu-login { background: none; border: 1px solid #e8e8e8 !important; color: #666; }
-.mobile-menu-register { background: #1B3A5C; color: white; }
-.mobile-menu-user { display: none; align-items: center; gap: 12px; padding: 12px 16px; background: #f8f7f4; border-radius: 12px; cursor: pointer; }
-.mobile-menu-av { width: 40px; height: 40px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #C8A96E; font-weight: 500; font-family: 'Tenor Sans', sans-serif; flex-shrink: 0; }
-.mobile-menu-username { font-size: 15px; font-weight: 500; }
-@media (max-width: 768px) {
-  .hamburger-btn { display: block; }
-  .nav-links { display: none !important; }
-}
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <a href="/borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
   <div class="nav-links">
     <a href="/borshjelpen.html">Hjem</a>
     <a href="/aksjer.html">Aksjer</a>
     <a href="/laer.html">Lær</a>
     <a href="/borsbrygg.html">Børsbrygg</a>
     <a href="/kontakt.html">Kontakt</a>
+    <a href="/om.html">Om oss</a>
     <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
       <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
       <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
@@ -94,10 +66,9 @@ p { font-size: 15px; line-height: 1.9; color: #444; margin-bottom: 1.5rem; }
   <button class="hamburger-btn" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
 
-<!-- Mobil hamburgermeny -->
 <div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
-    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;" onclick="closeMobileMenu()">Børs<span style="color:#C8A96E;">hjelpen</span></a>
+    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
     <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
   </div>
   <div style="display:flex;flex-direction:column;flex:1;">
@@ -106,6 +77,7 @@ p { font-size: 15px; line-height: 1.9; color: #444; margin-bottom: 1.5rem; }
     <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Lær</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/kontakt.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">✉️</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Kontakt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/om.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">💡</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Om oss</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/priser.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">⭐</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Priser</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
   </div>
   <div style="padding-top:1.5rem;">
@@ -127,46 +99,24 @@ p { font-size: 15px; line-height: 1.9; color: #444; margin-bottom: 1.5rem; }
 </div>
 
 <div class="content">
-
   <p class="ingress">Børsen har lenge vært forbeholdt de som kan finanssjargong, har tid til å lese lange rapporter, eller råd til en privatrådgiver. Det mener vi er feil.</p>
-
   <p>Aksjer og investeringer handler om fremtiden din — og den fremtiden bør du kunne forstå selv.</p>
-
   <p>Børshjelpen ble til fordi vi savnet noe enkelt. Et sted der mannen i gata kan slå opp en aksje og faktisk forstå hva selskapet gjør, hva som påvirker kursen, og hvilke risikoer som finnes — uten å måtte ha en finansgrad for å henge med.</p>
-
   <p>Vi bruker kunstig intelligens til å oversette komplisert finansinformasjon til vanlig norsk. Ikke for å gi deg tips om hva du skal kjøpe. Men for å gi deg kunnskapen du trenger til å ta egne, informerte valg.</p>
-
   <div class="divider"></div>
-
   <div class="values">
-    <div class="value-card">
-      <div class="value-icon">⚖️</div>
-      <div class="value-title">Alltid begge sider</div>
-      <div class="value-text">Vi presenterer alltid bull- og bear-case. Ingen ensidig optimisme.</div>
-    </div>
-    <div class="value-card">
-      <div class="value-icon">🚫</div>
-      <div class="value-title">Ingen kjøpsanbefalinger</div>
-      <div class="value-text">Vi gir deg informasjon, ikke råd. Beslutningene er alltid dine.</div>
-    </div>
-    <div class="value-card">
-      <div class="value-icon">🇳🇴</div>
-      <div class="value-title">Norsk, for nordmenn</div>
-      <div class="value-text">Bygget i Norge, for Oslo Børs, på norsk — uten finanssjargong.</div>
-    </div>
+    <div class="value-card"><div class="value-icon">⚖️</div><div class="value-title">Alltid begge sider</div><div class="value-text">Vi presenterer alltid bull- og bear-case. Ingen ensidig optimisme.</div></div>
+    <div class="value-card"><div class="value-icon">🚫</div><div class="value-title">Ingen kjøpsanbefalinger</div><div class="value-text">Vi gir deg informasjon, ikke råd. Beslutningene er alltid dine.</div></div>
+    <div class="value-card"><div class="value-icon">🇳🇴</div><div class="value-title">Norsk, for nordmenn</div><div class="value-text">Bygget i Norge, for Oslo Børs, på norsk — uten finanssjargong.</div></div>
   </div>
-
   <p>Det er ikke fordi vi må. Det er fordi vi mener det er den eneste rette måten å drive en finanstjeneste på.</p>
-
   <p>Børshjelpen er bygget og driftet fra Norge, for norske investorer — fra nybegynneren som nettopp hørte om aksjer for første gang, til den erfarne som vil ha en rask oppdatering på Oslo Børs.</p>
-
   <div class="cta-box">
     <div class="cta-title">Klar til å forstå børsen?</div>
     <div class="cta-sub">Gratis å komme i gang. Ingen bindingstid.</div>
     <a href="/auth.html" class="cta-btn">Start gratis →</a>
     <div class="cta-email">Spørsmål? <a href="mailto:kontakt@borshjelpen.no">kontakt@borshjelpen.no</a></div>
   </div>
-
 </div>
 
 <script>
@@ -188,22 +138,12 @@ p { font-size: 15px; line-height: 1.9; color: #444; margin-bottom: 1.5rem; }
       document.getElementById('navUser').style.display = 'flex';
       document.getElementById('navAv').textContent = initials;
       document.getElementById('navName').textContent = name.split(' ')[0];
-    if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
+      if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
     }
   } catch(e) {}
 })();
-</script>
-<script>
-function openMobileMenu() {
-  var m = document.getElementById('mobileMenu');
-  m.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-function closeMobileMenu() {
-  var m = document.getElementById('mobileMenu');
-  m.style.display = 'none';
-  document.body.style.overflow = '';
-}
+function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
 </body>
 </html>
