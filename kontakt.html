@@ -84,6 +84,32 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   <button class="hamburger-btn" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
 
+<div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
+    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
+    <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
+  </div>
+  <div style="display:flex;flex-direction:column;flex:1;">
+    <a href="/borshjelpen.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Lær</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/kontakt.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">✉️</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Kontakt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/om.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">💡</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Om oss</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/priser.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">⭐</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Priser</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+  </div>
+  <div style="padding-top:1.5rem;">
+    <div id="mobileMenuUser" style="display:none;align-items:center;gap:12px;padding:12px 16px;background:#f8f7f4;border-radius:12px;cursor:pointer;margin-bottom:8px;" onclick="location.href='/profil.html'">
+      <div id="mobileMenuAv" style="width:40px;height:40px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:14px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+      <span id="mobileMenuName" style="font-size:15px;font-weight:500;">Min side</span>
+    </div>
+    <div id="mobileMenuAuth">
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:14px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Registrer deg gratis</button>
+    </div>
+  </div>
+</div>
+
 <div class="page">
   <div class="page-title">Kontakt oss</div>
   <p class="page-sub">Har du spørsmål, tilbakemeldinger eller ønsker å samarbeide? Vi hører gjerne fra deg og svarer innen 1–2 virkedager.</p>
