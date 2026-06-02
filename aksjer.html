@@ -156,30 +156,9 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .wl-change-down { font-size: 12px; color: #A32D2D; font-weight: 500; }
 .watchlist-limit { font-size: 11px; color: #C8A96E; text-align: right; margin-bottom: 6px; }
 @media (max-width: 480px) { .watchlist-grid { grid-template-columns: repeat(2, 1fr); } }
-
-/* Hamburger mobil nav */
 .hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; position: relative; }
 .hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
-.mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 99999; flex-direction: column; padding: 1.5rem 2rem; overflow-y: auto; }
-.mobile-menu.open { display: flex; }
-.mobile-menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-.mobile-menu-logo { font-family: 'Tenor Sans', sans-serif; font-size: 16px; letter-spacing: 2.5px; text-transform: uppercase; color: #1a1a1a; text-decoration: none; }
-.mobile-menu-logo span { color: #C8A96E; }
-.mobile-menu-close { background: none; border: none; font-size: 28px; cursor: pointer; color: #666; line-height: 1; padding: 4px; }
-.mobile-menu-links { display: flex; flex-direction: column; gap: 0; flex: 1; }
-.mobile-menu-links a { font-size: 26px; font-family: 'Playfair Display', serif; font-weight: 700; color: #1B3A5C; text-decoration: none; padding: 16px 0; border-bottom: 1px solid #f0f0f0; display: block; }
-.mobile-menu-links a:active { color: #C8A96E; }
-.mobile-menu-footer { padding-top: 1.5rem; display: flex; gap: 8px; flex-direction: column; }
-.mobile-menu-btn { width: 100%; padding: 14px; border-radius: 100px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; border: none; }
-.mobile-menu-login { background: none; border: 1px solid #e8e8e8 !important; color: #666; }
-.mobile-menu-register { background: #1B3A5C; color: white; }
-.mobile-menu-user { display: none; align-items: center; gap: 12px; padding: 12px 16px; background: #f8f7f4; border-radius: 12px; cursor: pointer; }
-.mobile-menu-av { width: 40px; height: 40px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #C8A96E; font-weight: 500; font-family: 'Tenor Sans', sans-serif; flex-shrink: 0; }
-.mobile-menu-username { font-size: 15px; font-weight: 500; }
-@media (max-width: 768px) {
-  .hamburger-btn { display: block; }
-  .nav-links { display: none !important; }
-}
+@media (max-width: 768px) { .hamburger-btn { display: block; } .nav-links { display: none !important; } }
 </style>
 </head>
 <body>
@@ -206,7 +185,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <button class="hamburger-btn" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
 
-<!-- Mobil hamburgermeny -->
 <div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
     <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;" onclick="closeMobileMenu()">Børs<span style="color:#C8A96E;">hjelpen</span></a>
@@ -231,8 +209,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
     </div>
   </div>
 </div>
-
-
 
 <div class="search-hero">
   <div class="search-title">Søk opp en aksje</div>
@@ -318,10 +294,8 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   </div>
 </div>
 
-<!-- Porteføljeanalyse -->
 <div style="max-width:900px;margin:0 auto 3rem;padding:0 2rem;">
   <div style="border:1px solid #e8e8e8;border-radius:16px;overflow:hidden;">
-
     <div style="background:#1B3A5C;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;">
       <div style="display:flex;align-items:center;gap:10px;">
         <div style="width:32px;height:32px;border-radius:8px;background:#C8A96E;display:flex;align-items:center;justify-content:center;font-size:16px;">📊</div>
@@ -332,53 +306,34 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
       </div>
       <div id="portfolioPlanBadge" style="font-size:11px;background:rgba(200,169,110,.2);color:#C8A96E;padding:4px 10px;border-radius:100px;border:1px solid rgba(200,169,110,.3);">Proff</div>
     </div>
-
     <div id="portfolioBody" style="padding:1.5rem;background:#fff;">
-
-      <!-- Låst for gratis/investor -->
       <div id="portfolioLocked" style="text-align:center;padding:2rem;display:none;">
         <div style="font-size:32px;margin-bottom:12px;">🔒</div>
         <div style="font-weight:500;font-size:15px;margin-bottom:8px;">Porteføljeanalyse krever Proff</div>
         <div style="font-size:13px;color:#888;margin-bottom:1.5rem;">Analyser eksponeringen i porteføljen din — sektor, risiko og diversifisering</div>
         <button onclick="location.href='/priser.html'" style="padding:10px 24px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Oppgrader til Proff →</button>
       </div>
-
-      <!-- Aktiv portefølje -->
       <div id="portfolioActive">
-        <!-- Søk + legg til -->
         <div style="display:flex;gap:8px;margin-bottom:1.25rem;">
           <div style="position:relative;flex:1;">
-            <input id="pfInput" type="text" placeholder="Søk aksje (f.eks. EQNR, DNB...)" autocomplete="off"
-              style="width:100%;padding:10px 14px;border:1px solid #e8e8e8;border-radius:100px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;" />
+            <input id="pfInput" type="text" placeholder="Søk aksje (f.eks. EQNR, DNB...)" autocomplete="off" style="width:100%;padding:10px 14px;border:1px solid #e8e8e8;border-radius:100px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;" />
             <div id="pfAcList" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:999;overflow:hidden;"></div>
           </div>
           <input id="pfPct" type="number" min="0" max="100" placeholder="%" style="width:70px;padding:10px 14px;border:1px solid #e8e8e8;border-radius:100px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;text-align:center;" />
           <button onclick="addToPortfolio()" style="padding:10px 18px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Legg til</button>
         </div>
-
-        <!-- Portefølje-liste -->
         <div id="pfList" style="margin-bottom:1.25rem;"></div>
-
-        <!-- Total % indikator -->
         <div id="pfTotalRow" style="display:none;margin-bottom:1.25rem;">
           <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:6px;">
-            <span>Total allokering</span>
-            <span id="pfTotalPct">0%</span>
+            <span>Total allokering</span><span id="pfTotalPct">0%</span>
           </div>
           <div style="height:6px;background:#e8e8e8;border-radius:3px;">
             <div id="pfTotalBar" style="height:100%;border-radius:3px;background:#1B3A5C;width:0%;transition:width 0.3s;"></div>
           </div>
         </div>
-
-        <!-- Analyser-knapp -->
-        <button id="pfAnalyzeBtn" onclick="analyzePortfolio()" style="display:none;width:100%;padding:12px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">
-          Analyser portefølje →
-        </button>
-
-        <!-- AI-analyse resultat -->
+        <button id="pfAnalyzeBtn" onclick="analyzePortfolio()" style="display:none;width:100%;padding:12px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Analyser portefølje →</button>
         <div id="pfResult" style="margin-top:1.5rem;"></div>
       </div>
-
     </div>
   </div>
 </div>
@@ -499,14 +454,12 @@ function getStockType(s) {
   return badges;
 }
 
-// ===== PLAN SYSTEM =====
-// TODO BEFORE LAUNCH: fjern DEV_MODE og bytt til ekte Stripe-sjekk
-var DEV_MODE = window.location.hostname.includes('vercel.app'); // Automatisk av på eget domene
+var DEV_MODE = window.location.hostname.includes('vercel.app');
 var PLANS = { free: {aiAnalysis:2, aiChat:5, watchlist:2}, investor: {aiAnalysis:-1, aiChat:-1, watchlist:10}, proff: {aiAnalysis:-1, aiChat:-1, watchlist:-1} };
 var XP_VALUES = { search: 2, chat: 1, borsbrygg: 5, login: 3, watchlist: 5 };
 
 async function getUserPlan(sb) {
-  if (DEV_MODE) return 'proff'; // TODO BEFORE LAUNCH: fjern denne linjen
+  if (DEV_MODE) return 'proff';
   try {
     var sess = (await sb.auth.getSession()).data.session;
     if (!sess) return 'free';
@@ -530,7 +483,7 @@ function showUpgradeModal(message) {
   var modal = document.createElement('div');
   modal.id = 'upgradeModal';
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;';
-  modal.innerHTML = '<div style="background:white;border-radius:16px;padding:2rem;max-width:400px;width:100%;text-align:center;"><div style="font-size:36px;margin-bottom:1rem;">🔒</div><div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:8px;">Oppgrader for å fortsette</div><p style="font-size:14px;color:#666;margin-bottom:1.5rem;">' + message + '</p><button onclick="location.href=\'/borshjelpen.html\'" style="width:100%;padding:12px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;">Se abonnementer →</button><button onclick="document.getElementById(\'upgradeModal\').remove()" style="width:100%;padding:12px;border-radius:100px;border:1px solid #e8e8e8;background:none;font-size:14px;cursor:pointer;color:#666;">Lukk</button></div>';
+  modal.innerHTML = '<div style="background:white;border-radius:16px;padding:2rem;max-width:400px;width:100%;text-align:center;"><div style="font-size:36px;margin-bottom:1rem;">🔒</div><div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:8px;">Oppgrader for å fortsette</div><p style="font-size:14px;color:#666;margin-bottom:1.5rem;">' + message + '</p><button onclick="location.href=\'/priser.html\'" style="width:100%;padding:12px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;">Se abonnementer →</button><button onclick="document.getElementById(\'upgradeModal\').remove()" style="width:100%;padding:12px;border-radius:100px;border:1px solid #e8e8e8;background:none;font-size:14px;cursor:pointer;color:#666;">Lukk</button></div>';
   document.body.appendChild(modal);
   modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
 }
@@ -564,7 +517,7 @@ async function generateAI(s) {
     var used = await getTodayCount(sb, 'search');
     if (used >= limits.aiAnalysis) {
       var sec = document.getElementById('ai-section');
-      if (sec) sec.innerHTML = '<div style="padding:1.5rem;background:#fff8f0;border-radius:12px;text-align:center;margin-bottom:1rem;"><div style="font-size:24px;margin-bottom:8px;">🔒</div><div style="font-weight:500;margin-bottom:6px;">Du har brukt ' + limits.aiAnalysis + ' AI-analyser i dag</div><div style="font-size:13px;color:#888;margin-bottom:1rem;">Oppgrader for ubegrenset tilgang</div><button onclick="location.href=\'/borshjelpen.html\'" style="padding:10px 20px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;">Se abonnementer →</button></div>';
+      if (sec) sec.innerHTML = '<div style="padding:1.5rem;background:#fff8f0;border-radius:12px;text-align:center;margin-bottom:1rem;"><div style="font-size:24px;margin-bottom:8px;">🔒</div><div style="font-weight:500;margin-bottom:6px;">Du har brukt ' + limits.aiAnalysis + ' AI-analyser i dag</div><div style="font-size:13px;color:#888;margin-bottom:1rem;">Oppgrader for ubegrenset tilgang</div><button onclick="location.href=\'/priser.html\'" style="padding:10px 20px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;">Se abonnementer →</button></div>';
       return;
     }
   }
@@ -586,8 +539,6 @@ async function generateAI(s) {
       '<div class="card" style="margin-bottom:1rem"><div class="card-title">Risiko</div><p style="font-size:13px;line-height:1.7">' + (ai.risiko||'—') + '</p></div>' +
       (ai.historisk ? '<div class="historical-card"><div class="historical-title">📊 Historisk sett</div><div class="historical-text">' + ai.historisk + '</div></div>' : '') +
       (ai.nybegynner_tips ? '<div class="tip-box"><div class="tip-text"><strong>Tips:</strong> ' + ai.nybegynner_tips + '</div></div>' : '');
-
-    // Hent nyheter
     loadNews(s.ticker, plan);
   } catch(e) {
     var sec = document.getElementById('ai-section');
@@ -632,59 +583,28 @@ function showQLockedMsg() {
 async function loadNews(ticker, plan) {
   const sec = document.getElementById('newsSection');
   if (!sec) return;
-
-  // Gratis-brukere ser låst boks
   if (plan === 'free') {
-    sec.innerHTML = '<div class="card" style="margin-bottom:1rem;">' +
-      '<div class="card-title">Børsmeldinger</div>' +
-      '<div style="padding:1.5rem;text-align:center;">' +
-        '<div style="font-size:24px;margin-bottom:8px;">🔒</div>' +
-        '<div style="font-weight:500;font-size:14px;margin-bottom:6px;">Børsmeldinger krever Investor</div>' +
-        '<div style="font-size:13px;color:#888;margin-bottom:1rem;">Få AI-oppsummert nyheter og børsmeldinger per aksje</div>' +
-        '<button onclick="location.href=\'/priser.html\'" style="padding:10px 20px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Oppgrader til Investor →</button>' +
-      '</div>' +
-    '</div>';
+    sec.innerHTML = '<div class="card" style="margin-bottom:1rem;"><div class="card-title">Børsmeldinger</div><div style="padding:1.5rem;text-align:center;"><div style="font-size:24px;margin-bottom:8px;">🔒</div><div style="font-weight:500;font-size:14px;margin-bottom:6px;">Børsmeldinger krever Investor</div><div style="font-size:13px;color:#888;margin-bottom:1rem;">Få AI-oppsummert nyheter og børsmeldinger per aksje</div><button onclick="location.href=\'/priser.html\'" style="padding:10px 20px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Oppgrader til Investor →</button></div></div>';
     return;
   }
-
-  // Investor/Proff — vis placeholder inntil FMP norsk er tilgjengelig
-  sec.innerHTML = '<div class="card" style="margin-bottom:1rem;">' +
-    '<div class="card-title">Børsmeldinger</div>' +
-    '<div style="font-size:13px;color:#aaa;padding:8px 0;">Henter nyheter...</div>' +
-  '</div>';
-
+  sec.innerHTML = '<div class="card" style="margin-bottom:1rem;"><div class="card-title">Børsmeldinger</div><div style="font-size:13px;color:#aaa;padding:8px 0;">Henter nyheter...</div></div>';
   try {
     const res = await fetch('/api/news?ticker=' + encodeURIComponent(ticker));
     const data = await res.json();
     const articles = data.articles || [];
-
     if (articles.length === 0) {
-      sec.innerHTML = '<div class="card" style="margin-bottom:1rem;">' +
-        '<div class="card-title">Børsmeldinger</div>' +
-        '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen nyheter tilgjengelig akkurat nå.</div>' +
-      '</div>';
+      sec.innerHTML = '<div class="card" style="margin-bottom:1rem;"><div class="card-title">Børsmeldinger</div><div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen nyheter tilgjengelig akkurat nå.</div></div>';
       return;
     }
-
-    sec.innerHTML = '<div class="card" style="margin-bottom:1rem;">' +
-      '<div class="card-title">Børsmeldinger</div>' +
+    sec.innerHTML = '<div class="card" style="margin-bottom:1rem;"><div class="card-title">Børsmeldinger</div>' +
       articles.slice(0, 5).map(function(a) {
         var date = a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('nb-NO', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
-        return '<div style="padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
-          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">' +
-            '<a href="' + (a.url||'#') + '" target="_blank" style="font-size:13px;font-weight:500;color:#1B3A5C;text-decoration:none;line-height:1.4;">' + a.title + '</a>' +
-            '<span style="font-size:11px;color:#aaa;white-space:nowrap;flex-shrink:0;">' + date + '</span>' +
-          '</div>' +
+        return '<div style="padding:10px 0;border-bottom:1px solid #f0f0f0;"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;"><a href="' + (a.url||'#') + '" target="_blank" style="font-size:13px;font-weight:500;color:#1B3A5C;text-decoration:none;line-height:1.4;">' + a.title + '</a><span style="font-size:11px;color:#aaa;white-space:nowrap;flex-shrink:0;">' + date + '</span></div>' +
           (a.summary ? '<div style="font-size:12px;color:#888;line-height:1.5;">' + a.summary + '</div>' : '') +
-          '<div style="font-size:11px;color:#C8A96E;margin-top:4px;">' + (a.source||'') + '</div>' +
-        '</div>';
-      }).join('') +
-    '</div>';
+          '<div style="font-size:11px;color:#C8A96E;margin-top:4px;">' + (a.source||'') + '</div></div>';
+      }).join('') + '</div>';
   } catch(e) {
-    sec.innerHTML = '<div class="card" style="margin-bottom:1rem;">' +
-      '<div class="card-title">Børsmeldinger</div>' +
-      '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen nyheter tilgjengelig akkurat nå.</div>' +
-    '</div>';
+    sec.innerHTML = '<div class="card" style="margin-bottom:1rem;"><div class="card-title">Børsmeldinger</div><div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen nyheter tilgjengelig akkurat nå.</div></div>';
   }
 }
 
@@ -695,15 +615,12 @@ async function loadQuarterlyReport(s) {
   document.getElementById('qSubtitle').textContent = 'Siste tilgjengelige rapport';
   var nextDates = {'EQNR':'Juli 2026','DNB':'Juli 2026','AKRBP':'Juli 2026','TEL':'Juli 2026','MOWI':'August 2026','YAR':'Juli 2026','NHY':'Juli 2026','KAHOT':'August 2026'};
   document.getElementById('qNext').textContent = 'Neste rapport: ' + (nextDates[s.ticker] || 'Ikke tilgjengelig');
-
-  // Sjekk plan — kvartalsrapport krever Proff
   var sb = window._sb;
   if (!sb) { showQLockedMsg(); return; }
   var sess = (await sb.auth.getSession()).data.session;
   if (!sess) { showQLockedMsg(); return; }
   var plan = await getUserPlan(sb);
   if (plan !== 'proff') { showQLockedMsg(); return; }
-
   document.getElementById('qBody').innerHTML = '<div class="quarterly-loading"><div class="quarterly-spinner"></div>AI analyserer siste kvartalsrapport...</div>';
   try {
     var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(s)});
@@ -748,12 +665,14 @@ async function sendMessage() {
 
 document.getElementById('chatInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') sendMessage(); });
 
-// Populære aksjer
+// Populære aksjer — .OL fjernet fra visning
 var popular = [{ticker:'EQNR',name:'Equinor'},{ticker:'DNB',name:'DNB Bank'},{ticker:'AKRBP',name:'Aker BP'},{ticker:'TEL',name:'Telenor'},{ticker:'MOWI',name:'Mowi'},{ticker:'YAR',name:'Yara'}];
 document.getElementById('trending').innerHTML = '<div class="trending"><div class="trending-label">Populære aksjer på Oslo Børs</div><div class="trending-grid">' +
-  popular.map(function(s) { return '<div class="trending-card" onclick="search(\'' + s.ticker + '\')">' + '<div class="t-ticker">' + s.ticker + '.OL</div><div class="t-name">' + s.name + '</div><div class="t-price-row"><span style="font-size:12px;color:#aaa">Klikk for live data + AI</span><span style="color:#C8A96E">→</span></div></div>'; }).join('') + '</div></div>';
+  popular.map(function(s) { return '<div class="trending-card" onclick="search(\'' + s.ticker + '\')">' +
+    '<div class="t-ticker">' + s.ticker + '</div>' +
+    '<div class="t-name">' + s.name + '</div>' +
+    '<div class="t-price-row"><span style="font-size:12px;color:#aaa">Klikk for live data + AI</span><span style="color:#C8A96E">→</span></div></div>'; }).join('') + '</div></div>';
 
-// Autocomplete
 var osloStocks = [
   {ticker:'EQNR',name:'Equinor ASA',sector:'Energi'},{ticker:'DNB',name:'DNB Bank ASA',sector:'Finans'},{ticker:'AKRBP',name:'Aker BP ASA',sector:'Energi'},{ticker:'TEL',name:'Telenor ASA',sector:'Telekom'},{ticker:'MOWI',name:'Mowi ASA',sector:'Sjømat'},{ticker:'YAR',name:'Yara International ASA',sector:'Kjemikalier'},{ticker:'NHY',name:'Norsk Hydro ASA',sector:'Industri'},{ticker:'KAHOT',name:'Kahoot! ASA',sector:'Teknologi'},{ticker:'SALM',name:'SalMar ASA',sector:'Sjømat'},{ticker:'AKER',name:'Aker ASA',sector:'Industri'},{ticker:'AKSO',name:'Aker Solutions ASA',sector:'Energi'},{ticker:'BWLPG',name:'BW LPG Limited',sector:'Shipping'},{ticker:'FRONTLINE',name:'Frontline PLC',sector:'Shipping'},{ticker:'GOGL',name:'Golden Ocean Group',sector:'Shipping'},{ticker:'HYON',name:'Hydrogen Pro AS',sector:'Energi'},{ticker:'KOG',name:'Kongsberg Gruppen ASA',sector:'Forsvar'},{ticker:'LSG',name:'Lerøy Seafood Group ASA',sector:'Sjømat'},{ticker:'NEL',name:'Nel ASA',sector:'Energi'},{ticker:'ORK',name:'Orkla ASA',sector:'Forbruksvarer'},{ticker:'RECSI',name:'REC Silicon ASA',sector:'Teknologi'},{ticker:'SCATC',name:'Scatec ASA',sector:'Fornybar energi'},{ticker:'STB',name:'Storebrand ASA',sector:'Finans'},{ticker:'SUBC',name:'Subsea 7 SA',sector:'Energi'},{ticker:'TGS',name:'TGS ASA',sector:'Energi'},{ticker:'TOMRA',name:'Tomra Systems ASA',sector:'Teknologi'},{ticker:'GJF',name:'Gjensidige Forsikring ASA',sector:'Forsikring'},{ticker:'GRIEG',name:'Grieg Seafood ASA',sector:'Sjømat'},{ticker:'MPCC',name:'MPC Container Ships ASA',sector:'Shipping'},{ticker:'OKEA',name:'OKEA ASA',sector:'Energi'},{ticker:'PEXIP',name:'Pexip Holding ASA',sector:'Teknologi'},{ticker:'SRBANK',name:'SpareBank 1 SR-Bank ASA',sector:'Finans'},{ticker:'BOUVET',name:'Bouvet ASA',sector:'Teknologi'},{ticker:'ENTRA',name:'Entra ASA',sector:'Eiendom'},{ticker:'FLNG',name:'Flex LNG Ltd',sector:'Shipping'},{ticker:'SDRL',name:'Seadrill Limited',sector:'Energi'}
 ];
@@ -771,7 +690,6 @@ function selectStock(ticker) { document.getElementById('searchInput').value = ti
 document.getElementById('searchInput').addEventListener('input', function() { showAutocomplete(this.value.trim()); });
 document.addEventListener('click', function(e) { if (!e.target.closest('.search-wrap')) document.getElementById('acList').style.display = 'none'; });
 
-// Watchlist
 var currentStock = null;
 var WATCHLIST_LIMITS = { free: 2, investor: 10, proff: Infinity };
 function getWatchlist() { try { return JSON.parse(localStorage.getItem('bh_watchlist') || '[]'); } catch(e) { return []; } }
@@ -805,132 +723,57 @@ function renderWatchlist() {
     var priceStr = parseFloat(s.price).toLocaleString('nb-NO',{minimumFractionDigits:2,maximumFractionDigits:2});
     return '<div class="watchlist-card" onclick="search(\'' + s.ticker + '\')">' +
       '<button class="watchlist-remove" onclick="event.stopPropagation();removeFromWatchlist(\''+s.ticker+'\')" title="Fjern">✕</button>' +
-      '<div class="wl-ticker-tag">'+s.ticker+'.OL</div><div class="wl-name">'+s.name.split(' ')[0]+'</div>' +
+      '<div class="wl-ticker-tag">'+s.ticker+'</div><div class="wl-name">'+s.name.split(' ')[0]+'</div>' +
       '<div class="wl-price-row"><span class="wl-price">'+priceStr+' kr</span><span class="'+cls+'">'+sign+s.changePct+'%</span></div></div>';
   }).join('');
 }
 renderWatchlist();
 
-// ===== PORTEFØLJEANALYSE =====
 var portfolio = [];
-
-function savePortfolio() {
-  try { localStorage.setItem('bh_portfolio', JSON.stringify(portfolio)); } catch(e) {}
-}
-
+function savePortfolio() { try { localStorage.setItem('bh_portfolio', JSON.stringify(portfolio)); } catch(e) {} }
 function loadPortfolio() {
   try {
     var saved = JSON.parse(localStorage.getItem('bh_portfolio') || '[]');
-    if (Array.isArray(saved) && saved.length > 0) {
-      portfolio = saved;
-      renderPortfolioList();
-    }
+    if (Array.isArray(saved) && saved.length > 0) { portfolio = saved; renderPortfolioList(); }
   } catch(e) {}
 }
-
 async function initPortfolio() {
-  var sb = window._sb;
-  if (!sb) return;
+  var sb = window._sb; if (!sb) return;
   var plan = await getUserPlan(sb);
-  if (plan !== 'proff') {
-    document.getElementById('portfolioLocked').style.display = 'block';
-    document.getElementById('portfolioActive').style.display = 'none';
-  } else {
-    document.getElementById('portfolioLocked').style.display = 'none';
-    document.getElementById('portfolioActive').style.display = 'block';
-  }
+  if (plan !== 'proff') { document.getElementById('portfolioLocked').style.display = 'block'; document.getElementById('portfolioActive').style.display = 'none'; }
+  else { document.getElementById('portfolioLocked').style.display = 'none'; document.getElementById('portfolioActive').style.display = 'block'; }
 }
-
 document.getElementById('pfInput').addEventListener('input', function() {
   var q = this.value.trim().toUpperCase();
   var list = document.getElementById('pfAcList');
   if (!q) { list.style.display = 'none'; return; }
-  var matches = osloStocks.filter(function(s) {
-    return s.ticker.startsWith(q) || s.name.toUpperCase().includes(q);
-  }).slice(0, 5);
+  var matches = osloStocks.filter(function(s) { return s.ticker.startsWith(q) || s.name.toUpperCase().includes(q); }).slice(0, 5);
   if (!matches.length) { list.style.display = 'none'; return; }
-  list.innerHTML = matches.map(function(s) {
-    return '<div onclick="selectPfStock(\'' + s.ticker + '\',\'' + s.name.replace(/'/g,'') + '\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-family:\'DM Sans\',sans-serif;">' +
-      '<span style="font-size:11px;font-weight:500;color:#1B3A5C;background:#EEE8DA;padding:2px 8px;border-radius:100px;min-width:52px;text-align:center;">' + s.ticker + '</span>' +
-      '<span style="font-size:13px;">' + s.name + '</span></div>';
-  }).join('');
+  list.innerHTML = matches.map(function(s) { return '<div onclick="selectPfStock(\'' + s.ticker + '\',\'' + s.name.replace(/'/g,'') + '\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-family:\'DM Sans\',sans-serif;"><span style="font-size:11px;font-weight:500;color:#1B3A5C;background:#EEE8DA;padding:2px 8px;border-radius:100px;min-width:52px;text-align:center;">' + s.ticker + '</span><span style="font-size:13px;">' + s.name + '</span></div>'; }).join('');
   list.style.display = 'block';
 });
-
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('#pfInput') && !e.target.closest('#pfAcList')) {
-    document.getElementById('pfAcList').style.display = 'none';
-  }
-});
-
-function selectPfStock(ticker, name) {
-  var input = document.getElementById('pfInput');
-  input.value = ticker + ' — ' + name;
-  input.dataset.ticker = ticker;
-  input.dataset.name = name;
-  document.getElementById('pfAcList').style.display = 'none';
-  document.getElementById('pfPct').focus();
-}
-
+document.addEventListener('click', function(e) { if (!e.target.closest('#pfInput') && !e.target.closest('#pfAcList')) document.getElementById('pfAcList').style.display = 'none'; });
+function selectPfStock(ticker, name) { var input = document.getElementById('pfInput'); input.value = ticker + ' — ' + name; input.dataset.ticker = ticker; input.dataset.name = name; document.getElementById('pfAcList').style.display = 'none'; document.getElementById('pfPct').focus(); }
 function addToPortfolio() {
-  var input = document.getElementById('pfInput');
-  var pctInput = document.getElementById('pfPct');
+  var input = document.getElementById('pfInput'); var pctInput = document.getElementById('pfPct');
   var ticker = input.dataset.ticker || input.value.trim().toUpperCase().split(' ')[0];
-  var name = input.dataset.name || ticker;
-  var pct = parseFloat(pctInput.value);
-  if (!ticker || isNaN(pct) || pct <= 0 || pct > 100) {
-    pctInput.style.borderColor = '#A32D2D';
-    setTimeout(function() { pctInput.style.borderColor = '#e8e8e8'; }, 1500);
-    return;
-  }
+  var name = input.dataset.name || ticker; var pct = parseFloat(pctInput.value);
+  if (!ticker || isNaN(pct) || pct <= 0 || pct > 100) { pctInput.style.borderColor = '#A32D2D'; setTimeout(function() { pctInput.style.borderColor = '#e8e8e8'; }, 1500); return; }
   var existing = portfolio.findIndex(function(p) { return p.ticker === ticker; });
   if (existing >= 0) { portfolio[existing].pct = pct; }
-  else {
-    var stockInfo = osloStocks.find(function(s) { return s.ticker === ticker; });
-    portfolio.push({ ticker: ticker, name: name, pct: pct, sector: stockInfo ? stockInfo.sector : 'Ukjent' });
-  }
+  else { var stockInfo = osloStocks.find(function(s) { return s.ticker === ticker; }); portfolio.push({ ticker: ticker, name: name, pct: pct, sector: stockInfo ? stockInfo.sector : 'Ukjent' }); }
   input.value = ''; input.dataset.ticker = ''; input.dataset.name = ''; pctInput.value = '';
-  savePortfolio();
-  renderPortfolioList();
+  savePortfolio(); renderPortfolioList();
 }
-
-function removeFromPortfolio(ticker) {
-  portfolio = portfolio.filter(function(p) { return p.ticker !== ticker; });
-  savePortfolio();
-  renderPortfolioList();
-}
-
-function updatePct(ticker, val) {
-  var pct = parseFloat(val);
-  if (isNaN(pct) || pct < 0) return;
-  var item = portfolio.find(function(p) { return p.ticker === ticker; });
-  if (item) { item.pct = pct; savePortfolio(); renderPortfolioList(); }
-}
-
+function removeFromPortfolio(ticker) { portfolio = portfolio.filter(function(p) { return p.ticker !== ticker; }); savePortfolio(); renderPortfolioList(); }
+function updatePct(ticker, val) { var pct = parseFloat(val); if (isNaN(pct) || pct < 0) return; var item = portfolio.find(function(p) { return p.ticker === ticker; }); if (item) { item.pct = pct; savePortfolio(); renderPortfolioList(); } }
 function renderPortfolioList() {
-  var list = document.getElementById('pfList');
-  var totalRow = document.getElementById('pfTotalRow');
-  var analyzeBtn = document.getElementById('pfAnalyzeBtn');
+  var list = document.getElementById('pfList'); var totalRow = document.getElementById('pfTotalRow'); var analyzeBtn = document.getElementById('pfAnalyzeBtn');
   if (!list) return;
-  if (portfolio.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#aaa;font-size:13px;">Ingen aksjer lagt til ennå — søk opp en aksje og skriv inn prosent</div>';
-    totalRow.style.display = 'none'; analyzeBtn.style.display = 'none';
-    document.getElementById('pfResult').innerHTML = '';
-    return;
-  }
+  if (portfolio.length === 0) { list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#aaa;font-size:13px;">Ingen aksjer lagt til ennå — søk opp en aksje og skriv inn prosent</div>'; totalRow.style.display = 'none'; analyzeBtn.style.display = 'none'; document.getElementById('pfResult').innerHTML = ''; return; }
   var total = portfolio.reduce(function(sum, p) { return sum + p.pct; }, 0);
   list.innerHTML = '<div style="border:1px solid #e8e8e8;border-radius:12px;overflow:hidden;margin-bottom:4px;">' +
-    portfolio.map(function(p, i) {
-      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;' + (i < portfolio.length-1 ? 'border-bottom:1px solid #f0f0f0;' : '') + '">' +
-        '<span style="font-size:11px;font-weight:500;color:#1B3A5C;background:#EEE8DA;padding:2px 8px;border-radius:100px;min-width:50px;text-align:center;">' + p.ticker + '</span>' +
-        '<span style="flex:1;font-size:13px;">' + p.name + '</span>' +
-        '<span style="font-size:11px;color:#aaa;">' + p.sector + '</span>' +
-        '<input type="number" value="' + p.pct + '" min="0" max="100" onchange="updatePct(\'' + p.ticker + '\',this.value)" style="width:52px;padding:4px 8px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;text-align:center;outline:none;font-family:\'DM Sans\',sans-serif;" />' +
-        '<span style="font-size:13px;color:#888;">%</span>' +
-        '<button onclick="removeFromPortfolio(\'' + p.ticker + '\')" style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;border:none;cursor:pointer;font-size:11px;color:#aaa;">✕</button>' +
-      '</div>';
-    }).join('') +
-  '</div>';
+    portfolio.map(function(p, i) { return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;' + (i < portfolio.length-1 ? 'border-bottom:1px solid #f0f0f0;' : '') + '"><span style="font-size:11px;font-weight:500;color:#1B3A5C;background:#EEE8DA;padding:2px 8px;border-radius:100px;min-width:50px;text-align:center;">' + p.ticker + '</span><span style="flex:1;font-size:13px;">' + p.name + '</span><span style="font-size:11px;color:#aaa;">' + p.sector + '</span><input type="number" value="' + p.pct + '" min="0" max="100" onchange="updatePct(\'' + p.ticker + '\',this.value)" style="width:52px;padding:4px 8px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;text-align:center;outline:none;font-family:\'DM Sans\',sans-serif;" /><span style="font-size:13px;color:#888;">%</span><button onclick="removeFromPortfolio(\'' + p.ticker + '\')" style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;border:none;cursor:pointer;font-size:11px;color:#aaa;">✕</button></div>'; }).join('') + '</div>';
   totalRow.style.display = 'block';
   document.getElementById('pfTotalPct').textContent = total.toFixed(0) + '%';
   document.getElementById('pfTotalPct').style.color = total > 100 ? '#A32D2D' : (Math.round(total) === 100 ? '#2C7A5C' : '#666');
@@ -941,34 +784,15 @@ function renderPortfolioList() {
 
 async function analyzePortfolio() {
   if (portfolio.length < 2) return;
-  var btn = document.getElementById('pfAnalyzeBtn');
-  var result = document.getElementById('pfResult');
-
-  // Sjekk cache — oppdater hvis eldre enn 4 timer
   var pfKey = 'pf_analysis_' + portfolio.map(function(p){return p.ticker+p.pct;}).join('_');
   try {
     var cached = JSON.parse(localStorage.getItem(pfKey) || 'null');
     if (cached && (Date.now() - cached.ts) < 24 * 60 * 60 * 1000) {
-      var cachedReply = cached.reply
-        .replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>')
-        .replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>')
-        .replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>')
-        .replace(/\n/g, '');
-    result.innerHTML = '<div class="card" style="margin-top:1rem;">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
-          '<div class="card-title" style="margin-bottom:0;">AI Porteføljeanalyse</div>' +
-          '<button onclick="analyzePortfolioFresh()" style="font-size:11px;padding:3px 10px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Oppdater</button>' +
-        '</div>' +
-        '<p style="font-size:13px;line-height:1.7;">' + reply + '</p>' +
-        '<div style="margin-top:1rem;padding:10px 14px;background:#fff8f0;border-radius:10px;font-size:11px;color:#888;font-style:italic;">⚠️ Dette er ikke finansiell rådgivning. Analysen er generert av AI og skal ikke brukes som grunnlag for investeringsbeslutninger. Snakk alltid med en kvalifisert finansrådgiver.</div>' +
-        '<div style="font-size:11px;color:#aaa;margin-top:8px;">Sist oppdatert: ' + new Date(cached.ts).toLocaleString('nb-NO') + '</div>' +
-      '</div>';
+      var cachedReply = cached.reply.replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>').replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>').replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>').replace(/\n/g, '');
+      document.getElementById('pfResult').innerHTML = '<div class="card" style="margin-top:1rem;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div class="card-title" style="margin-bottom:0;">AI Porteføljeanalyse</div><button onclick="analyzePortfolioFresh()" style="font-size:11px;padding:3px 10px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Oppdater</button></div><p style="font-size:13px;line-height:1.7;">' + cachedReply + '</p><div style="margin-top:1rem;padding:10px 14px;background:#fff8f0;border-radius:10px;font-size:11px;color:#888;font-style:italic;">⚠️ Dette er ikke finansiell rådgivning.</div><div style="font-size:11px;color:#aaa;margin-top:8px;">Sist oppdatert: ' + new Date(cached.ts).toLocaleString('nb-NO') + '</div></div>';
       return;
     }
   } catch(e) {}
-
   analyzePortfolioFresh();
 }
 
@@ -979,54 +803,27 @@ async function analyzePortfolioFresh() {
   var result = document.getElementById('pfResult');
   result.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div><p>AI analyserer porteføljen din...</p></div>';
   var total = portfolio.reduce(function(sum, p) { return sum + p.pct; }, 0);
-  var portfolioText = portfolio.map(function(p) {
-    return p.ticker + ' (' + p.name + ', ' + p.sector + '): ' + p.pct + '% av porteføljen';
-  }).join('\n');
+  var portfolioText = portfolio.map(function(p) { return p.ticker + ' (' + p.name + ', ' + p.sector + '): ' + p.pct + '% av porteføljen'; }).join('\n');
   try {
-    var res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål. Bruk IKKE ### eller markdown-headings. Strukturer svaret slik:\n\n📊 **Sektoreksponering og diversifisering**\n- [sektor]: [kort forklaring]\n- [sektor]: [kort forklaring]\n\n📰 **Hva skjer nå i disse sektorene**\n- [sektor]: [konkret hva som påvirker sektoren akkurat nå — oljepriser, renter, geopolitikk etc.]\n- [sektor]: [konkret]\n\n🌍 **Geografisk og valutarisiko**\n- [punkt]\n- [punkt]\n\n⚠️ **Konsentrasjonsrisiko**\n- [punkt]\n- [punkt]\n\n🔍 **Samlede risikoer**\n- [risiko]\n- [risiko]\n\n💡 **Konkrete tips til forbedring**\n- [tips]\n- [tips]\n\nKort og konkret per punkt. Enkelt norsk. Gi ALDRI kjøps- eller salgsanbefalinger.' }],
-        context: null
-      })
-    });
+    var res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål. Bruk IKKE ### eller markdown-headings. Gi ALDRI kjøps- eller salgsanbefalinger.' }], context: null }) });
     var data = await res.json();
-    var reply = (data.reply || 'Kunne ikke analysere.')
-      .replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>')
-      .replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>')
-      .replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>')
-      .replace(/\n/g, '');
-
-    // Lagre analysen i localStorage
+    var reply = (data.reply || 'Kunne ikke analysere.').replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>').replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>').replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>').replace(/\n/g, '');
     var pfKey = 'pf_analysis_' + portfolio.map(function(p){return p.ticker+p.pct;}).join('_');
     localStorage.setItem(pfKey, JSON.stringify({ reply: data.reply, ts: Date.now() }));
-
     result.innerHTML = '<div class="card" style="margin-top:1rem;"><div class="card-title">AI Porteføljeanalyse</div><p style="font-size:13px;line-height:1.7;">' + reply + '</p><div style="margin-top:1rem;padding:10px 14px;background:#fff8f0;border-radius:10px;font-size:11px;color:#888;font-style:italic;">⚠️ Dette er ikke finansiell rådgivning. Analysen er generert av AI og skal ikke brukes som grunnlag for investeringsbeslutninger. Snakk alltid med en kvalifisert finansrådgiver.</div></div>';
-  } catch(e) {
-    result.innerHTML = '<div style="font-size:13px;color:#888;padding:1rem;">Kunne ikke analysere porteføljen akkurat nå.</div>';
-  }
+  } catch(e) { result.innerHTML = '<div style="font-size:13px;color:#888;padding:1rem;">Kunne ikke analysere porteføljen akkurat nå.</div>'; }
   btn.textContent = 'Analyser portefølje →'; btn.disabled = false;
 }
 
-window.addEventListener('load', function() {
-  setTimeout(initPortfolio, 800);
-  loadPortfolio();
-});
+window.addEventListener('load', function() { setTimeout(initPortfolio, 800); loadPortfolio(); });
 
-// Auth — identisk med borshjelpen.html
 (async function checkAuth() {
   try {
     var script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
     document.head.appendChild(script);
     await new Promise(function(r) { script.onload = r; });
-    var sb = supabase.createClient(
-      'https://twckvtwzyadevqbyehnu.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
-    );
+    var sb = supabase.createClient('https://twckvtwzyadevqbyehnu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c');
     window._sb = sb;
     var sess = (await sb.auth.getSession()).data.session;
     if (sess) {
@@ -1037,22 +834,13 @@ window.addEventListener('load', function() {
       document.getElementById('navUser').style.display = 'flex';
       document.getElementById('navAv').textContent = initials;
       document.getElementById('navName').textContent = name.split(' ')[0];
-    if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
+      if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
     }
   } catch(e) {}
 })();
-</script>
-<script>
-function openMobileMenu() {
-  var m = document.getElementById('mobileMenu');
-  m.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-function closeMobileMenu() {
-  var m = document.getElementById('mobileMenu');
-  m.style.display = 'none';
-  document.body.style.overflow = '';
-}
+
+function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
 </body>
 </html>
