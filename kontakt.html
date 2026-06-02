@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kontakt oss — Børshjelpen</title>
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; min-height: 100vh; }
@@ -26,6 +27,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .field label { display: block; font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
 .field input, .field select, .field textarea { width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid #e8e8e8; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color .15s; background: #fafafa; }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: #1B3A5C; background: white; }
+.field input:disabled { background: #f0f0f0; color: #888; cursor: not-allowed; }
 .field textarea { resize: vertical; min-height: 130px; }
 .btn { width: 100%; padding: 12px; border-radius: 100px; border: none; background: #1B3A5C; color: white; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: .5rem; }
 .btn:hover { background: #2a5070; }
@@ -39,6 +41,9 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .info-icon { font-size: 24px; margin-bottom: 8px; }
 .info-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
 .info-val { font-size: 13px; font-weight: 500; color: #1B3A5C; }
+.login-notice { background: #EEE8DA; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 13px; color: #5a4520; line-height: 1.6; display: none; }
+.login-notice a { color: #1B3A5C; font-weight: 500; }
+.email-match-error { font-size: 12px; color: #A32D2D; margin-top: 4px; display: none; }
 @media (max-width: 600px) { .page { margin: 2rem auto; } .info-row { flex-direction: column; } }
 </style>
 </head>
@@ -98,6 +103,9 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   <p class="page-sub">Har du spørsmål, tilbakemeldinger eller ønsker å samarbeide? Vi hører gjerne fra deg og svarer innen 1–2 virkedager.</p>
 
   <div class="form-card">
+    <div id="loginNotice" class="login-notice">
+      Du må være innlogget for å bruke kontaktskjemaet. <a href="/auth.html">Logg inn her →</a>
+    </div>
     <div id="formWrap">
       <div class="field">
         <label>Navn</label>
@@ -106,6 +114,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
       <div class="field">
         <label>E-post</label>
         <input type="email" id="epost" placeholder="din@epost.no" />
+        <div class="email-match-error" id="emailMatchError">E-posten må være den samme som på brukerkontoen din.</div>
       </div>
       <div class="field">
         <label>Emne</label>
@@ -153,74 +162,48 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 </div>
 
 <script>
-async function sendForm() {
-  const navn = document.getElementById('navn').value.trim();
-  const epost = document.getElementById('epost').value.trim();
-  const emne = document.getElementById('emne').value;
-  const melding = document.getElementById('melding').value.trim();
+var userEmail = null;
 
-  if (!navn || !epost || !emne || !melding) {
-    alert('Fyll inn alle feltene.');
+(async function init() {
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://twckvtwzyadevqbyehnu.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
+  );
+
+  const sess = (await sb.auth.getSession()).data.session;
+
+  if (!sess) {
+    // Ikke innlogget — vis melding og deaktiver skjema
+    document.getElementById('loginNotice').style.display = 'block';
+    document.getElementById('sendBtn').disabled = true;
+    document.getElementById('sendBtn').textContent = 'Logg inn for å sende';
     return;
   }
 
-  const btn = document.getElementById('sendBtn');
-  btn.disabled = true;
-  btn.textContent = 'Sender...';
+  // Innlogget — fyll inn navn og e-post fra brukerkontoen
+  const user = sess.user;
+  userEmail = user.email;
+  const name = (user.user_metadata && user.user_metadata.full_name) || '';
 
-  try {
-    const res = await fetch('https://formspree.io/f/mojbgayn', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ navn, epost, emne, melding })
-    });
+  document.getElementById('navn').value = name;
+  document.getElementById('epost').value = userEmail;
+  document.getElementById('epost').disabled = true; // e-post kan ikke endres
 
-    if (res.ok) {
-      document.getElementById('formWrap').style.display = 'none';
-      document.getElementById('successEmail').textContent = epost;
-      document.getElementById('successMsg').style.display = 'block';
-    } else {
-      throw new Error('Feil');
-    }
-  } catch(e) {
-    const subject = encodeURIComponent('[Børshjelpen] ' + emne);
-    const body = encodeURIComponent('Navn: ' + navn + '\nE-post: ' + epost + '\n\n' + melding);
-    window.location.href = 'mailto:kontakt@borshjelpen.no?subject=' + subject + '&body=' + body;
-    btn.disabled = false;
-    btn.textContent = 'Send melding';
+  // Nav
+  const uname = name || userEmail.split('@')[0];
+  const initials = uname.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+  document.getElementById('navAuth').style.display = 'none';
+  document.getElementById('navUser').style.display = 'flex';
+  document.getElementById('navAv').textContent = initials;
+  document.getElementById('navName').textContent = uname.split(' ')[0];
+  if (document.getElementById('mobileMenuAv')) {
+    document.getElementById('mobileMenuAv').textContent = initials;
+    document.getElementById('mobileMenuName').textContent = uname.split(' ')[0];
+    document.getElementById('mobileMenuUser').style.display = 'flex';
+    document.getElementById('mobileMenuAuth').style.display = 'none';
   }
-}
-</script>
-<script>
-(async function checkAuth() {
-  try {
-    var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    document.head.appendChild(script);
-    await new Promise(function(r) { script.onload = r; });
-    var sb = supabase.createClient(
-      'https://twckvtwzyadevqbyehnu.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
-    );
-    var sess = (await sb.auth.getSession()).data.session;
-    if (sess) {
-      var name = (sess.user.user_metadata && sess.user.user_metadata.full_name) || sess.user.email.split('@')[0];
-      var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
-      document.getElementById('navAuth').style.display = 'none';
-      document.getElementById('navUser').style.display = 'flex';
-      document.getElementById('navAv').textContent = initials;
-      document.getElementById('navName').textContent = name.split(' ')[0];
-    }
-  } catch(e) {}
 })();
-</script>
-<script>
-function openMobileMenu() {}
-function closeMobileMenu() {}
-</script>
-
-
-<script>
 
 async function sendForm() {
   const navn = document.getElementById('navn').value.trim();
@@ -233,6 +216,15 @@ async function sendForm() {
     return;
   }
 
+  // Sjekk at e-post matcher brukerens e-post
+  if (userEmail && epost.toLowerCase() !== userEmail.toLowerCase()) {
+    document.getElementById('emailMatchError').style.display = 'block';
+    document.getElementById('epost').style.borderColor = '#A32D2D';
+    return;
+  }
+  document.getElementById('emailMatchError').style.display = 'none';
+  document.getElementById('epost').style.borderColor = '';
+
   const btn = document.getElementById('sendBtn');
   btn.disabled = true;
   btn.textContent = 'Sender...';
@@ -243,7 +235,6 @@ async function sendForm() {
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ navn, epost, emne, melding })
     });
-
     if (res.ok) {
       document.getElementById('formWrap').style.display = 'none';
       document.getElementById('successEmail').textContent = epost;
@@ -260,33 +251,6 @@ async function sendForm() {
   }
 }
 
-</script>
-<script>
-
-(async function checkAuth() {
-  try {
-    var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    document.head.appendChild(script);
-    await new Promise(function(r) { script.onload = r; });
-    var sb = supabase.createClient(
-      'https://twckvtwzyadevqbyehnu.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
-    );
-    var sess = (await sb.auth.getSession()).data.session;
-    if (sess) {
-      var name = (sess.user.user_metadata && sess.user.user_metadata.full_name) || sess.user.email.split('@')[0];
-      var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
-      document.getElementById('navAuth').style.display = 'none';
-      document.getElementById('navUser').style.display = 'flex';
-      document.getElementById('navAv').textContent = initials;
-      document.getElementById('navName').textContent = name.split(' ')[0];
-    }
-  } catch(e) {}
-})();
-
-</script>
-<script>
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
