@@ -473,31 +473,31 @@ async function confirmDelete() {
     alert('Skriv SLETT for å bekrefte.');
     return;
   }
-  if (!currentUser) return;
   const btn = document.getElementById('confirmDeleteBtn');
   btn.textContent = 'Sletter...'; btn.disabled = true;
   try {
-    var deleteToken = '';
-    try {
-      var delSess = (await sb.auth.getSession()).data.session;
-      deleteToken = delSess ? delSess.access_token : '';
-    } catch(e) {}
+    // Hent sesjon direkte — ikke stol på currentUser
+    var delSess = null;
+    try { delSess = (await sb.auth.getSession()).data.session; } catch(e) {}
+    var deleteToken = delSess ? delSess.access_token : '';
+    var userId = delSess ? delSess.user.id : (currentUser ? currentUser.id : null);
 
-    try {
-      await fetch('/api/delete-account', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + deleteToken },
-        body: JSON.stringify({ user_id: currentUser.id })
-      });
-    } catch(e) {}
+    if (userId) {
+      try {
+        await fetch('/api/delete-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + deleteToken },
+          body: JSON.stringify({ user_id: userId })
+        });
+      } catch(e) {}
+    }
 
-    // Alltid logg ut og redirect uansett
+    // Alltid logg ut og redirect
     try { await sb.auth.signOut(); } catch(e) {}
     localStorage.clear();
     sessionStorage.clear();
     window.location.href = '/auth.html';
   } catch(e) {
-    // Selv ved total feil — logg ut
     try { await sb.auth.signOut(); } catch(e2) {}
     localStorage.clear();
     sessionStorage.clear();
