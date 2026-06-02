@@ -4,10 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aksjeguiden — Børshjelpen</title>
+<meta name="description" content="Lær om aksjer og børsen på norsk — uten finanssjargong. Enkle guider for nybegynnere om P/E, utbytte, kvartalsrapporter og mer.">
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+
 .nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; }
 .logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
 .logo span { color: #C8A96E; }
@@ -15,41 +17,155 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .nav-links a { font-size: 14px; color: #666; text-decoration: none; }
 .nav-links a:hover { color: #1B3A5C; }
 .nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-.content { max-width: 600px; margin: 0 auto; padding: 6rem 2rem; text-align: center; }
-.icon { font-size: 56px; margin-bottom: 1.5rem; }
-h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; margin-bottom: 1rem; color: #1B3A5C; }
-p { font-size: 15px; color: #888; line-height: 1.7; margin-bottom: 2rem; }
-.badge { display: inline-block; background: #EEE8DA; color: #8B6E3A; font-size: 12px; font-weight: 500; padding: 6px 16px; border-radius: 100px; letter-spacing: 0.5px; }
-
-/* Hamburger mobil nav */
-.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; position: relative; }
-.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
-.mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 99999; flex-direction: column; padding: 1.5rem 2rem; overflow-y: auto; }
-.mobile-menu.open { display: flex; }
-.mobile-menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-.mobile-menu-logo { font-family: 'Tenor Sans', sans-serif; font-size: 16px; letter-spacing: 2.5px; text-transform: uppercase; color: #1a1a1a; text-decoration: none; }
-.mobile-menu-logo span { color: #C8A96E; }
-.mobile-menu-close { background: none; border: none; font-size: 28px; cursor: pointer; color: #666; line-height: 1; padding: 4px; }
-.mobile-menu-links { display: flex; flex-direction: column; gap: 0; flex: 1; }
-.mobile-menu-links a { font-size: 26px; font-family: 'Playfair Display', serif; font-weight: 700; color: #1B3A5C; text-decoration: none; padding: 16px 0; border-bottom: 1px solid #f0f0f0; display: block; }
-.mobile-menu-links a:active { color: #C8A96E; }
-.mobile-menu-footer { padding-top: 1.5rem; display: flex; gap: 8px; flex-direction: column; }
-.mobile-menu-btn { width: 100%; padding: 14px; border-radius: 100px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; border: none; }
-.mobile-menu-login { background: none; border: 1px solid #e8e8e8 !important; color: #666; }
-.mobile-menu-register { background: #1B3A5C; color: white; }
-.mobile-menu-user { display: none; align-items: center; gap: 12px; padding: 12px 16px; background: #f8f7f4; border-radius: 12px; cursor: pointer; }
-.mobile-menu-av { width: 40px; height: 40px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #C8A96E; font-weight: 500; font-family: 'Tenor Sans', sans-serif; flex-shrink: 0; }
-.mobile-menu-username { font-size: 15px; font-weight: 500; }
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; }
 @media (max-width: 768px) {
   .hamburger-btn { display: block; }
   .nav-links { display: none !important; }
+}
+
+/* HERO */
+.hero { background: #1B3A5C; padding: 4rem 2rem 5rem; text-align: center; position: relative; overflow: hidden; }
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(200,169,110,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-label { font-size: 11px; color: #C8A96E; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: 48px; color: white; font-weight: 700; margin-bottom: 1rem; line-height: 1.15; }
+.hero-sub { font-size: 17px; color: rgba(255,255,255,0.55); max-width: 520px; margin: 0 auto 2.5rem; line-height: 1.7; font-weight: 300; }
+
+/* FILTER PILLS */
+.filter-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+.filter-pill {
+  font-size: 13px; padding: 6px 16px;
+  border-radius: 100px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: none; color: rgba(255,255,255,0.6);
+  transition: all 0.2s;
+}
+.filter-pill:hover { border-color: rgba(255,255,255,0.5); color: white; }
+.filter-pill.active { background: #C8A96E; border-color: #C8A96E; color: #1B3A5C; font-weight: 500; }
+
+/* FEATURED */
+.featured-wrap { max-width: 1000px; margin: -40px auto 0; padding: 0 2rem; position: relative; z-index: 2; }
+.featured-card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s;
+}
+.featured-card:hover { box-shadow: 0 12px 50px rgba(0,0,0,0.12); }
+.featured-left { background: #1B3A5C; padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between; }
+.featured-tag { font-size: 10px; color: #C8A96E; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; margin-bottom: 1rem; }
+.featured-title { font-family: 'Playfair Display', serif; font-size: 32px; color: white; font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+.featured-excerpt { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.7; font-weight: 300; }
+.featured-meta { display: flex; gap: 1rem; margin-top: 1.5rem; font-size: 12px; color: rgba(255,255,255,0.3); }
+.featured-read-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 2rem; font-size: 13px; font-weight: 500;
+  color: #C8A96E; background: rgba(200,169,110,0.15);
+  padding: 8px 18px; border-radius: 100px;
+  width: fit-content;
+}
+.featured-right { padding: 2.5rem; background: #f8f7f4; display: flex; flex-direction: column; justify-content: center; gap: 1.25rem; }
+.feat-point { display: flex; gap: 12px; align-items: flex-start; }
+.feat-point-num { font-family: 'Playfair Display', serif; font-size: 22px; color: #C8A96E; font-style: italic; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+.feat-point-text h4 { font-size: 14px; font-weight: 500; margin-bottom: 3px; color: #1B3A5C; }
+.feat-point-text p { font-size: 13px; color: #888; line-height: 1.5; }
+
+/* ARTICLE GRID */
+.articles-wrap { max-width: 1000px; margin: 3rem auto; padding: 0 2rem 4rem; }
+.articles-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.articles-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+.articles-count { font-size: 13px; color: #aaa; }
+
+.articles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+
+.article-card {
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+.article-card:hover { border-color: #1B3A5C; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
+
+.article-card-top {
+  background: #1B3A5C;
+  padding: 1.5rem;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.article-card-top.light { background: #f8f7f4; }
+.article-card-top.gold { background: linear-gradient(135deg, #3a2800, #5a4520); }
+
+.ac-tag { font-size: 10px; color: #C8A96E; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; }
+.article-card-top.light .ac-tag { color: #C8A96E; }
+.ac-icon { font-size: 28px; margin-top: auto; }
+
+.article-card-body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
+.ac-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #1B3A5C; line-height: 1.3; margin-bottom: 8px; }
+.ac-excerpt { font-size: 13px; color: #888; line-height: 1.6; font-weight: 300; flex: 1; }
+.ac-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f0f0f0; }
+.ac-time { font-size: 11px; color: #aaa; }
+.ac-level { font-size: 10px; padding: 3px 10px; border-radius: 100px; font-weight: 500; }
+.level-beginner { background: #E1F5EE; color: #085041; }
+.level-medium { background: #EEE8DA; color: #5a4520; }
+
+/* COMING SOON */
+.coming-soon-card {
+  border: 1.5px dashed #e8e8e8;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 220px;
+  gap: 8px;
+}
+.cs-icon { font-size: 28px; opacity: 0.3; }
+.cs-title { font-size: 14px; font-weight: 500; color: #ccc; }
+.cs-sub { font-size: 12px; color: #ddd; }
+
+/* NEWSLETTER CTA */
+.nl-cta { background: #f8f7f4; border-top: 1px solid #e8e8e8; padding: 3rem 2rem; text-align: center; }
+.nl-cta-inner { max-width: 500px; margin: 0 auto; }
+.nl-cta h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; color: #1B3A5C; }
+.nl-cta p { font-size: 14px; color: #888; margin-bottom: 1.5rem; }
+.nl-cta-btn { background: #1B3A5C; color: white; padding: 12px 28px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 32px; }
+  .featured-card { grid-template-columns: 1fr; }
+  .featured-right { display: none; }
+  .articles-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .articles-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <a href="/borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
   <div class="nav-links">
     <a href="/borshjelpen.html">Hjem</a>
     <a href="/aksjer.html">Aksjer</a>
@@ -62,7 +178,7 @@ p { font-size: 15px; color: #888; line-height: 1.7; margin-bottom: 2rem; }
     </div>
     <div id="navUser" style="display:none;align-items:center;gap:8px;">
       <div onclick="location.href='/profil.html'" style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;border:1px solid #e8e8e8;cursor:pointer;">
-        <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+        <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;">?</div>
         <span id="navName" style="font-size:13px;font-weight:500;color:#1a1a1a;">Min side</span>
       </div>
     </div>
@@ -70,38 +186,184 @@ p { font-size: 15px; color: #888; line-height: 1.7; margin-bottom: 2rem; }
   <button class="hamburger-btn" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
 
-<!-- Mobil hamburgermeny -->
-<div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
-    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;" onclick="closeMobileMenu()">Børs<span style="color:#C8A96E;">hjelpen</span></a>
-    <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
-  </div>
-  <div style="display:flex;flex-direction:column;flex:1;">
-    <a href="/borshjelpen.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
-    <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
-    <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
-    <a href="/kontakt.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">✉️</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Kontakt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
-    <a href="/om.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">💡</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Om oss</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
-    <a href="/priser.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">⭐</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Priser</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
-  </div>
-  <div style="padding-top:1.5rem;">
-    <div id="mobileMenuUser" style="display:none;align-items:center;gap:12px;padding:12px 16px;background:#f8f7f4;border-radius:12px;cursor:pointer;margin-bottom:8px;" onclick="location.href='/profil.html'">
-      <div id="mobileMenuAv" style="width:40px;height:40px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:14px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
-      <span id="mobileMenuName" style="font-size:15px;font-weight:500;">Min side</span>
-    </div>
-    <div id="mobileMenuAuth">
-      <button onclick="location.href='/auth.html'" style="width:100%;padding:14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;">Logg inn</button>
-      <button onclick="location.href='/auth.html'" style="width:100%;padding:14px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Registrer deg gratis</button>
-    </div>
+<div class="hero">
+  <div class="hero-label">Aksjeguiden</div>
+  <h1>Lær om børsen.<br>På vanlig norsk.</h1>
+  <p class="hero-sub">Enkle guider som forklarer alt fra hva en aksje er til hvordan du leser en kvartalsrapport — uten finanssjargong.</p>
+  <div class="filter-row">
+    <button class="filter-pill active" onclick="filterArticles('alle', this)">Alle</button>
+    <button class="filter-pill" onclick="filterArticles('grunnleggende', this)">Grunnleggende</button>
+    <button class="filter-pill" onclick="filterArticles('begreper', this)">Begreper</button>
+    <button class="filter-pill" onclick="filterArticles('selskaper', this)">Selskaper</button>
   </div>
 </div>
 
-<div class="content">
-  <div class="icon">📚</div>
-  <h1>Aksjeguiden</h1>
-  <p>Vi jobber med å lage enkle og gode læringsressurser om aksjer og børsen — uten finanssjargong. Snart kan du lære alt fra hva en aksje er til hvordan du leser en kvartalsrapport.</p>
-  <div class="badge">🚧 Under utvikling</div>
+<!-- FEATURED -->
+<div class="featured-wrap">
+  <a href="/hva-er-en-aksje.html" class="featured-card">
+    <div class="featured-left">
+      <div>
+        <div class="featured-tag">⭐ Start her · Grunnleggende</div>
+        <div class="featured-title">Hva er en aksje?</div>
+        <div class="featured-excerpt">En aksje er en eierandel i et selskap. Men hva betyr det i praksis, og hvorfor stiger og faller kursen? Alt du trenger å vite som nybegynner.</div>
+        <div class="featured-read-btn">Les artikkelen →</div>
+      </div>
+      <div class="featured-meta">
+        <span>⏱ 5 min</span>
+        <span>·</span>
+        <span>Nybegynnernivå</span>
+      </div>
+    </div>
+    <div class="featured-right">
+      <div class="feat-point">
+        <div class="feat-point-num">1</div>
+        <div class="feat-point-text"><h4>Hva du faktisk eier</h4><p>En aksje er en eierandel — ikke bare et tall på en skjerm.</p></div>
+      </div>
+      <div class="feat-point">
+        <div class="feat-point-num">2</div>
+        <div class="feat-point-text"><h4>Hvorfor kursen beveger seg</h4><p>Forventninger, renter og nyheter driver prisen opp og ned.</p></div>
+      </div>
+      <div class="feat-point">
+        <div class="feat-point-num">3</div>
+        <div class="feat-point-text"><h4>Risiko og utbytte</h4><p>Du kan tjene penger på to måter — og tape alt på én.</p></div>
+      </div>
+      <div class="feat-point">
+        <div class="feat-point-num">4</div>
+        <div class="feat-point-text"><h4>Viktige begreper forklart</h4><p>Ticker, P/E, markedsverdi — forklart på norsk.</p></div>
+      </div>
+    </div>
+  </a>
 </div>
+
+<!-- ARTICLE GRID -->
+<div class="articles-wrap">
+  <div class="articles-header">
+    <div class="articles-label">Alle artikler</div>
+    <div class="articles-count" id="articleCount">1 artikkel</div>
+  </div>
+
+  <div class="articles-grid" id="articlesGrid">
+
+    <!-- Publisert -->
+    <a href="/hva-er-en-aksje.html" class="article-card" data-category="grunnleggende">
+      <div class="article-card-top">
+        <div class="ac-tag">Grunnleggende</div>
+        <div class="ac-icon">📈</div>
+      </div>
+      <div class="article-card-body">
+        <div class="ac-title">Hva er en aksje?</div>
+        <div class="ac-excerpt">Alt du trenger å vite om hva en aksje er, hvordan kursen beveger seg og hva risikoen er.</div>
+        <div class="ac-meta">
+          <span class="ac-time">⏱ 5 min</span>
+          <span class="ac-level level-beginner">Nybegynner</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Kommer snart -->
+    <div class="article-card" data-category="begreper" style="cursor:default;">
+      <div class="article-card-top gold">
+        <div class="ac-tag">Begreper</div>
+        <div class="ac-icon">📊</div>
+      </div>
+      <div class="article-card-body">
+        <div class="ac-title">Hva er P/E-tall?</div>
+        <div class="ac-excerpt">P/E-tallet er en av de viktigste nøkkeltallene — men hva betyr det egentlig, og når er en aksje «dyr»?</div>
+        <div class="ac-meta">
+          <span class="ac-time">⏱ 4 min</span>
+          <span class="ac-level" style="background:#f0f0f0;color:#aaa;">Kommer snart</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-card" data-category="selskaper" style="cursor:default;">
+      <div class="article-card-top light">
+        <div class="ac-tag">Selskaper</div>
+        <div class="ac-icon">🛢️</div>
+      </div>
+      <div class="article-card-body">
+        <div class="ac-title">Equinor aksje — hva bør du vite?</div>
+        <div class="ac-excerpt">Norges største selskap forklart enkelt. Hva driver kursen, hva er risikoen og hva er utbyttet?</div>
+        <div class="ac-meta">
+          <span class="ac-time">⏱ 6 min</span>
+          <span class="ac-level" style="background:#f0f0f0;color:#aaa;">Kommer snart</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-card" data-category="grunnleggende" style="cursor:default;">
+      <div class="article-card-top">
+        <div class="ac-tag">Grunnleggende</div>
+        <div class="ac-icon">📋</div>
+      </div>
+      <div class="article-card-body">
+        <div class="ac-title">Slik leser du en kvartalsrapport</div>
+        <div class="ac-excerpt">50 sider finansrapport på 5 minutter. Hva du skal se etter og hva som faktisk betyr noe.</div>
+        <div class="ac-meta">
+          <span class="ac-time">⏱ 7 min</span>
+          <span class="ac-level" style="background:#f0f0f0;color:#aaa;">Kommer snart</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-card" data-category="begreper" style="cursor:default;">
+      <div class="article-card-top light">
+        <div class="ac-tag">Begreper</div>
+        <div class="ac-icon">💰</div>
+      </div>
+      <div class="article-card-body">
+        <div class="ac-title">Hva er utbytte?</div>
+        <div class="ac-excerpt">Noen aksjer gir deg penger bare for å eie dem. Slik fungerer utbytte og hva du bør se etter.</div>
+        <div class="ac-meta">
+          <span class="ac-time">⏱ 4 min</span>
+          <span class="ac-level" style="background:#f0f0f0;color:#aaa;">Kommer snart</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-card" data-category="begreper" style="cursor:default;">
+      <div class="article-card-top gold">
+        <div class="ac-tag">Begreper</div>
+        <div class="ac-icon">⚖️</div>
+      </div>
+      <div class="article-card-body">
+        <div class="ac-title">Hva betyr bull og bear?</div>
+        <div class="ac-excerpt">Bull-marked og bear-marked — to ord du hører hele tiden på børsen. Her er hva de faktisk betyr.</div>
+        <div class="ac-meta">
+          <span class="ac-time">⏱ 3 min</span>
+          <span class="ac-level" style="background:#f0f0f0;color:#aaa;">Kommer snart</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="nl-cta">
+  <div class="nl-cta-inner">
+    <h2>Klar til å prøve i praksis?</h2>
+    <p>Søk opp en aksje og se hva AI-en forteller deg — alt forklart på vanlig norsk.</p>
+    <a href="/aksjer.html" class="nl-cta-btn">Søk opp en aksje →</a>
+  </div>
+</div>
+
+<script>
+function filterArticles(category, btn) {
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('#articlesGrid .article-card');
+  let count = 0;
+  cards.forEach(card => {
+    if (category === 'alle' || card.dataset.category === category) {
+      card.style.display = 'flex';
+      count++;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+  document.getElementById('articleCount').textContent = count + (count === 1 ? ' artikkel' : ' artikler');
+}
+</script>
 
 <script>
 (async function checkAuth() {
@@ -122,22 +384,11 @@ p { font-size: 15px; color: #888; line-height: 1.7; margin-bottom: 2rem; }
       document.getElementById('navUser').style.display = 'flex';
       document.getElementById('navAv').textContent = initials;
       document.getElementById('navName').textContent = name.split(' ')[0];
-    if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
     }
   } catch(e) {}
 })();
-</script>
-<script>
-function openMobileMenu() {
-  var m = document.getElementById('mobileMenu');
-  m.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-function closeMobileMenu() {
-  var m = document.getElementById('mobileMenu');
-  m.style.display = 'none';
-  document.body.style.overflow = '';
-}
+function openMobileMenu() {}
+function closeMobileMenu() {}
 </script>
 </body>
 </html>
