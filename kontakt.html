@@ -6,8 +6,6 @@
 <title>Kontakt oss — Børshjelpen</title>
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; min-height: 100vh; }
 .nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; background: white; }
 .logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
 .logo span { color: #C8A96E; }
@@ -15,6 +13,20 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .nav-links a { font-size: 14px; color: #666; text-decoration: none; }
 .nav-links a:hover { color: #1B3A5C; }
 .nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 200; position: relative; }
+.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
+@media (max-width: 768px) { .nav-links { display: none !important; } .hamburger-btn { display: block; } }
+
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; min-height: 100vh; }
+
+
+
+
+
+
+
 
 .page { max-width: 600px; margin: 4rem auto; padding: 0 2rem; }
 .page-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; margin-bottom: 6px; }
@@ -45,18 +57,10 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .info-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
 .info-val { font-size: 13px; font-weight: 500; color: #1B3A5C; }
 
-@media (max-width: 768px) {
-  .nav-links a { display: none; }
-  .page { margin: 2rem auto; }
-  .info-row { flex-direction: column; }
-}
 
-.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; position: relative; }
-.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
-@media (max-width: 768px) {
-  .hamburger-btn { display: block; }
-  .nav-links { display: none !important; }
-}
+
+
+
 </style>
 </head>
 <body>
