@@ -502,7 +502,14 @@ async function logActivity(type, ticker, name) {
   try {
     var sb = window._sb; if (!sb) return;
     var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
-    await sb.from('user_activity').insert({user_id: sess.user.id, type: type, ticker: ticker||null, name: name||null, xp: XP_VALUES[type]||0});
+    var { error } = await sb.from('user_activity').insert({
+      user_id: sess.user.id,
+      type: type,
+      ticker: ticker || null,
+      name: name || null,
+      xp: XP_VALUES[type] || 0
+    });
+    if (error) console.warn('logActivity feil:', error.message);
   } catch(e) {}
 }
 
