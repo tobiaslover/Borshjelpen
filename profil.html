@@ -39,11 +39,15 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 .edit-btn:hover { border-color: #1B3A5C; color: #1B3A5C; }
 .section-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .75rem; margin-top: 1.5rem; }
 .stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: .5rem; }
+@media (min-width: 600px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
 .stat-card { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1rem; text-align: center; }
 .stat-num { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #1B3A5C; }
 .stat-num.gold { color: #C8A96E; }
 .stat-lbl { font-size: 11px; color: #888; margin-top: 3px; }
 .watch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 600px) { .watch-grid { grid-template-columns: repeat(3, 1fr); } 
+#planGrid { grid-template-columns: repeat(3, 1fr); }
+#accountBtns { flex-direction: row; justify-content: center; } }
 .wcard { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1rem; cursor: pointer; transition: border-color .15s; }
 .wcard:hover { border-color: #1B3A5C; }
 .wcard.add { border-style: dashed; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; color: #aaa; }
@@ -73,6 +77,14 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 .modal-actions { display: flex; gap: 8px; margin-top: 1.25rem; }
 .modal-save { flex: 1; padding: 11px; border-radius: 100px; border: none; background: #1B3A5C; color: white; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 .modal-cancel { flex: 1; padding: 11px; border-radius: 100px; border: 1px solid #e8e8e8; background: none; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; color: #666; }
+
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; }
+.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
+@media (max-width: 768px) {
+  .hamburger-btn { display: block; }
+  .nav-tabs { display: none !important; }
+  .user-pill { display: none !important; }
+}
 </style>
 </head>
 <body>
@@ -102,7 +114,30 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
     <div class="dd-sep"></div>
     <div class="dd-item danger" onclick="doLogout()">🚪 Logg ut</div>
   </div>
+  <button class="hamburger-btn" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
+
+<div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
+    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
+    <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
+  </div>
+  <div style="display:flex;flex-direction:column;flex:1;">
+    <a href="/borshjelpen.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Lær</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/kontakt.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">✉️</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Kontakt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/priser.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">⭐</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Priser</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+  </div>
+  <div style="padding-top:1.5rem;">
+    <div id="mobileMenuUser" style="display:none;align-items:center;gap:12px;padding:12px 16px;background:#f8f7f4;border-radius:12px;cursor:pointer;margin-bottom:8px;" onclick="location.href='/profil.html'">
+      <div id="mobileMenuAv" style="width:40px;height:40px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:14px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+      <span id="mobileMenuName" style="font-size:15px;font-weight:500;">Min side</span>
+    </div>
+    <button onclick="doLogout()" style="width:100%;padding:14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#A32D2D;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg ut</button>
+  </div>
+</div>
 
 <!-- Rediger profil modal -->
 <div class="modal-overlay" id="editModal">
@@ -180,7 +215,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 
   <div style="margin-top:1.5rem;">
     <div class="section-label" style="margin-bottom:1rem;">Oppgrader abonnement</div>
-    <div style="display:grid;grid-template-columns:1fr;gap:1rem;">
+    <div id="planGrid" style="display:grid;grid-template-columns:1fr;gap:1rem;">
 
       <div style="background:#E6EEF5;border:2px solid #b0cce0;border-radius:16px;padding:1.25rem;">
         <div style="font-size:11px;color:#1B3A5C;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Gratis</div>
@@ -233,7 +268,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
     <p style="font-size:11px;color:#aaa;text-align:center;margin-top:1rem;">Ingen bindingstid · Avslutt når som helst</p>
 
     <!-- Kontohandlinger -->
-    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e8e8e8;display:flex;flex-direction:column;gap:8px;">
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e8e8e8;display:flex;flex-direction:column;gap:8px;" id="accountBtns">
       <button onclick="showCancelModal()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;">Avslutt abonnement</button>
       <button onclick="showDeleteModal()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #ffcccc;background:none;color:#A32D2D;cursor:pointer;font-family:'DM Sans',sans-serif;">Slett konto</button>
     </div>
@@ -247,6 +282,9 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
+
+function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 
 function getInitials(name) { if (!name) return '?'; return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2); }
 
@@ -270,6 +308,11 @@ function renderUser(user) {
   document.getElementById('profileName').textContent = name;
   document.getElementById('profileEmail').textContent = user.email;
   document.getElementById('editName').value = name;
+  if (document.getElementById('mobileMenuAv')) {
+    document.getElementById('mobileMenuAv').textContent = initials;
+    document.getElementById('mobileMenuName').textContent = name.split(' ')[0];
+    document.getElementById('mobileMenuUser').style.display = 'flex';
+  }
   loadActivity(user.id);
   loadStats(user.id);
   loadWatchlist();
@@ -320,7 +363,7 @@ async function loadActivity(userId) {
       list.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#aaa;font-size:13px;">Ingen aktivitet ennå — søk på en aksje for å komme i gang!</div>';
       return;
     }
-    list.innerHTML = data.map(function(item) {
+    function fmtRow(item) {
       const date = new Date(item.created_at);
       const now = new Date();
       const diffH = Math.floor((now - date) / 3600000);
@@ -335,7 +378,16 @@ async function loadActivity(userId) {
         '<div class="act-icon" style="background:#E1F5EE">📊</div>' +
         '<div class="act-text">Søkte opp <strong>' + item.name + ' (' + item.ticker + ')</strong></div>' +
         '<div class="act-time">' + timeStr + '</div></div>';
-    }).join('');
+    }
+    const first5 = data.slice(0, 5);
+    const rest = data.slice(5);
+    list.innerHTML = first5.map(fmtRow).join('') +
+      (rest.length > 0
+        ? '<div id="actHidden" style="display:none;">' + rest.map(fmtRow).join('') + '</div>' +
+          '<div id="actMoreBtn" style="text-align:center;padding:10px;border-top:1px solid #f0f0f0;">' +
+          '<button onclick="document.getElementById(\'actHidden\').style.display=\'block\';document.getElementById(\'actMoreBtn\').style.display=\'none\';" ' +
+          'style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-weight:500;">Se mer (' + rest.length + ') ↓</button></div>'
+        : '');
   } catch(e) {
     list.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#aaa;font-size:13px;">Kunne ikke laste aktivitet.</div>';
   }
