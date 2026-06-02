@@ -7,22 +7,30 @@
 <meta name="description" content="Lær om aksjer og børsen på norsk — uten finanssjargong. Enkle guider for nybegynnere om P/E, utbytte, kvartalsrapporter og mer.">
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
-
-.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; background: white; }
 .logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
 .logo span { color: #C8A96E; }
 .nav-links { display: flex; gap: 1.5rem; align-items: center; }
 .nav-links a { font-size: 14px; color: #666; text-decoration: none; }
 .nav-links a:hover { color: #1B3A5C; }
 .nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
-.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; }
-@media (max-width: 768px) {
-  .hamburger-btn { display: block; }
-  .nav-links { display: none !important; }
-}
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 200; position: relative; }
+.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
+@media (max-width: 768px) { .nav-links { display: none !important; } .hamburger-btn { display: block; } }
+
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+
+
+
+
+
+
+
+
+
+
 
 /* HERO */
 .hero { background: #1B3A5C; padding: 4rem 2rem 5rem; text-align: center; position: relative; overflow: hidden; }
@@ -151,15 +159,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .nl-cta p { font-size: 14px; color: #888; margin-bottom: 1.5rem; }
 .nl-cta-btn { background: #1B3A5C; color: white; padding: 12px 28px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
 
-@media (max-width: 768px) {
-  .hero h1 { font-size: 32px; }
-  .featured-card { grid-template-columns: 1fr; }
-  .featured-right { display: none; }
-  .articles-grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 480px) {
-  .articles-grid { grid-template-columns: 1fr; }
-}
+
 </style>
 </head>
 <body>
