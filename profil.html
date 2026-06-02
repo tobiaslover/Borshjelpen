@@ -292,8 +292,6 @@ function renderUser(user) {
   const initials = getInitials(name);
   document.getElementById('navAv').textContent = initials;
   document.getElementById('navName').textContent = name.split(' ')[0];
-  document.getElementById('ddName').textContent = name;
-  document.getElementById('ddEmail').textContent = user.email;
   document.getElementById('profileAv').textContent = initials;
   document.getElementById('profileName').textContent = name;
   document.getElementById('profileEmail').textContent = user.email;
@@ -420,7 +418,6 @@ async function saveProfile() {
     await sb.auth.updateUser({ data: { full_name: newName } });
     document.getElementById('profileName').textContent = newName;
     document.getElementById('navName').textContent = newName.split(' ')[0];
-    document.getElementById('ddName').textContent = newName;
     const initials = getInitials(newName);
     document.getElementById('profileAv').textContent = initials;
     document.getElementById('navAv').textContent = initials;
