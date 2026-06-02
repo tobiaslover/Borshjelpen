@@ -1,5 +1,8 @@
-// Cache for dagens utgave — én per dag
-const cache = {};
+import OpenAI from 'openai';
+import { createClient } from '@supabase/supabase-js';
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -7,126 +10,94 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  const fmpApiKey = process.env.FMP_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY mangler' });
+  // GET /api/borsbrygg?date=2026-06-02 — hent én arkivutgave
+  if (req.method === 'GET') {
+    const { date } = req.query;
+    if (!date) return res.status(400).json({ error: 'date mangler' });
+    const { data, error } = await sb
+      .from('borsbrygg_editions')
+      .select('*')
+      .eq('date', date)
+      .single();
+    if (error || !data) return res.status(404).json({ error: 'Ikke funnet' });
+    return res.status(200).json(data);
+  }
 
-  // Dagens dato som cache-nøkkel
-  const todayKey = new Date().toLocaleDateString('no-NO', { timeZone: 'Europe/Oslo' });
+  // POST — generer dagens utgave (eller returner cached)
+  if (req.method !== 'POST') return res.status(405).end();
 
-  // Returner cached utgave hvis den finnes for i dag
-  if (cache[todayKey]) return res.status(200).json(cache[todayKey]);
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' }); // YYYY-MM-DD
 
-  // Tillat både GET og POST — generer alltid hvis ingen cache
-  const today = new Date().toLocaleDateString('nb-NO', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Oslo'
-  });
+  // Sjekk om dagens utgave allerede finnes
+  const { data: existing } = await sb
+    .from('borsbrygg_editions')
+    .select('*')
+    .eq('date', today)
+    .single();
 
-  const stockSummary = (req.body && req.body.stockSummary) || 'Ingen kursdata tilgjengelig';
+  if (existing) {
+    return res.status(200).json(existing.content);
+  }
 
-  // Hent kun aksje- og finansnyheter fra FMP
-  let newsText = '';
+  // Generer ny utgave
+  const { stockSummary } = req.body;
+  if (!stockSummary) return res.status(400).json({ error: 'stockSummary mangler' });
+
   try {
-    if (fmpApiKey) {
-      const newsRes = await fetch(
-        `https://financialmodelingprep.com/api/v3/stock_news?limit=15&apikey=${fmpApiKey}`
-      );
-      if (newsRes.ok) {
-        const newsData = await newsRes.json();
-        const articles = (Array.isArray(newsData) ? newsData : [])
-          .filter(a => a.title && a.text)
-          .slice(0, 12);
-        if (articles.length) {
-          newsText = "Finansnyheter (inntil 24t gamle):\n" + 
-            articles.map(a => 
-              "* [" + (a.site || '') + "] " + a.title + "\n  " + (a.text || '').slice(0, 200) +
-              (a.publishedDate ? "\n  Publisert: " + new Date(a.publishedDate).toLocaleString('nb-NO', {timeZone:'Europe/Oslo'}) : "")
-            ).join("\n\n");
-          req._articles = articles.map(a => ({
-            tittel: a.title,
-            beskrivelse: (a.text || '').slice(0, 200),
-            kilde: a.site || '',
-            url: a.url || '',
-            publisert: a.publishedDate || ''
-          }));
-        }
-      }
-    }
-  } catch(e) {}
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      max_tokens: 1800,
+      response_format: { type: 'json_object' },
+      messages: [
+        {
+          role: 'system',
+          content: `Du er Børshjelpen sin daglige børskommentator. Du skriver for norske nybegynnere som aldri har investert før. 
+Svar KUN med gyldig JSON på norsk bokmål. Ikke bruk finanssjargong uten å forklare det.
 
-  const prompt = `Du er redaktør for Børsbrygg — en daglig børsoppsummering for norske nybegynnere.
-
-Dato: ${today}
-Kursdata fra Oslo Børs i dag: ${stockSummary}
-${newsText ? "\n" + newsText + "\n" : "\nIngen nyhetsdata — bruk kun kursdata.\n"}
-
-Lag en grundig daglig børsoppsummering BASERT KUN PÅ INFORMASJONEN OVER. Finn aldri opp nyheter.
-
-Svar KUN med gyldig JSON:
+JSON-struktur:
 {
-  "hva_skjedde": "4-5 setninger om hva som faktisk skjedde basert på nyhetene og kursdata over. Sitér konkrete tall, selskapsnavn og hendelser fra nyhetene.",
+  "tittel": "Kort tittel for dagens utgave (maks 10 ord)",
+  "hva_skjedde": "2-3 setninger om hva som skjedde på Oslo Børs i dag",
+  "globale_faktorer": "2-3 setninger om globale faktorer som påvirket børsen",
   "nyheter": [
-    {"tittel": "...", "tekst": "2-3 setninger.", "aksje": "ticker eller null", "kilde": "kildenavn"},
-    {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."},
-    {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."},
-    {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."},
-    {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."},
-    {"tittel": "...", "tekst": "...", "aksje": null, "kilde": "..."}
+    { "tittel": "Nyhetstittel", "tekst": "2-3 setninger", "aksje": "TICKER eller null", "kilde": "Kildetype" }
   ],
   "aksje_påvirkning": [
-    {"ticker": "EQNR", "navn": "Equinor", "forklaring": "..."},
-    {"ticker": "DNB", "navn": "DNB", "forklaring": "..."},
-    {"ticker": "TEL", "navn": "Telenor", "forklaring": "..."},
-    {"ticker": "MOWI", "navn": "Mowi", "forklaring": "..."}
+    { "ticker": "EQNR", "navn": "Equinor", "forklaring": "Kort forklaring" }
   ],
-  "globale_faktorer": "3-4 setninger om globale faktorer.",
-  "risiko": "3 konkrete risikoer å følge med på.",
-  "nybegynner_tips": "Ett konkret tips til nybegynnere."
-}
-
-Regler: Norsk bokmål. Ingen kjøpsanbefalinger. Alltid begge sider. IKKE finn opp hendelser.`;
-
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25000);
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        max_tokens: 2500,
-        temperature: 0.2,
-        messages: [
-          { role: 'system', content: 'Du er en erfaren norsk finansjournalist. Svar alltid med gyldig JSON. Finn aldri opp fakta.' },
-          { role: 'user', content: prompt }
-        ]
-      })
+  "risiko": "2-3 setninger om risikoer å holde øye med",
+  "nybegynner_tips": {
+    "overskrift": "Kort overskrift for dagens tips (f.eks. 'Hva er P/E-tall?')",
+    "intro": "1-2 setninger som introduserer konseptet enkelt",
+    "punkter": [
+      "Punkt 1 — kort og konkret",
+      "Punkt 2 — kort og konkret",
+      "Punkt 3 — kort og konkret",
+      "Punkt 4 — kort og konkret"
+    ],
+    "konklusjon": "1 setning som oppsummerer hvorfor dette er nyttig å vite"
+  }
+}`
+        },
+        {
+          role: 'user',
+          content: `Dagens kursdata fra Oslo Børs: ${stockSummary}`
+        }
+      ]
     });
 
-    clearTimeout(timeout);
+    const raw = completion.choices[0].message.content;
+    const ai = JSON.parse(raw);
 
-    if (!response.ok) {
-      const err = await response.json();
-      return res.status(500).json({ error: 'OpenAI feil', detail: err });
-    }
+    // Lagre i Supabase
+    await sb.from('borsbrygg_editions').insert({
+      date: today,
+      title: ai.tittel || 'Børsbrygg ' + today,
+      content: ai
+    });
 
-    const data = await response.json();
-    const text = data.choices[0].message.content || '';
-    const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
-
-    // Cache dagens utgave — samme innhold resten av dagen
-    cache[todayKey] = parsed;
-
-    res.status(200).json(parsed);
-
+    return res.status(200).json(ai);
   } catch (err) {
-    if (err.name === 'AbortError') return res.status(504).json({ error: 'Timeout' });
-    res.status(500).json({ error: 'Serverfeil', detail: err.message });
+    return res.status(500).json({ error: err.message });
   }
 }
