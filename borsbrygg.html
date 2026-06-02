@@ -312,7 +312,7 @@ function renderEdition(ai, container) {
       }).join('') +
     '</div></div>' +
     '<div class="story"><div class="story-tag">📈 Aksjer i fokus</div><div class="story-title">Slik kan det slå ut fremover</div><div class="story-text">' +
-      (ai.aksje_påvirkning||[]).map(function(a) {
+      (ai.aksje_paavirkning || ai.aksje_påvirkning||[]).map(function(a) {
         return '<div style="padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
           '<div style="font-weight:500;margin-bottom:4px;">' + a.navn + ' <span style="font-size:12px;color:#888;font-weight:400;">(' + a.ticker + ')</span></div>' +
           '<div style="font-size:13px;color:#555;line-height:1.6;">' + a.forklaring + '</div>' +
