@@ -436,9 +436,11 @@ async function confirmCancel() {
   const btn = document.getElementById('confirmCancelBtn');
   btn.textContent = 'Avslutter...'; btn.disabled = true;
   try {
+    const { data: { session: cancelSession } } = await sb.auth.getSession();
+    const cancelToken = cancelSession?.access_token || '';
     const res = await fetch('/api/cancel', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cancelToken },
       body: JSON.stringify({ user_id: currentUser.id })
     });
     const data = await res.json();
@@ -470,9 +472,11 @@ async function confirmDelete() {
   const btn = document.getElementById('confirmDeleteBtn');
   btn.textContent = 'Sletter...'; btn.disabled = true;
   try {
+    const { data: { session: deleteSession } } = await sb.auth.getSession();
+    const deleteToken = deleteSession?.access_token || '';
     const res = await fetch('/api/delete-account', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + deleteToken },
       body: JSON.stringify({ user_id: currentUser.id })
     });
     const data = await res.json();
