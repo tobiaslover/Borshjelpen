@@ -1,64 +1,50 @@
+import OpenAI from 'openai';
+import { createClient } from '@supabase/supabase-js';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Kun POST støttes' });
+  if (req.method !== 'POST') return res.status(405).end();
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY mangler i Vercel Environment Variables.' });
+  // Verifiser Supabase JWT
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Ikke autentisert' });
+  }
+  const token = authHeader.replace('Bearer ', '');
+  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+  const { data: { user }, error: authError } = await sb.auth.getUser(token);
+  if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
 
-  const { messages, context } = req.body;
-  if (!messages || !Array.isArray(messages)) return res.status(400).json({ error: 'messages mangler' });
+  const { messages, context } = req.body || {};
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({ error: 'messages mangler' });
+  }
 
-  const systemPrompt = `Du er Børshjelpen AI — en vennlig og nøytral finansassistent som hjelper nybegynnere forstå aksjer og børsen.
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-${context ? `Brukeren ser på: ${context.name} (${context.ticker}), pris ${context.price} ${context.currency}, endring ${context.up ? '+' : ''}${context.changePct}%, sektor: ${context.sector || 'ukjent'}, P/E: ${context.pe || 'ukjent'}, beta: ${context.beta || 'ukjent'}.` : 'Ingen spesifikk aksje valgt.'}
-
-REGLER:
-1. Gi ALDRI kjøpsanbefalinger eller råd om å kjøpe/selge/holde
-2. Anbefal alltid å snakke med en finansrådgiver for personlige råd
-3. Forklar alltid risiko ved siden av potensielle gevinster
-4. Presenter alltid begge sider
-5. Svar på norsk bokmål
-6. Enkelt språk — forklar faguttrykk
-7. Maks 3-4 avsnitt per svar
-8. Du er en lærer, ikke en rådgiver`;
+  const systemPrompt = `Du er Børshjelpen sin AI-assistent for norske nybegynnere på Oslo Børs.
+VIKTIGE REGLER:
+- Gi ALDRI kjøps- eller salgsanbefalinger
+- Presenter alltid begge sider — bull og bear
+- Inkluder alltid risikoer
+- Skriv enkelt norsk uten finanssjargong
+- Avslutt alltid med: "Dette er ikke finansiell rådgivning."
+${context ? `\nAksje i fokus: ${context.name} (${context.ticker}), kurs: ${context.price} NOK, endring: ${context.changePct}%` : ''}`;
 
   try {
-    const chatController = new AbortController();
-    const chatTimeout = setTimeout(() => chatController.abort(), 25000);
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      signal: chatController.signal,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        max_tokens: 2000,
-        temperature: 0.5,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages
-        ]
-      })
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      max_tokens: 600,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages.slice(-10)
+      ]
     });
-
-    clearTimeout(chatTimeout);
-    if (!response.ok) {
-      const err = await response.json();
-      const msg = (err.error && err.error.message) || JSON.stringify(err);
-      return res.status(500).json({ error: msg });
-    }
-
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || '';
-    res.status(200).json({ reply });
-
+    res.status(200).json({ reply: completion.choices[0].message.content });
   } catch (err) {
-    res.status(500).json({ error: 'Serverfeil', detail: err.message });
+    res.status(500).json({ error: err.message });
   }
 }
