@@ -43,7 +43,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .bb-header-left p { font-size: 13px; color: #888; margin-top: 3px; }
 .bb-today-badge { background: #1B3A5C; color: #C8A96E; font-size: 11px; padding: 5px 12px; border-radius: 100px; font-weight: 500; }
 .edition-card { background: white; border-radius: 16px; border: 1px solid #e8e8e8; overflow: hidden; margin-bottom: 1.5rem; }
-.edition-header { background: #1B3A5C; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; }
+.edition-header { background: #1B3A5C; padding: 1.25rem 1.5rem; }
 .edition-logo { font-family: 'Tenor Sans', sans-serif; font-size: 14px; letter-spacing: 2px; color: #C8A96E; text-transform: uppercase; }
 .edition-date { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 3px; }
 .edition-title { font-family: 'Playfair Display', serif; font-size: 22px; color: white; margin-top: 10px; line-height: 1.3; }
@@ -56,14 +56,11 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .story-tag { font-size: 10px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
 .story-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
 .story-text { font-size: 14px; color: #555; line-height: 1.7; }
-.archive-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .75rem; }
-.archive-list { background: white; border-radius: 12px; border: 1px solid #e8e8e8; overflow: hidden; }
-.archive-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: background .15s; }
-.archive-item:last-child { border-bottom: none; }
-.archive-item:hover { background: #f8f7f4; }
-.archive-title { font-size: 14px; font-weight: 500; }
-.archive-date { font-size: 12px; color: #aaa; }
-.archive-arrow { color: #C8A96E; font-size: 14px; }
+.tip-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.tip-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #444; line-height: 1.6; }
+.tip-list li::before { content: '→'; color: #C8A96E; font-weight: 500; flex-shrink: 0; margin-top: 1px; }
+.tip-intro { font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 10px; }
+.tip-conclusion { font-size: 13px; color: #888; font-style: italic; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
 .wl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
 .wl-card { background: white; border-radius: 12px; border: 1px solid #e8e8e8; overflow: hidden; }
 .wl-header { padding: .75rem 1rem; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
@@ -75,8 +72,25 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .wl-pct { font-size: 13px; font-weight: 500; }
 .wl-pct.up { color: #2C7A5C; }
 .wl-pct.down { color: #A32D2D; }
-.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; position: relative; }
+.archive-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .75rem; }
+.archive-list { background: white; border-radius: 12px; border: 1px solid #e8e8e8; overflow: hidden; }
+.archive-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: background .15s; }
+.archive-item:last-child { border-bottom: none; }
+.archive-item:hover { background: #f8f7f4; }
+.archive-title { font-size: 14px; font-weight: 500; }
+.archive-date { font-size: 12px; color: #aaa; }
+.archive-arrow { color: #C8A96E; font-size: 14px; }
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; }
 .hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
+
+/* Arkiv-modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; }
+.modal-overlay.open { display: flex; }
+.modal-edition { background: white; border-radius: 16px; max-width: 700px; width: 100%; margin: auto; overflow: hidden; }
+.modal-edition-header { background: #1B3A5C; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; }
+.modal-edition-body { padding: 1.5rem; }
+.modal-close-btn { background: none; border: none; color: rgba(255,255,255,.6); font-size: 22px; cursor: pointer; line-height: 1; }
+
 @media (max-width: 768px) {
   .nav-links a { display: none; }
   .bb-hero { padding: 2.5rem 1rem; }
@@ -85,6 +99,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   .bb-features { flex-direction: column; align-items: center; gap: 10px; }
   .bb-content { padding: 0 1rem; }
   .bb-header-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .wl-grid { grid-template-columns: 1fr; }
   .hamburger-btn { display: block; }
   .nav-links { display: none !important; }
 }
@@ -116,7 +131,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 
 <div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
-    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;" onclick="closeMobileMenu()">Børs<span style="color:#C8A96E;">hjelpen</span></a>
+    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
     <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
   </div>
   <div style="display:flex;flex-direction:column;flex:1;">
@@ -201,7 +216,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 </div>
 
 <!-- SUBSCRIBER VIEW -->
-<div id="subscriberView">
+<div id="subscriberView" style="display:none;">
   <div class="bb-content">
     <div class="bb-header-bar">
       <div class="bb-header-left">
@@ -210,18 +225,20 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
       </div>
       <div class="bb-today-badge">Dagens utgave</div>
     </div>
+
+    <!-- Dagens utgave -->
     <div class="edition-card">
       <div class="edition-header">
-        <div>
-          <div class="edition-logo">Børsbrygg</div>
-          <div class="edition-date" id="editionDate">Laster...</div>
-          <div class="edition-title" id="editionTitle">Henter dagens børsoppsummering...</div>
-        </div>
+        <div class="edition-logo">Børsbrygg</div>
+        <div class="edition-date" id="editionDate">Laster...</div>
+        <div class="edition-title" id="editionTitle">Henter dagens børsoppsummering...</div>
       </div>
       <div class="edition-body" id="editionBody">
         <div class="edition-loading"><div class="edition-spinner"></div>AI genererer dagens oppsummering...</div>
       </div>
     </div>
+
+    <!-- Vinnere og tapere -->
     <div class="archive-label" style="margin-top:1.5rem;">Gårsdagens vinnere og tapere</div>
     <div class="wl-grid">
       <div class="wl-card">
@@ -233,93 +250,261 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
         <div id="losersList"><div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Laster...</div></div>
       </div>
     </div>
+
+    <!-- Arkiv -->
     <div class="archive-label">Tidligere utgaver</div>
     <div class="archive-list" id="archiveList">
-      <div class="archive-item"><div><div class="archive-title">Equinor opp 2% — oljeprisen driver børsen</div><div class="archive-date">Torsdag 29. mai 2026</div></div><div class="archive-arrow">→</div></div>
-      <div class="archive-item"><div><div class="archive-title">DNB med sterk kvartal — men renten bekymrer</div><div class="archive-date">Onsdag 28. mai 2026</div></div><div class="archive-arrow">→</div></div>
-      <div class="archive-item"><div><div class="archive-title">Oslo Børs ned 1.2% — Fed-tale skapte uro</div><div class="archive-date">Tirsdag 27. mai 2026</div></div><div class="archive-arrow">→</div></div>
+      <div style="padding:1.5rem;text-align:center;color:#aaa;font-size:13px;">Laster arkiv...</div>
+    </div>
+    <div id="archiveMoreBtn" style="display:none;text-align:center;margin-top:12px;">
+      <button onclick="loadMoreArchive()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:white;color:#1B3A5C;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">Last inn flere utgaver ↓</button>
+    </div>
+  </div>
+</div>
+
+<!-- Arkiv-modal -->
+<div class="modal-overlay" id="archiveModal">
+  <div class="modal-edition">
+    <div class="modal-edition-header">
+      <div>
+        <div style="font-family:'Tenor Sans',sans-serif;font-size:14px;letter-spacing:2px;color:#C8A96E;text-transform:uppercase;">Børsbrygg</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:3px;" id="modalDate"></div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;color:white;margin-top:8px;line-height:1.3;" id="modalTitle">Laster...</div>
+      </div>
+      <button class="modal-close-btn" onclick="closeArchiveModal()">✕</button>
+    </div>
+    <div class="modal-edition-body" id="modalBody">
+      <div class="edition-loading"><div class="edition-spinner"></div>Laster utgave...</div>
     </div>
   </div>
 </div>
 
 <script>
+const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
+
 const today = new Date().toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'Europe/Oslo'});
 const todayCap = today.charAt(0).toUpperCase() + today.slice(1);
 if (document.getElementById('bbTodayDate')) document.getElementById('bbTodayDate').textContent = todayCap;
 if (document.getElementById('editionDate')) document.getElementById('editionDate').textContent = todayCap;
 
-const watchlist = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
+const watchlistTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
+let archiveOffset = 0;
+const ARCHIVE_PAGE = 10;
+
+// Render en utgave (brukes både i dagens og i modal)
+function renderEdition(ai, container) {
+  container.innerHTML =
+    '<div class="story"><div class="story-tag">📊 Hva skjedde i dag</div><div class="story-title" id="editionTitle2">' + (ai.tittel||'') + '</div><div class="story-text">' + (ai.hva_skjedde||'') + '</div></div>' +
+    '<div class="story"><div class="story-tag">🌍 Globale faktorer</div><div class="story-title">Slik påvirket verden Oslo Børs</div><div class="story-text">' + (ai.globale_faktorer||'') + '</div></div>' +
+    '<div class="story"><div class="story-tag">📰 Viktige nyheter</div><div class="story-title">Dette bør du vite</div><div class="story-text">' +
+      (ai.nyheter||[]).map(function(n) {
+        return '<div style="margin-bottom:1rem;padding:1rem;background:#f8f7f4;border-radius:10px;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
+            '<div style="font-weight:500;font-size:14px;">' + n.tittel + '</div>' +
+            '<div style="display:flex;gap:4px;flex-shrink:0;">' +
+              (n.aksje && n.aksje !== 'null' ? '<span style="background:#1B3A5C;color:#C8A96E;font-size:10px;padding:2px 8px;border-radius:100px;">' + n.aksje + '</span>' : '') +
+              (n.kilde ? '<span style="background:#f0f0f0;color:#888;font-size:10px;padding:2px 8px;border-radius:100px;">' + n.kilde + '</span>' : '') +
+            '</div>' +
+          '</div>' +
+          '<div style="font-size:13px;color:#555;line-height:1.6;">' + n.tekst + '</div>' +
+        '</div>';
+      }).join('') +
+    '</div></div>' +
+    '<div class="story"><div class="story-tag">📈 Aksjer i fokus</div><div class="story-title">Slik kan det slå ut fremover</div><div class="story-text">' +
+      (ai.aksje_påvirkning||[]).map(function(a) {
+        return '<div style="padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
+          '<div style="font-weight:500;margin-bottom:4px;">' + a.navn + ' <span style="font-size:12px;color:#888;font-weight:400;">(' + a.ticker + ')</span></div>' +
+          '<div style="font-size:13px;color:#555;line-height:1.6;">' + a.forklaring + '</div>' +
+        '</div>';
+      }).join('') +
+    '</div></div>' +
+    '<div class="story"><div class="story-tag">⚠️ Risiko og muligheter</div><div class="story-title">Hold øye med dette</div><div class="story-text">' + (ai.risiko||'') + '</div></div>' +
+    renderTips(ai.nybegynner_tips) +
+    '<div style="font-size:11px;color:#aaa;font-style:italic;margin-top:1rem;padding-top:1rem;border-top:1px solid #f0f0f0;">Kursdata fra Yahoo Finance · Forsinket ca. 15 min · Ikke finansiell rådgivning</div>';
+}
+
+function renderTips(tips) {
+  if (!tips) return '';
+  if (typeof tips === 'string') {
+    return '<div class="story"><div class="story-tag">💡 Tips til nybegynnere</div><div class="story-text">' + tips + '</div></div>';
+  }
+  return '<div class="story">' +
+    '<div class="story-tag">💡 Tips til nybegynnere</div>' +
+    '<div class="story-title">' + (tips.overskrift||'Visste du dette?') + '</div>' +
+    '<p class="tip-intro">' + (tips.intro||'') + '</p>' +
+    '<ul class="tip-list">' +
+      (tips.punkter||[]).map(function(p) { return '<li>' + p + '</li>'; }).join('') +
+    '</ul>' +
+    (tips.konklusjon ? '<p class="tip-conclusion">' + tips.konklusjon + '</p>' : '') +
+  '</div>';
+}
 
 async function loadBorsbrygg() {
   try {
-    const results = await Promise.all(watchlist.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null)));
-    const valid = results.filter(r => r && !r.error);
+    const results = await Promise.all(
+      watchlistTickers.map(function(t) { return fetch('/api/stock?ticker=' + t).then(function(r) { return r.json(); }).catch(function() { return null; }); })
+    );
+    const valid = results.filter(function(r) { return r && !r.error; });
     if (!valid.length) { document.getElementById('editionBody').innerHTML = '<div class="edition-loading">Kunne ikke hente kursdata. Prøv igjen senere.</div>'; return; }
-    const sorted = [...valid].sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
-    const winner = sorted[0]; const loser = sorted[sorted.length - 1];
-    const title = winner.name.split(' ')[0] + ' opp ' + winner.changePct + '% — ' + loser.name.split(' ')[0] + ' ned ' + Math.abs(loser.changePct) + '%';
-    document.getElementById('editionTitle').textContent = title;
-    const stockSummary = valid.map(s => { const sign = parseFloat(s.changePct) >= 0 ? '+' : ''; return s.name + ' (' + s.ticker + '): ' + s.price + ' NOK, ' + sign + s.changePct + '%'; }).join(', ');
-    const res = await fetch('/api/borsbrygg', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stockSummary }) });
+
+    const sorted = [...valid].sort(function(a,b) { return parseFloat(b.changePct) - parseFloat(a.changePct); });
+    const winner = sorted[0]; const loser = sorted[sorted.length-1];
+    const stockSummary = valid.map(function(s) { const sign = parseFloat(s.changePct) >= 0 ? '+' : ''; return s.name + ' (' + s.ticker + '): ' + s.price + ' NOK, ' + sign + s.changePct + '%'; }).join(', ');
+
+    const res = await fetch('/api/borsbrygg', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stockSummary })
+    });
     const ai = await res.json();
     if (ai.error) throw new Error(ai.error);
-    document.getElementById('editionBody').innerHTML =
-      '<div class="story"><div class="story-tag">📊 Hva skjedde i dag</div><div class="story-title">' + title + '</div><div class="story-text">' + (ai.hva_skjedde || '') + '</div></div>' +
-      '<div class="story"><div class="story-tag">🌍 Globale faktorer</div><div class="story-title">Slik påvirket verden Oslo Børs</div><div class="story-text">' + (ai.globale_faktorer || '') + '</div></div>' +
-      '<div class="story"><div class="story-tag">📰 Viktige nyheter</div><div class="story-title">Dette bør du vite</div><div class="story-text">' +
-        (ai.nyheter || []).map(n => '<div style="margin-bottom:1rem;padding:1rem;background:#f8f7f4;border-radius:10px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;"><div style="font-weight:500;font-size:14px;">' + n.tittel + '</div><div style="display:flex;gap:4px;flex-shrink:0;">' + (n.aksje ? '<span style="background:#1B3A5C;color:#C8A96E;font-size:10px;padding:2px 8px;border-radius:100px;">' + n.aksje + '</span>' : '') + (n.kilde ? '<span style="background:#f0f0f0;color:#888;font-size:10px;padding:2px 8px;border-radius:100px;">' + n.kilde + '</span>' : '') + '</div></div><div style="font-size:13px;color:#555;line-height:1.6;">' + n.tekst + '</div></div>').join('') +
-      '</div></div>' +
-      '<div class="story"><div class="story-tag">📈 Hvordan påvirker dette aksjene</div><div class="story-title">Slik kan det slå ut fremover</div><div class="story-text">' +
-        (ai.aksje_påvirkning || []).map(a => { const stock = valid.find(s => s.ticker === a.ticker); const sign = stock && parseFloat(stock.changePct) >= 0 ? '+' : ''; const color = stock && parseFloat(stock.changePct) >= 0 ? '#2C7A5C' : '#A32D2D'; const pct = stock ? sign + stock.changePct + '%' : ''; return '<div style="padding:12px 0;border-bottom:1px solid #f0f0f0;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-weight:500;">' + a.navn + '</span><span style="color:' + color + ';font-size:13px;font-weight:500;">' + pct + '</span></div><div style="font-size:13px;color:#555;line-height:1.6;">' + a.forklaring + '</div></div>'; }).join('') +
-      '</div></div>' +
-      '<div class="story"><div class="story-tag">⚠️ Risiko og muligheter</div><div class="story-title">Hold øye med dette</div><div class="story-text">' + (ai.risiko || '') + '</div></div>' +
-      '<div class="story"><div class="story-tag">💡 Tips til nybegynnere</div><div class="story-title">' + (ai.nybegynner_tips || '') + '</div><div class="story-text" style="font-size:12px;color:#aaa;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0;">Kursdata fra Yahoo Finance · Forsinket ca. 15 min · Ikke finansiell rådgivning · Gjør alltid egne vurderinger.</div></div>';
+
+    document.getElementById('editionTitle').textContent = ai.tittel || (winner.name.split(' ')[0] + ' opp ' + winner.changePct + '%');
+    renderEdition(ai, document.getElementById('editionBody'));
   } catch(e) {
     document.getElementById('editionBody').innerHTML = '<div class="edition-loading">Kunne ikke laste innhold: ' + e.message + '</div>';
   }
 }
 
-loadBorsbrygg();
-loadWinnersLosers();
-
 async function loadWinnersLosers() {
   const allTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT','KOG','SALM','ORK','STB','GJF','NAS','SUBC'];
   try {
-    const results = await Promise.all(allTickers.map(t => fetch('/api/stock?ticker=' + t).then(r => r.json()).catch(() => null)));
-    const valid = results.filter(r => r && !r.error && r.changePct !== undefined).sort((a, b) => parseFloat(b.changePct) - parseFloat(a.changePct));
-    const winners = valid.slice(0, 3); const losers = valid.slice(-3).reverse();
-    function renderItem(s) { const sign = parseFloat(s.changePct) >= 0 ? '+' : ''; const cls = parseFloat(s.changePct) >= 0 ? 'up' : 'down'; return '<div class="wl-item"><div><div class="wl-name">' + s.name.split(' ')[0] + '</div><div class="wl-ticker">' + s.ticker + '</div></div><div class="wl-pct ' + cls + '">' + sign + s.changePct + '%</div></div>'; }
+    const results = await Promise.all(allTickers.map(function(t) { return fetch('/api/stock?ticker='+t).then(function(r){return r.json();}).catch(function(){return null;}); }));
+    const valid = results.filter(function(r){return r&&!r.error&&r.changePct!==undefined;}).sort(function(a,b){return parseFloat(b.changePct)-parseFloat(a.changePct);});
+    const winners = valid.slice(0,3); const losers = valid.slice(-3).reverse();
+    function renderItem(s) {
+      const sign = parseFloat(s.changePct)>=0?'+':''; const cls = parseFloat(s.changePct)>=0?'up':'down';
+      return '<div class="wl-item"><div><div class="wl-name">'+s.name.split(' ')[0]+'</div><div class="wl-ticker">'+s.ticker+'</div></div><div class="wl-pct '+cls+'">'+sign+s.changePct+'%</div></div>';
+    }
     document.getElementById('winnersList').innerHTML = winners.map(renderItem).join('') || '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
     document.getElementById('losersList').innerHTML = losers.map(renderItem).join('') || '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
   } catch(e) {
-    document.getElementById('winnersList').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Kunne ikke laste data</div>';
-    document.getElementById('losersList').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Kunne ikke laste data</div>';
+    document.getElementById('winnersList').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
+    document.getElementById('losersList').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
   }
 }
 
-const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
+// Arkiv
+async function loadArchive(reset) {
+  if (reset) { archiveOffset = 0; document.getElementById('archiveList').innerHTML = ''; }
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const todayStr = new Date().toLocaleDateString('sv-SE', {timeZone:'Europe/Oslo'});
+  const { data, error } = await sb
+    .from('borsbrygg_editions')
+    .select('date, title')
+    .neq('date', todayStr)
+    .order('date', { ascending: false })
+    .range(archiveOffset, archiveOffset + ARCHIVE_PAGE - 1);
 
+  if (error || !data || data.length === 0) {
+    if (archiveOffset === 0) document.getElementById('archiveList').innerHTML = '<div style="padding:1.5rem;text-align:center;color:#aaa;font-size:13px;">Ingen tidligere utgaver ennå.</div>';
+    document.getElementById('archiveMoreBtn').style.display = 'none';
+    return;
+  }
+
+  const visible = data.slice(0, 5);
+  const extra = data.slice(5);
+
+  const list = document.getElementById('archiveList');
+
+  function makeRow(item) {
+    const d = new Date(item.date + 'T12:00:00');
+    const dateStr = d.toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+    const dateCapStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+    const row = document.createElement('div');
+    row.className = 'archive-item';
+    row.innerHTML = '<div><div class="archive-title">' + (item.title||'Børsbrygg') + '</div><div class="archive-date">' + dateCapStr + '</div></div><div class="archive-arrow">→</div>';
+    row.onclick = function() { openArchiveModal(item.date, item.title); };
+    return row;
+  }
+
+  visible.forEach(function(item) { list.appendChild(makeRow(item)); });
+
+  if (extra.length > 0) {
+    const hiddenWrap = document.createElement('div');
+    hiddenWrap.id = 'archiveHidden_' + archiveOffset;
+    hiddenWrap.style.display = 'none';
+    extra.forEach(function(item) { hiddenWrap.appendChild(makeRow(item)); });
+    list.appendChild(hiddenWrap);
+
+    const toggleRow = document.createElement('div');
+    toggleRow.style.cssText = 'text-align:center;padding:10px;border-top:1px solid #f0f0f0;';
+    toggleRow.innerHTML = '<button onclick="toggleArchiveExtra(\'' + archiveOffset + '\')" id="archiveToggleBtn_' + archiveOffset + '" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-weight:500;">Vis ' + extra.length + ' til ↓</button>';
+    list.appendChild(toggleRow);
+  }
+
+  archiveOffset += data.length;
+  document.getElementById('archiveMoreBtn').style.display = data.length === ARCHIVE_PAGE ? 'block' : 'none';
+}
+
+function toggleArchiveExtra(offset) {
+  const hidden = document.getElementById('archiveHidden_' + offset);
+  const btn = document.getElementById('archiveToggleBtn_' + offset);
+  if (!hidden) return;
+  if (hidden.style.display === 'none') {
+    hidden.style.display = 'block';
+    btn.textContent = 'Skjul ↑';
+  } else {
+    hidden.style.display = 'none';
+    btn.textContent = 'Vis ' + hidden.children.length + ' til ↓';
+  }
+}
+
+function loadMoreArchive() { loadArchive(false); }
+
+async function openArchiveModal(date, title) {
+  document.getElementById('archiveModal').classList.add('open');
+  const d = new Date(date + 'T12:00:00');
+  const dateStr = d.toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('modalDate').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+  document.getElementById('modalTitle').textContent = title || 'Børsbrygg';
+  document.getElementById('modalBody').innerHTML = '<div class="edition-loading"><div class="edition-spinner"></div>Laster utgave...</div>';
+
+  try {
+    const res = await fetch('/api/borsbrygg?date=' + date);
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || 'Ikke funnet');
+    const ai = data.content || data;
+    renderEdition(ai, document.getElementById('modalBody'));
+  } catch(e) {
+    document.getElementById('modalBody').innerHTML = '<div class="edition-loading">Kunne ikke laste utgave.</div>';
+  }
+}
+
+function closeArchiveModal() {
+  document.getElementById('archiveModal').classList.remove('open');
+}
+document.getElementById('archiveModal').addEventListener('click', function(e) {
+  if (e.target === this) closeArchiveModal();
+});
+
+// Auth
 (async function checkAuth() {
   try {
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    function applyBbSession(user) {
+    function applySession(user) {
       const name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
-      const initials = name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0,2);
+      const initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
       document.getElementById('navAuth').style.display = 'none';
       document.getElementById('navUser').style.display = 'flex';
       document.getElementById('navAv').textContent = initials;
       document.getElementById('navName').textContent = name.split(' ')[0];
       if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
     }
-    sb.auth.onAuthStateChange(function(event, session) { if (session) applyBbSession(session.user); });
+    sb.auth.onAuthStateChange(function(event, session) { if (session) applySession(session.user); });
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
-      applyBbSession(session.user);
+      applySession(session.user);
       document.getElementById('lockedView').style.display = 'none';
       document.getElementById('subscriberView').style.display = 'block';
       loadBorsbrygg();
+      loadWinnersLosers();
+      loadArchive(true);
       try { await sb.from('user_activity').insert({ user_id: session.user.id, type: 'borsbrygg', ticker: null, name: 'Børsbrygg lest', xp: 5 }); } catch(e) {}
+    } else {
+      document.getElementById('lockedView').style.display = 'block';
+      document.getElementById('subscriberView').style.display = 'none';
     }
   } catch(e) {}
 })();
