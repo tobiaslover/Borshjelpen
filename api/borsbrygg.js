@@ -71,10 +71,10 @@ JSON-struktur (bruk eksakt disse nøklene):
   ],
   "risiko": "2-3 setninger om risikoer",
   "nybegynner_tips": {
-    "overskrift": "Kort overskrift f.eks. Hva er P/E-tall?",
-    "intro": "1-2 setninger som introduserer konseptet",
-    "punkter": ["Punkt 1", "Punkt 2", "Punkt 3", "Punkt 4"],
-    "konklusjon": "1 setning som oppsummerer hvorfor dette er nyttig"
+    "overskrift": "Velg ett begrep fra DAGENS nyheter og forhandle det (f.eks. hvis Equinor er omtalt: 'Hva er oljeprisrisiko?', hvis renter nevnes: 'Hva betyr renter for aksjer?', hvis kvartal nevnes: 'Hva er en kvartalsrapport?')",
+    "intro": "Forklar begrepet enkelt med utgangspunkt i hva som skjedde i dag på Oslo Børs",
+    "punkter": ["Konkret punkt knyttet til noe fra dagens nyheter", "Enkelt forklarende punkt", "Praktisk punkt nybegynnere kan bruke", "Punkt som knytter begrepet til en aksje fra dagens utgave"],
+    "konklusjon": "Avslutt med å knytte tipset direkte tilbake til noe konkret fra dagens børsdag"
   }
 }`
         },
