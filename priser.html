@@ -15,94 +15,44 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .nav-links a { font-size: 14px; color: #666; text-decoration: none; }
 .nav-links a:hover { color: #1B3A5C; }
 .nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-
 .hero { background: #1B3A5C; padding: 4rem 2rem; text-align: center; }
 .hero-label { font-size: 12px; color: #C8A96E; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; }
 .hero-title { font-family: 'Playfair Display', serif; font-size: 42px; color: white; font-weight: 700; margin-bottom: 1rem; }
 .hero-sub { font-size: 15px; color: rgba(255,255,255,0.55); max-width: 480px; margin: 0 auto; }
-
 .plans { max-width: 900px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-
 .plan-card { border-radius: 20px; padding: 2rem; position: relative; }
 .plan-card.free { background: #E6EEF5; border: 2px solid #b0cce0; }
 .plan-card.investor { background: linear-gradient(135deg,#e8e8e8,#f5f5f5); border: 2px solid #bbb; }
 .plan-card.proff { background: linear-gradient(135deg,#FFF8E7,#FFF0C0); border: 2px solid #C8A96E; }
-
 .popular-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: #C8A96E; color: #1B3A5C; font-size: 11px; font-weight: 600; padding: 4px 14px; border-radius: 100px; white-space: nowrap; }
-
 .plan-name { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; margin-bottom: 8px; }
 .plan-card.free .plan-name { color: #1B3A5C; }
 .plan-card.investor .plan-name { color: #555; }
 .plan-card.proff .plan-name { color: #8B6E3A; }
-
 .plan-price { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; margin-bottom: 4px; }
 .plan-card.free .plan-price { color: #1B3A5C; }
 .plan-card.investor .plan-price { color: #333; }
 .plan-card.proff .plan-price { color: #8B6E3A; }
-
 .plan-period { font-size: 12px; margin-bottom: 1.5rem; }
 .plan-card.free .plan-period { color: #5a7a9c; }
 .plan-card.investor .plan-period { color: #777; }
 .plan-card.proff .plan-period { color: #a07830; }
-
 .plan-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2rem; }
 .feature-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; }
 .feature-item .check { font-size: 11px; margin-top: 2px; flex-shrink: 0; }
 .plan-card.free .feature-item { color: #1B3A5C; }
 .plan-card.investor .feature-item { color: #444; }
 .plan-card.proff .feature-item { color: #3a2800; }
-
 .plan-btn { width: 100%; padding: 12px; border-radius: 100px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s; }
 .plan-btn:hover { opacity: 0.85; }
 .plan-card.free .plan-btn { background: none; border: 2px solid #1B3A5C; color: #1B3A5C; }
 .plan-card.investor .plan-btn { background: #888; border: none; color: white; }
 .plan-card.proff .plan-btn { background: #C8A96E; border: none; color: #1B3A5C; }
-
-/* Modal */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 1rem; }
-.modal-overlay.open { display: flex; }
-.modal { background: white; border-radius: 20px; padding: 2.5rem; max-width: 440px; width: 100%; text-align: center; }
-.modal-icon { font-size: 40px; margin-bottom: 1rem; }
-.modal-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-.modal-sub { font-size: 14px; color: #888; margin-bottom: 1.5rem; line-height: 1.6; }
-.modal-plan-badge { display: inline-block; padding: 4px 14px; border-radius: 100px; font-size: 12px; font-weight: 500; margin-bottom: 1.5rem; }
-.modal-input { width: 100%; padding: 12px 16px; border: 1px solid #e8e8e8; border-radius: 100px; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: 12px; }
-.modal-input:focus { border-color: #1B3A5C; }
-.modal-submit { width: 100%; padding: 12px; border-radius: 100px; border: none; background: #1B3A5C; color: white; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-bottom: 10px; }
-.modal-close { background: none; border: none; font-size: 13px; color: #aaa; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-.modal-success { display: none; }
-.modal-success-icon { font-size: 48px; margin-bottom: 1rem; }
-
 .footer-note { text-align: center; font-size: 12px; color: #aaa; padding-bottom: 3rem; }
-
-@media (max-width: 700px) {
-  .plans { grid-template-columns: 1fr; }
-  .hero-title { font-size: 30px; }
-}
-
-/* Hamburger mobil nav */
+@media (max-width: 700px) { .plans { grid-template-columns: 1fr; } .hero-title { font-size: 30px; } }
 .hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; position: relative; }
 .hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
-.mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 99999; flex-direction: column; padding: 1.5rem 2rem; overflow-y: auto; }
-.mobile-menu.open { display: flex; }
-.mobile-menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-.mobile-menu-logo { font-family: 'Tenor Sans', sans-serif; font-size: 16px; letter-spacing: 2.5px; text-transform: uppercase; color: #1a1a1a; text-decoration: none; }
-.mobile-menu-logo span { color: #C8A96E; }
-.mobile-menu-close { background: none; border: none; font-size: 28px; cursor: pointer; color: #666; line-height: 1; padding: 4px; }
-.mobile-menu-links { display: flex; flex-direction: column; gap: 0; flex: 1; }
-.mobile-menu-links a { font-size: 26px; font-family: 'Playfair Display', serif; font-weight: 700; color: #1B3A5C; text-decoration: none; padding: 16px 0; border-bottom: 1px solid #f0f0f0; display: block; }
-.mobile-menu-links a:active { color: #C8A96E; }
-.mobile-menu-footer { padding-top: 1.5rem; display: flex; gap: 8px; flex-direction: column; }
-.mobile-menu-btn { width: 100%; padding: 14px; border-radius: 100px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; border: none; }
-.mobile-menu-login { background: none; border: 1px solid #e8e8e8 !important; color: #666; }
-.mobile-menu-register { background: #1B3A5C; color: white; }
-.mobile-menu-user { display: none; align-items: center; gap: 12px; padding: 12px 16px; background: #f8f7f4; border-radius: 12px; cursor: pointer; }
-.mobile-menu-av { width: 40px; height: 40px; border-radius: 50%; background: #1B3A5C; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #C8A96E; font-weight: 500; font-family: 'Tenor Sans', sans-serif; flex-shrink: 0; }
-.mobile-menu-username { font-size: 15px; font-weight: 500; }
-@media (max-width: 768px) {
-  .hamburger-btn { display: block; }
-  .nav-links { display: none !important; }
-}
+@media (max-width: 768px) { .hamburger-btn { display: block; } .nav-links { display: none !important; } }
 </style>
 </head>
 <body>
@@ -130,7 +80,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <button class="hamburger-btn" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
 
-<!-- Mobil hamburgermeny -->
 <div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
     <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;" onclick="closeMobileMenu()">Børs<span style="color:#C8A96E;">hjelpen</span></a>
@@ -173,9 +122,9 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
       <div class="feature-item"><span class="check">✓</span><span>AI-chat — 5 spørsmål per dag</span></div>
       <div class="feature-item"><span class="check">✓</span><span>Watchlist — 2 aksjer</span></div>
       <div class="feature-item"><span class="check">✓</span><span>Børsbrygg</span></div>
-      <div class="feature-item"><span class="check">✓</span><span>Læring — grunnleggende</span></div>
+      <div class="feature-item"><span class="check">✓</span><span>Læring</span></div>
     </div>
-    <button class="plan-btn" onclick="location.href='/priser.html'">Kom i gang gratis →</button>
+    <button class="plan-btn" onclick="location.href='/auth.html'">Kom i gang gratis →</button>
   </div>
 
   <div class="plan-card investor">
@@ -218,48 +167,18 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   Ved kjøp aksepterer du at tjenesten starter umiddelbart og at 14 dagers angrerett etter angrerettloven dermed bortfaller. Les våre <a href="/vilkar.html" style="color:#888;">vilkår</a> og <a href="/personvern.html" style="color:#888;">personvernerklæring</a>.
 </p>
 
-<!-- Modal -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal">
-    <div id="modalForm">
-      <div class="modal-icon" id="modalIcon">⭐</div>
-      <div class="modal-title" id="modalTitle">Investor-plan</div>
-      <div class="modal-sub">Betalingsløsning er under utvikling. Legg igjen e-posten din — vi varsler deg så snart du kan abonnere!</div>
-      <span class="modal-plan-badge" id="modalBadge">79 kr/mnd</span><br>
-      <input type="email" id="emailInput" class="modal-input" placeholder="din@epost.no" />
-      <button class="modal-submit" onclick="submitEmail()">Varsle meg →</button>
-      <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">Lukk</button>
-    </div>
-    <div class="modal-success" id="modalSuccess">
-      <div class="modal-success-icon">🎉</div>
-      <div class="modal-title">Takk!</div>
-      <div class="modal-sub">Vi varsler deg på <strong id="confirmedEmail"></strong> så snart betalingen er klar. Du vil være blant de første!</div>
-      <button class="modal-submit" style="margin-top:1rem" onclick="document.getElementById('modalOverlay').classList.remove('open')">Tilbake</button>
-    </div>
-  </div>
-</div>
-
 <script>
-var selectedPlan = 'investor';
-
 async function startCheckout(plan) {
-  // Vis angrerett-bekreftelse
-  const confirmed = confirm(
-    'Ved å fortsette aksepterer du at tjenesten starter umiddelbart og at du dermed gir avkall på 14 dagers angrerett etter angrerettloven.\n\nVil du fortsette?'
-  );
+  const confirmed = confirm('Ved å fortsette aksepterer du at tjenesten starter umiddelbart og at du dermed gir avkall på 14 dagers angrerett etter angrerettloven.\n\nVil du fortsette?');
   if (!confirmed) return;
-
   const btn = document.getElementById('btn-' + plan);
   if (btn) { btn.textContent = 'Laster...'; btn.disabled = true; }
-
   try {
-    // Hent e-post fra innlogget bruker hvis mulig
     let email = '';
     if (window._sb) {
       const sess = (await window._sb.auth.getSession()).data.session;
       if (sess) email = sess.user.email;
     }
-
     const res = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -278,11 +197,6 @@ async function startCheckout(plan) {
   }
 }
 
-function openModal(plan) {
-  startCheckout(plan);
-}
-
-// Auth
 (async function checkAuth() {
   try {
     var script = document.createElement('script');
@@ -293,6 +207,7 @@ function openModal(plan) {
       'https://twckvtwzyadevqbyehnu.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
     );
+    window._sb = sb;
     var sess = (await sb.auth.getSession()).data.session;
     if (sess) {
       var name = (sess.user.user_metadata && sess.user.user_metadata.full_name) || sess.user.email.split('@')[0];
@@ -301,24 +216,13 @@ function openModal(plan) {
       document.getElementById('navUser').style.display = 'flex';
       document.getElementById('navAv').textContent = initials;
       document.getElementById('navName').textContent = name.split(' ')[0];
-    if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
-      // Forhåndsutfyll e-post
-      document.getElementById('emailInput').value = sess.user.email;
+      if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
     }
   } catch(e) {}
 })();
-</script>
-<script>
-function openMobileMenu() {
-  var m = document.getElementById('mobileMenu');
-  m.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-function closeMobileMenu() {
-  var m = document.getElementById('mobileMenu');
-  m.style.display = 'none';
-  document.body.style.overflow = '';
-}
+
+function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
 </body>
 </html>
