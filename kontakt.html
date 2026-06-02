@@ -127,7 +127,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
     <div class="info-card">
       <div class="info-icon">📧</div>
       <div class="info-label">E-post</div>
-      <div class="info-val">kontakt@børshjelpen.no</div>
+      <div class="info-val">kontakt@borshjelpen.no</div>
     </div>
     <div class="info-card">
       <div class="info-icon">⏱️</div>
@@ -175,7 +175,7 @@ async function sendForm() {
   } catch(e) {
     const subject = encodeURIComponent('[Børshjelpen] ' + emne);
     const body = encodeURIComponent('Navn: ' + navn + '\nE-post: ' + epost + '\n\n' + melding);
-    window.location.href = 'mailto:kontakt@børshjelpen.no?subject=' + subject + '&body=' + body;
+    window.location.href = 'mailto:kontakt@borshjelpen.no?subject=' + subject + '&body=' + body;
     btn.disabled = false;
     btn.textContent = 'Send melding';
   }
