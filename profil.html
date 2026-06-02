@@ -485,15 +485,11 @@ async function confirmDelete() {
       body: JSON.stringify({ user_id: currentUser.id })
     });
     const data = await res.json();
-    if (res.ok) {
-      try { await sb.auth.signOut(); } catch(e) {}
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = '/auth.html';
-    } else {
-      alert('Feil: ' + (data.error || 'Noe gikk galt'));
-      btn.textContent = 'Slett konto permanent'; btn.disabled = false;
-    }
+    // Uansett hva API returnerer — logg ut og redirect
+    try { await sb.auth.signOut(); } catch(e) {}
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = '/auth.html';
   } catch(e) {
     alert('Noe gikk galt. Kontakt kontakt@borshjelpen.no');
     btn.textContent = 'Slett konto permanent'; btn.disabled = false;
