@@ -24,7 +24,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .hero-sub { font-size: 16px; color: #555; line-height: 1.7; font-weight: 300; }
 .hero-actions { display: flex; gap: 12px; align-items: center; margin-top: 0.5rem; }
 .btn-primary { background: #1B3A5C; color: white; padding: 12px 24px; border-radius: 100px; font-size: 15px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-.btn-secondary { font-size: 14px; color: #666; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'DM Sans', sans-serif; }
 .hero-right { display: flex; align-items: center; justify-content: center; }
 .phone-mock { width: 240px; background: #fff; border: 1px solid #e8e8e8; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
 .phone-top { background: #1B3A5C; padding: 1.2rem 1rem 1rem; color: white; }
@@ -127,11 +126,11 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 <nav class="nav">
   <div class="logo">Børs<span>hjelpen</span></div>
   <div class="nav-links">
-    <a href="/aksjer.html" style="color:#666;text-decoration:none;font-size:14px;">Aksjer</a>
-    <a href="/laer.html" style="color:#666;text-decoration:none;font-size:14px;">Lær</a>
-    <a href="/borsbrygg.html" style="color:#666;text-decoration:none;font-size:14px;">Børsbrygg</a>
-    <a href="/kontakt.html" style="color:#666;text-decoration:none;font-size:14px;">Kontakt</a>
-    <a href="/om.html" style="color:#666;text-decoration:none;font-size:14px;">Om oss</a>
+    <a href="/aksjer.html">Aksjer</a>
+    <a href="/laer.html">Lær</a>
+    <a href="/borsbrygg.html">Børsbrygg</a>
+    <a href="/kontakt.html">Kontakt</a>
+    <a href="/om.html">Om oss</a>
     <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
       <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
       <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
@@ -220,7 +219,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <div class="section-label">Hva du får</div>
   <div class="section-title">Alt du trenger. Ingenting du ikke forstår.</div>
   <div class="feature-grid">
-    <div class="feature-card"><div class="feature-icon" style="background:#EEE8DA;">📄</div><h3>Kvartalsrapport på 30 sekunder — helt uten finanssjargong!</h3><p>AI leser de lange rapportene og gir deg det viktigste — hva gikk bra, hva gikk dårlig, og hvilke risikoer ledelsen selv advarer om.</p></div>
+    <div class="feature-card"><div class="feature-icon" style="background:#EEE8DA;">📄</div><h3>Kvartalsrapport på 30 sekunder</h3><p>AI leser de lange rapportene og gir deg det viktigste — hva gikk bra, hva gikk dårlig, og hvilke risikoer ledelsen selv advarer om.</p></div>
     <div class="feature-card"><div class="feature-icon" style="background:#E6EEF5;">⚖️</div><h3>Alltid begge sider</h3><p>For hvert selskap ser du bull-caset og bear-caset side om side. Du bestemmer selv — «Forstå mulighetene. Se risikoen»</p></div>
     <div class="feature-card"><div class="feature-icon" style="background:#EEE8DA;">📊</div><h3>Scenarioer og sannsynlighet</h3><p>Ingen spår fremtiden — men vi viser deg realistiske utfall med sannsynligheter, slik at du forstår risikoen før du handler.</p></div>
     <div class="feature-card"><div class="feature-icon" style="background:#E6EEF5;">💬</div><h3>AI-coach — still alt</h3><p>Stiller du spørsmål om en aksje, får du alltid en balansert analyse — med risiko, usikkerhet og alternative perspektiver inkludert.</p></div>
@@ -278,6 +277,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <div class="cta-title">Klar til å forstå børsen?</div>
   <p class="cta-sub">Velg planen som passer deg — start gratis, oppgrader når du vil.</p>
   <div class="pricing-grid">
+
     <div style="background:#E6EEF5;border:2px solid #b0cce0;border-radius:16px;padding:1.5rem;text-align:left;">
       <div style="font-size:11px;color:#1B3A5C;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Gratis</div>
       <div style="font-family:'Playfair Display',serif;font-size:28px;color:#1B3A5C;margin-bottom:4px;">0 kr</div>
@@ -287,10 +287,11 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
         <div style="font-size:13px;color:#1B3A5C;">✓ AI-chat — 5 spørsmål per dag</div>
         <div style="font-size:13px;color:#1B3A5C;">✓ Watchlist — 2 aksjer</div>
         <div style="font-size:13px;color:#1B3A5C;">✓ Børsbrygg</div>
-        <div style="font-size:13px;color:#1B3A5C;">✓ Læring — under utvikling</div>
+        <div style="font-size:13px;color:#1B3A5C;">✓ Læring</div>
       </div>
       <button onclick="location.href='/auth.html'" style="width:100%;padding:10px;border-radius:100px;border:1px solid #1B3A5C;background:none;color:#1B3A5C;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Start gratis →</button>
     </div>
+
     <div style="background:linear-gradient(135deg,#e8e8e8,#f5f5f5);border:2px solid #bbb;border-radius:16px;padding:1.5rem;text-align:left;position:relative;">
       <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#C8A96E;color:#1B3A5C;font-size:11px;font-weight:500;padding:3px 12px;border-radius:100px;white-space:nowrap;">Mest populær</div>
       <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Investor</div>
@@ -306,6 +307,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
       </div>
       <button onclick="location.href='/priser.html'" style="width:100%;padding:10px;border-radius:100px;border:none;background:#888;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Abonner →</button>
     </div>
+
     <div style="background:linear-gradient(135deg,#FFF8E7,#FFF0C0);border:2px solid #C8A96E;border-radius:16px;padding:1.5rem;text-align:left;">
       <div style="font-size:11px;color:#1a1a1a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Proff</div>
       <div style="font-family:'Playfair Display',serif;font-size:28px;color:#1a1a1a;margin-bottom:4px;">149 kr</div>
@@ -322,6 +324,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
       </div>
       <button onclick="location.href='/priser.html'" style="width:100%;padding:10px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
     </div>
+
   </div>
   <p class="footer-note">Ingen bindingstid. Avslutt når som helst.</p>
 </section>
