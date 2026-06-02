@@ -271,7 +271,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
 const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
 
@@ -477,22 +477,31 @@ async function confirmDelete() {
   const btn = document.getElementById('confirmDeleteBtn');
   btn.textContent = 'Sletter...'; btn.disabled = true;
   try {
-    const { data: { session: deleteSession } } = await sb.auth.getSession();
-    const deleteToken = deleteSession?.access_token || '';
-    const res = await fetch('/api/delete-account', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + deleteToken },
-      body: JSON.stringify({ user_id: currentUser.id })
-    });
-    const data = await res.json();
-    // Uansett hva API returnerer — logg ut og redirect
+    var deleteToken = '';
+    try {
+      var delSess = (await sb.auth.getSession()).data.session;
+      deleteToken = delSess ? delSess.access_token : '';
+    } catch(e) {}
+
+    try {
+      await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + deleteToken },
+        body: JSON.stringify({ user_id: currentUser.id })
+      });
+    } catch(e) {}
+
+    // Alltid logg ut og redirect uansett
     try { await sb.auth.signOut(); } catch(e) {}
     localStorage.clear();
     sessionStorage.clear();
     window.location.href = '/auth.html';
   } catch(e) {
-    alert('Noe gikk galt. Kontakt kontakt@borshjelpen.no');
-    btn.textContent = 'Slett konto permanent'; btn.disabled = false;
+    // Selv ved total feil — logg ut
+    try { await sb.auth.signOut(); } catch(e2) {}
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = '/auth.html';
   }
 }
 
