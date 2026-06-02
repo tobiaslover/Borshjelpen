@@ -478,9 +478,10 @@ async function confirmDelete() {
   try {
     // Hent sesjon direkte — ikke stol på currentUser
     var delSess = null;
-    try { delSess = (await sb.auth.getSession()).data.session; } catch(e) {}
+    try { delSess = (await sb.auth.getSession()).data.session; } catch(e) { console.error('getSession feil:', e); }
     var deleteToken = delSess ? delSess.access_token : '';
     var userId = delSess ? delSess.user.id : (currentUser ? currentUser.id : null);
+    console.log('Delete: userId=', userId, 'token=', deleteToken ? 'OK' : 'MANGLER');
 
     if (userId) {
       try {
@@ -505,9 +506,9 @@ async function confirmDelete() {
   }
 }
 
-function toggleDropdown() { document.getElementById('dropdown').classList.toggle('open'); }
+function toggleDropdown() { var d = document.getElementById('dropdown'); if (d) d.classList.toggle('open'); }
 document.addEventListener('click', e => {
-  if (!e.target.closest('.user-pill') && !e.target.closest('.dropdown')) document.getElementById('dropdown').classList.remove('open');
+  var dd = document.getElementById('dropdown'); if (dd && !e.target.closest('.user-pill') && !e.target.closest('.dropdown')) dd.classList.remove('open');
   if (e.target === document.getElementById('editModal')) closeEditModal();
   if (e.target === document.getElementById('cancelModal')) closeCancelModal();
   if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
