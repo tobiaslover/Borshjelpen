@@ -46,7 +46,6 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 .stat-lbl { font-size: 11px; color: #888; margin-top: 3px; }
 .watch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 @media (min-width: 600px) { .watch-grid { grid-template-columns: repeat(3, 1fr); }
-#planGrid { grid-template-columns: repeat(3, 1fr); }
 #accountBtns { flex-direction: row; justify-content: center; } }
 .wcard { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1rem; cursor: pointer; transition: border-color .15s; }
 .wcard:hover { border-color: #1B3A5C; }
@@ -85,6 +84,8 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
   .nav-tabs { display: none !important; }
   .user-pill { display: none !important; }
 }
+#planGrid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 700px) { #planGrid { grid-template-columns: repeat(3, 1fr); } }
 </style>
 </head>
 <body>
@@ -215,7 +216,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 
   <div style="margin-top:1.5rem;">
     <div class="section-label" style="margin-bottom:1rem;">Oppgrader abonnement</div>
-    <div id="planGrid" style="display:grid;grid-template-columns:1fr;gap:1rem;">
+    <div id="planGrid">
 
       <div style="background:#E6EEF5;border:2px solid #b0cce0;border-radius:16px;padding:1.25rem;">
         <div style="font-size:11px;color:#1B3A5C;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Gratis</div>
