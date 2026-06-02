@@ -522,7 +522,8 @@ async function generateAI(s) {
     }
   }
   try {
-    var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(s)});
+    var token = (await sb.auth.getSession()).data.session?.access_token || '';
+    var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify(s)});
     var ai = await res.json();
     var sec = document.getElementById('ai-section');
     if (!sec) return;
@@ -623,7 +624,8 @@ async function loadQuarterlyReport(s) {
   if (plan !== 'proff') { showQLockedMsg(); return; }
   document.getElementById('qBody').innerHTML = '<div class="quarterly-loading"><div class="quarterly-spinner"></div>AI analyserer siste kvartalsrapport...</div>';
   try {
-    var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(s)});
+    var token = (await sb.auth.getSession()).data.session?.access_token || '';
+    var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify(s)});
     var ai = await res.json();
     if (!res.ok || ai.error) { document.getElementById('qBody').innerHTML = '<div class="quarterly-loading">Kunne ikke laste kvartalsrapport.</div>'; return; }
     var bull = (ai.bull||[]).slice(0,2); var bear = (ai.bear||[]).slice(0,2);
@@ -654,7 +656,8 @@ async function sendMessage() {
   addMsg('user', text); chatHistory.push({role:'user', content:text}); addTyping();
   if (currentStockContext) logActivity('chat', currentStockContext.ticker, currentStockContext.name);
   try {
-    var res = await fetch('/api/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({messages:chatHistory, context:currentStockContext})});
+    var tokenChat = (await sbChat.auth.getSession()).data.session?.access_token || '';
+    var res = await fetch('/api/chat', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+tokenChat}, body: JSON.stringify({messages:chatHistory, context:currentStockContext})});
     removeTyping();
     var data = await res.json();
     if (!res.ok || data.error) { addMsg('ai', 'Beklager, prøv igjen.'); }
@@ -805,7 +808,8 @@ async function analyzePortfolioFresh() {
   var total = portfolio.reduce(function(sum, p) { return sum + p.pct; }, 0);
   var portfolioText = portfolio.map(function(p) { return p.ticker + ' (' + p.name + ', ' + p.sector + '): ' + p.pct + '% av porteføljen'; }).join('\n');
   try {
-    var res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål. Bruk IKKE ### eller markdown-headings. Gi ALDRI kjøps- eller salgsanbefalinger.' }], context: null }) });
+    var pfToken = window._sb ? ((await window._sb.auth.getSession()).data.session?.access_token || '') : '';
+    var res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pfToken }, body: JSON.stringify({ messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål. Bruk IKKE ### eller markdown-headings. Gi ALDRI kjøps- eller salgsanbefalinger.' }], context: null }) });
     var data = await res.json();
     var reply = (data.reply || 'Kunne ikke analysere.').replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>').replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>').replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>').replace(/\n/g, '');
     var pfKey = 'pf_analysis_' + portfolio.map(function(p){return p.ticker+p.pct;}).join('_');
