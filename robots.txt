@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /profil.html
+Disallow: /auth.html
+
+Sitemap: https://borshjelpen.no/sitemap.xml
