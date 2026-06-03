@@ -544,14 +544,23 @@ async function logActivity(type, ticker, name) {
   try {
     var sb = window._sb; if (!sb) return;
     var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
+    var xp = XP_VALUES[type] || 0;
     var { error } = await sb.from('user_activity').insert({
       user_id: sess.user.id,
       type: type,
       ticker: ticker || null,
       name: name || null,
-      xp: XP_VALUES[type] || 0
+      xp: xp
     });
     if (error) console.warn('logActivity feil:', error.message);
+    // Oppdater total_xp i user_plans
+    if (xp > 0) {
+      try {
+        var { data: plan } = await sb.from('user_plans').select('total_xp').eq('user_id', sess.user.id).maybeSingle();
+        var currentXp = (plan && plan.total_xp) || 0;
+        await sb.from('user_plans').upsert({ user_id: sess.user.id, total_xp: currentXp + xp }, { onConflict: 'user_id' });
+      } catch(e) {}
+    }
   } catch(e) {}
 }
 
@@ -572,7 +581,8 @@ async function generateAI(s) {
   }
   try {
     var token = (await sb.auth.getSession()).data.session?.access_token || '';
-    var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify(s)});
+    var stockWithLabel = Object.assign({}, s, {marketLabel: getMarketLabel()});
+    var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify(stockWithLabel)});
     var ai = await res.json();
     var sec = document.getElementById('ai-section');
     if (!sec) return;
@@ -674,7 +684,8 @@ async function loadQuarterlyReport(s) {
   document.getElementById('qBody').innerHTML = '<div class="quarterly-loading"><div class="quarterly-spinner"></div>AI analyserer siste kvartalsrapport...</div>';
   try {
     var token = (await sb.auth.getSession()).data.session?.access_token || '';
-    var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify(s)});
+    var stockWithLabel = Object.assign({}, s, {marketLabel: getMarketLabel()});
+    var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify(stockWithLabel)});
     var ai = await res.json();
     if (!res.ok || ai.error) { document.getElementById('qBody').innerHTML = '<div class="quarterly-loading">Kunne ikke laste kvartalsrapport.</div>'; return; }
     var bull = (ai.bull||[]).slice(0,2); var bear = (ai.bear||[]).slice(0,2);
