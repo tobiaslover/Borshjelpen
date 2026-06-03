@@ -52,7 +52,7 @@ JSON-struktur:
         },
         {
           role: 'user',
-          content: `Analyser ${stock.name} (${stock.ticker}). Kurs: ${stock.price} NOK, endring: ${stock.changePct}%, P/E: ${stock.pe}, utbytte: ${stock.dividendYield}, markedsverdi: ${stock.marketCap}, beta: ${stock.beta}, sektor: ${stock.sector}`
+          content: `Analyser ${stock.name} (${stock.ticker}). Kurs: ${stock.price} NOK, endring: ${stock.changePct}% (${stock.marketLabel || 'siden siste stenging'}), P/E: ${stock.pe}, utbytte: ${stock.dividendYield}, markedsverdi: ${stock.marketCap}, beta: ${stock.beta}, sektor: ${stock.sector}`
         }
       ]
     });
