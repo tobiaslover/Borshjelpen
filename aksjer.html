@@ -837,7 +837,7 @@ async function renderWatchlist() {
       '<div class="wl-price-row"><span class="wl-price">—</span></div></div>';
   }).join('');
 }
-renderWatchlist(); }
+// renderWatchlist() kalles etter auth er satt opp }
   else {
     if (list.length >= limit) { showUpgradeModal('Du har nådd grensen på ' + limit + ' aksjer i watchlist. Oppgrader til Investor for opptil 10 aksjer.'); return; }
     list.push({ticker:s.ticker, name:s.name, price:s.price, changePct:s.changePct, up:s.up, currency:s.currency});
@@ -865,7 +865,7 @@ function renderWatchlist() {
       '<div class="wl-price-row"><span class="wl-price">'+priceStr+' kr</span><span class="'+cls+'">'+sign+s.changePct+'%</span></div></div>';
   }).join('');
 }
-renderWatchlist();
+// renderWatchlist() kalles etter auth er satt opp
 
 var portfolio = [];
 function savePortfolio() { try { localStorage.setItem('bh_portfolio', JSON.stringify(portfolio)); } catch(e) {} }
@@ -965,6 +965,7 @@ window.addEventListener('load', function() { setTimeout(initPortfolio, 800); loa
     var sb = supabase.createClient('https://twckvtwzyadevqbyehnu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c');
     window._sb = sb;
     var sess = (await sb.auth.getSession()).data.session;
+    renderWatchlist();
     if (sess) {
       var user = sess.user;
       var name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
