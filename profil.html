@@ -342,7 +342,7 @@ async function loadWatchlist() {
       var addBtn = '<div class="wcard add" onclick="location.href=\'aksjer.html\'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
     if (list.length === 0) { grid.innerHTML = addBtn; return; }
     grid.innerHTML = list.map(function(s) {
-      var card = '<div class="wcard" onclick="location.href='/aksjer.html?ticker=' + s.ticker + ''">';
+      var card = '<div class="wcard" onclick="location.href=\'/aksjer.html?ticker=' + s.ticker + '\'">' ;
       card += '<div class="wt">' + s.ticker + '</div>';
       card += '<div class="wn">' + (s.name||s.ticker).split(' ')[0] + '</div>';
       card += '<div class="wrow"><span class="wp" id="profwlp-' + s.ticker + '">—</span></div></div>';
