@@ -183,7 +183,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 <body>
 
 <nav class="nav">
-  <a href="borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <a href="/oversikt.html" class="logo">Børs<span>hjelpen</span></a>
   <div class="nav-links">
     <a href="/borshjelpen.html">Hjem</a>
     <a href="/oversikt.html" id="navOversikt" style="display:none;">Oversikt</a>
@@ -757,14 +757,87 @@ document.addEventListener('click', function(e) { if (!e.target.closest('.search-
 
 var currentStock = null;
 var WATCHLIST_LIMITS = { free: 2, investor: 10, proff: Infinity };
-function getWatchlist() { try { return JSON.parse(localStorage.getItem('bh_watchlist') || '[]'); } catch(e) { return []; } }
-function saveWatchlist(list) { localStorage.setItem('bh_watchlist', JSON.stringify(list)); }
+
+async function getWatchlist() {
+  var sb = window._sb; if (!sb) return [];
+  var sess = (await sb.auth.getSession()).data.session; if (!sess) return [];
+  try {
+    var { data } = await sb.from('user_watchlist').select('*').eq('user_id', sess.user.id).order('created_at', {ascending:true});
+    return data || [];
+  } catch(e) { return []; }
+}
+
+async function saveWatchlistItem(ticker, name) {
+  var sb = window._sb; if (!sb) return;
+  var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
+  try {
+    await sb.from('user_watchlist').upsert({user_id: sess.user.id, ticker: ticker, name: name}, {onConflict:'user_id,ticker'});
+  } catch(e) {}
+}
+
+async function removeWatchlistItem(ticker) {
+  var sb = window._sb; if (!sb) return;
+  var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
+  try {
+    await sb.from('user_watchlist').delete().eq('user_id', sess.user.id).eq('ticker', ticker);
+  } catch(e) {}
+}
+
 function getWatchlistLimit() { return WATCHLIST_LIMITS['free']; }
-function toggleWatchlist(s) {
+
+async function toggleWatchlist(s) {
   if (!s) return;
-  var list = getWatchlist(); var limit = getWatchlistLimit();
-  var idx = list.findIndex(function(w) { return w.ticker === s.ticker; });
-  if (idx >= 0) { list.splice(idx, 1); saveWatchlist(list); renderWatchlistBtn(s); renderWatchlist(); }
+  var list = await getWatchlist();
+  var limit = getWatchlistLimit();
+  var exists = list.find(function(w) { return w.ticker === s.ticker; });
+  if (exists) {
+    await removeWatchlistItem(s.ticker);
+    renderWatchlistBtn(s, false);
+    await renderWatchlist();
+  } else {
+    if (list.length >= limit) { showUpgradeModal('Du har nådd grensen på ' + limit + ' aksjer i watchlist. Oppgrader til Investor for opptil 10 aksjer.'); return; }
+    await saveWatchlistItem(s.ticker, s.name);
+    renderWatchlistBtn(s, true);
+    await renderWatchlist();
+    logActivity('watchlist', s.ticker, s.name);
+  }
+}
+
+async function removeFromWatchlist(ticker) {
+  await removeWatchlistItem(ticker);
+  await renderWatchlist();
+  if (currentStock && currentStock.ticker === ticker) renderWatchlistBtn(currentStock, false);
+}
+
+async function renderWatchlistBtn(s, inList) {
+  if (inList === undefined) {
+    var list = await getWatchlist();
+    inList = list.some(function(w){return w.ticker===s.ticker;});
+  }
+  currentStock = s;
+  var btn = document.getElementById('watchlistBtn'); if (!btn) return;
+  btn.textContent = inList ? '✓ I watchlist' : '+ Legg til watchlist';
+  btn.style.background = inList ? '#E1F5EE' : 'none';
+  btn.style.color = inList ? '#085041' : '#888';
+  btn.style.borderColor = inList ? '#a8dcc8' : '#e8e8e8';
+}
+
+async function renderWatchlist() {
+  var list = await getWatchlist();
+  var section = document.getElementById('watchlistSection');
+  var grid = document.getElementById('watchlistGrid');
+  var limit = getWatchlistLimit();
+  if (!list.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  document.getElementById('watchlistLimit').textContent = list.length + '/' + (limit===Infinity?'∞':limit) + ' aksjer';
+  grid.innerHTML = list.map(function(s) {
+    return '<div class="watchlist-card" onclick="search('' + s.ticker + '')">' +
+      '<button class="watchlist-remove" onclick="event.stopPropagation();removeFromWatchlist(''+s.ticker+'')" title="Fjern">✕</button>' +
+      '<div class="wl-ticker-tag">'+s.ticker+'</div><div class="wl-name">'+(s.name||s.ticker).split(' ')[0]+'</div>' +
+      '<div class="wl-price-row"><span class="wl-price">—</span></div></div>';
+  }).join('');
+}
+renderWatchlist(); }
   else {
     if (list.length >= limit) { showUpgradeModal('Du har nådd grensen på ' + limit + ' aksjer i watchlist. Oppgrader til Investor for opptil 10 aksjer.'); return; }
     list.push({ticker:s.ticker, name:s.name, price:s.price, changePct:s.changePct, up:s.up, currency:s.currency});
