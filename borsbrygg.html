@@ -522,7 +522,8 @@ document.getElementById('archiveModal').addEventListener('click', function(e) {
       loadBorsbrygg();
       loadWinnersLosers();
       loadArchive(true);
-      try { await sb.from('user_activity').insert({ user_id: session.user.id, type: 'borsbrygg', ticker: null, name: 'Børsbrygg lest', xp: 5 }); } catch(e) {}
+      try { await sb.from('user_activity').insert({ user_id: session.user.id, type: 'borsbrygg', ticker: null, name: 'Børsbrygg lest', xp: 5 });
+      try { var bpd = await sb.from('user_plans').select('total_xp').eq('user_id', session.user.id).maybeSingle(); var bxp = (bpd.data && bpd.data.total_xp) || 0; await sb.from('user_plans').upsert({ user_id: session.user.id, total_xp: bxp + 5 }, { onConflict: 'user_id' }); } catch(e) {} } catch(e) {}
     } else {
       document.getElementById('lockedView').style.display = 'block';
       document.getElementById('subscriberView').style.display = 'none';
