@@ -395,8 +395,16 @@ function getMarketLabel() {
   var now = new Date();
   var oslo = new Date(now.toLocaleString('en-US', {timeZone: 'Europe/Oslo'}));
   var h = oslo.getHours(), m = oslo.getMinutes(), day = oslo.getDay();
-  if (day >= 1 && day <= 5 && (h > 9 || (h === 9 && m >= 0)) && (h < 16 || (h === 16 && m <= 25))) return 'siden åpning';
-  return 'siden forrige sluttkurs';
+  var isWeekday = day >= 1 && day <= 5;
+  var marketOpen = h > 9 || (h === 9 && m >= 0);
+  var marketClosed = h > 16 || (h === 16 && m > 25);
+  var duringTrading = isWeekday && marketOpen && !marketClosed;
+  var afterClose = isWeekday && marketClosed;
+  var beforeOpen = isWeekday && !marketOpen;
+
+  if (duringTrading) return 'siden åpning';
+  if (afterClose) return 'i dag';
+  return 'i går';
 }
 
 function renderStock(s) {
