@@ -66,6 +66,7 @@ p { font-size: 15px; line-height: 1.9; color: #444; margin-bottom: 1.5rem; }
   <a href="/borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
   <div class="nav-links">
     <a href="/borshjelpen.html">Hjem</a>
+    <a href="/oversikt.html" id="navOversikt" style="display:none;">Oversikt</a>
     <a href="/aksjer.html">Aksjer</a>
     <a href="/laer.html">Lær</a>
     <a href="/borsbrygg.html">Børsbrygg</a>
@@ -92,6 +93,7 @@ p { font-size: 15px; line-height: 1.9; color: #444; margin-bottom: 1.5rem; }
   </div>
   <div style="display:flex;flex-direction:column;flex:1;">
     <a href="/borshjelpen.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/oversikt.html" id="mobileOversikt" onclick="closeMobileMenu()" style="display:none;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📊</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Oversikt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Lær</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
@@ -155,6 +157,8 @@ p { font-size: 15px; line-height: 1.9; color: #444; margin-bottom: 1.5rem; }
       var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
       document.getElementById('navAuth').style.display = 'none';
       document.getElementById('navUser').style.display = 'flex';
+      if(document.getElementById('navOversikt')) document.getElementById('navOversikt').style.display = 'block';
+      if(document.getElementById('mobileOversikt')) document.getElementById('mobileOversikt').style.display = 'flex';
       document.getElementById('navAv').textContent = initials;
       document.getElementById('navName').textContent = name.split(' ')[0];
       if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
