@@ -61,8 +61,8 @@ Svar KUN med gyldig JSON. Bruk BARE ASCII-kompatible nøkkelnavn (ingen æøå i
 JSON-struktur (bruk eksakt disse nøklene):
 {
   "tittel": "Kort tittel maks 10 ord",
-  "hva_skjedde": "2-3 setninger om hva som skjedde på Oslo Børs",
-  "globale_faktorer": "2-3 setninger om globale faktorer",
+  "hva_skjedde": "2-3 setninger om hva som skjedde på Oslo Børs I GÅR (ikke i dag)",
+  "globale_faktorer": "2-3 setninger om globale faktorer som påvirket børsen I GÅR",
   "nyheter": [
     { "tittel": "Nyhetstittel", "tekst": "2-3 setninger", "aksje": "TICKER eller null", "kilde": "Kildetype" }
   ],
@@ -72,7 +72,7 @@ JSON-struktur (bruk eksakt disse nøklene):
   "risiko": "2-3 setninger om risikoer",
   "nybegynner_tips": {
     "overskrift": "Velg ett begrep fra DAGENS nyheter og forhandle det (f.eks. hvis Equinor er omtalt: 'Hva er oljeprisrisiko?', hvis renter nevnes: 'Hva betyr renter for aksjer?', hvis kvartal nevnes: 'Hva er en kvartalsrapport?')",
-    "intro": "Forklar begrepet enkelt med utgangspunkt i hva som skjedde i dag på Oslo Børs",
+    "intro": "Forklar begrepet enkelt med utgangspunkt i hva som skjedde på Oslo Børs i går",
     "punkter": ["Konkret punkt knyttet til noe fra dagens nyheter", "Enkelt forklarende punkt", "Praktisk punkt nybegynnere kan bruke", "Punkt som knytter begrepet til en aksje fra dagens utgave"],
     "konklusjon": "Avslutt med å knytte tipset direkte tilbake til noe konkret fra dagens børsdag"
   }
@@ -80,7 +80,7 @@ JSON-struktur (bruk eksakt disse nøklene):
         },
         {
           role: 'user',
-          content: 'Dagens kursdata: ' + stockSummary
+          content: 'Kursdata fra gårsdagens børsdag på Oslo Børs: ' + stockSummary
         }
       ]
     });
