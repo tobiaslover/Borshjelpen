@@ -477,7 +477,7 @@ function getStockType(s) {
 }
 
 var DEV_MODE = window.location.hostname.includes('vercel.app');
-var PLANS = { free: {aiAnalysis:2, aiChat:5, watchlist:2}, investor: {aiAnalysis:-1, aiChat:-1, watchlist:10}, proff: {aiAnalysis:-1, aiChat:-1, watchlist:-1} };
+var PLANS = { free: {aiAnalysis:2, aiChat:5, watchlist:2}, investor: {aiAnalysis:200, aiChat:200, watchlist:10}, proff: {aiAnalysis:200, aiChat:200, watchlist:-1} };
 var XP_VALUES = { search: 2, chat: 1, borsbrygg: 5, login: 3, watchlist: 5 };
 
 async function getUserPlan(sb) {
