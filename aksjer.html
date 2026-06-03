@@ -839,14 +839,6 @@ async function renderWatchlist() {
     return card;
   }).join('');
 }
-// renderWatchlist() kalles etter auth er satt opp }
-  else {
-    if (list.length >= limit) { showUpgradeModal('Du har nådd grensen på ' + limit + ' aksjer i watchlist. Oppgrader til Investor for opptil 10 aksjer.'); return; }
-    list.push({ticker:s.ticker, name:s.name, price:s.price, changePct:s.changePct, up:s.up, currency:s.currency});
-    saveWatchlist(list); renderWatchlistBtn(s); renderWatchlist(); logActivity('watchlist', s.ticker, s.name);
-  }
-}
-function removeFromWatchlist(ticker) { var list = getWatchlist().filter(function(w){return w.ticker!==ticker;}); saveWatchlist(list); renderWatchlist(); if (currentStock&&currentStock.ticker===ticker) renderWatchlistBtn(currentStock); }
 
 // renderWatchlist() kalles etter auth er satt opp
 
