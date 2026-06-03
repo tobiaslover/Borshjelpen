@@ -831,8 +831,8 @@ async function renderWatchlist() {
   section.style.display = 'block';
   document.getElementById('watchlistLimit').textContent = list.length + '/' + (limit===Infinity?'∞':limit) + ' aksjer';
   grid.innerHTML = list.map(function(s) {
-    var card = '<div class="watchlist-card" onclick="search('' + s.ticker + '')">';
-    card += '<button class="watchlist-remove" onclick="event.stopPropagation();removeFromWatchlist('' + s.ticker + '')" title="Fjern">✕</button>';
+    var card = '<div class="watchlist-card" onclick="search(&quot;' + s.ticker + '&quot;)">';
+    card += '<button class="watchlist-remove" onclick="event.stopPropagation();removeFromWatchlist(&quot;' + s.ticker + '&quot;)" title="Fjern">✕</button>';
     card += '<div class="wl-ticker-tag">' + s.ticker + '</div>';
     card += '<div class="wl-name">' + (s.name||s.ticker).split(' ')[0] + '</div>';
     card += '<div class="wl-price-row"><span class="wl-price" id="wlprice-' + s.ticker + '">—</span><span class="wl-pct" id="wlpct-' + s.ticker + '" style="font-size:11px;font-weight:500;margin-left:4px;"></span></div></div>';
