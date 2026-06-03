@@ -455,11 +455,11 @@ function filterArticles(category, btn) {
       if(document.getElementById('mobileOversikt')) document.getElementById('mobileOversikt').style.display = 'flex';
       document.getElementById('navAv').textContent = initials;
       document.getElementById('navName').textContent = name.split(' ')[0];
+      if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
     }
   } catch(e) {}
 })();
-function openMobileMenu() {}
-function closeMobileMenu() {}
+
 
 </script>
 <script>
