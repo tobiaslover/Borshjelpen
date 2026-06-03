@@ -334,12 +334,12 @@ async function loadWatchlist() {
     const grid = document.getElementById('watchGrid');
     const sess = (await sb.auth.getSession()).data.session;
     if (!sess) {
-      grid.innerHTML = '<div class="wcard add" onclick="location.href='aksjer.html'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
+      grid.innerHTML = '<div class="wcard add" onclick="location.href=\'aksjer.html\'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
       return;
     }
     const { data } = await sb.from('user_watchlist').select('*').eq('user_id', sess.user.id).order('created_at', {ascending:true});
     const list = data || [];
-    const addBtn = '<div class="wcard add" onclick="location.href='aksjer.html'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
+      var addBtn = '<div class="wcard add" onclick="location.href=\'aksjer.html\'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
     if (list.length === 0) { grid.innerHTML = addBtn; return; }
     grid.innerHTML = list.map(function(s) {
       var card = '<div class="wcard" onclick="location.href='/aksjer.html?ticker=' + s.ticker + ''">';
