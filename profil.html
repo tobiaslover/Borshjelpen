@@ -333,18 +333,34 @@ async function loadWatchlist() {
   try {
     const grid = document.getElementById('watchGrid');
     const sess = (await sb.auth.getSession()).data.session;
-    if (!sess) { grid.innerHTML = '<div class="wcard add" onclick="location.href='aksjer.html'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>'; return; }
-    const { data } = await sb.from('user_watchlist').select('*').eq('user_id', sess.user.id).order('created_at', {ascending:true});
-    const list = data || [];
-    if (list.length === 0) {
+    if (!sess) {
       grid.innerHTML = '<div class="wcard add" onclick="location.href='aksjer.html'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
       return;
     }
+    const { data } = await sb.from('user_watchlist').select('*').eq('user_id', sess.user.id).order('created_at', {ascending:true});
+    const list = data || [];
+    const addBtn = '<div class="wcard add" onclick="location.href='aksjer.html'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
+    if (list.length === 0) { grid.innerHTML = addBtn; return; }
     grid.innerHTML = list.map(function(s) {
-      return '<div class="wcard" onclick="location.href='aksjer.html?ticker=' + s.ticker + ''">' +
-        '<div class="wt">' + s.ticker + '</div><div class="wn">' + (s.name||s.ticker).split(' ')[0] + '</div>' +
-        '<div class="wrow"><span class="wp">—</span></div></div>';
-    }).join('') + '<div class="wcard add" onclick="location.href='aksjer.html'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
+      var card = '<div class="wcard" onclick="location.href='/aksjer.html?ticker=' + s.ticker + ''">';
+      card += '<div class="wt">' + s.ticker + '</div>';
+      card += '<div class="wn">' + (s.name||s.ticker).split(' ')[0] + '</div>';
+      card += '<div class="wrow"><span class="wp" id="profwlp-' + s.ticker + '">—</span></div></div>';
+      return card;
+    }).join('') + addBtn;
+    // Hent live kurs
+    list.forEach(function(s) {
+      fetch('/api/stock?ticker=' + s.ticker)
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          var el = document.getElementById('profwlp-' + s.ticker);
+          if (el && d && !d.error) {
+            var sign = parseFloat(d.changePct) >= 0 ? '+' : '';
+            el.textContent = parseFloat(d.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
+            el.insertAdjacentHTML('afterend', '<span style="font-size:11px;font-weight:500;margin-left:4px;color:' + (parseFloat(d.changePct)>=0?'#2C7A5C':'#A32D2D') + '">' + sign + d.changePct + '%</span>');
+          }
+        }).catch(function(){});
+    });
   } catch(e) {}
 }
 
