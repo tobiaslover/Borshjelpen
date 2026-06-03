@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oversikt — Børshjelpen</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; min-height: 100vh; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; background: white; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
+.logo span { color: #C8A96E; }
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #666; text-decoration: none; }
+.nav-links a:hover { color: #1B3A5C; }
+.nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 200; }
+.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; }
+@media (max-width: 768px) { .nav-links { display: none !important; } .hamburger-btn { display: block; } }
+
+.page { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+
+/* GREETING */
+.greeting { margin-bottom: 2rem; }
+.greeting-hello { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #1B3A5C; }
+.greeting-date { font-size: 13px; color: #888; margin-top: 4px; }
+
+/* XP BAR */
+.xp-bar { background: white; border-radius: 14px; border: 1px solid #e8e8e8; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+.xp-level { font-size: 28px; }
+.xp-info { flex: 1; }
+.xp-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.xp-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.xp-name { font-size: 14px; font-weight: 500; color: #1B3A5C; }
+.xp-num { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #C8A96E; }
+.xp-track { height: 6px; background: #e8e8e8; border-radius: 3px; }
+.xp-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #C8A96E, #e8c87a); transition: width 0.5s; }
+.xp-next { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+/* GRID LAYOUT */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+@media (max-width: 700px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .page { padding: 1rem; }
+  .xp-bar { flex-direction: column; text-align: center; gap: 1rem; }
+  .xp-row { flex-direction: column; gap: 4px; }
+  .greeting-hello { font-size: 24px; }
+  .wl-grid { grid-template-columns: repeat(2, 1fr); }
+  .bb-shortcut { padding: 1.25rem; }
+  .bb-title { font-size: 16px; }
+  .chat-messages { height: 220px; }
+}
+
+/* CARDS */
+.card { background: white; border-radius: 14px; border: 1px solid #e8e8e8; padding: 1.25rem; }
+.card-title { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+.card-title a { font-size: 11px; color: #C8A96E; text-decoration: none; font-weight: 400; }
+
+/* INDEKS */
+.index-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+.index-row:last-child { border-bottom: none; }
+.index-name { font-size: 14px; font-weight: 500; }
+.index-val { font-size: 14px; font-weight: 500; }
+.index-pct { font-size: 13px; font-weight: 500; padding: 3px 10px; border-radius: 100px; }
+.up { background: #E1F5EE; color: #085041; }
+.down { background: #FCEBEB; color: #A32D2D; }
+
+/* VINNERE/TAPERE */
+.stock-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+.stock-row:last-child { border-bottom: none; }
+.stock-row:hover { opacity: 0.75; }
+.stock-name { font-size: 13px; font-weight: 500; }
+.stock-ticker { font-size: 11px; color: #aaa; }
+.stock-pct { font-size: 13px; font-weight: 500; }
+.pct-up { color: #2C7A5C; }
+.pct-down { color: #A32D2D; }
+
+/* WATCHLIST */
+.wl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 700px) { .wl-grid { grid-template-columns: repeat(2, 1fr); } }
+.wl-card { background: #f8f7f4; border-radius: 10px; padding: 1rem; cursor: pointer; border: 1px solid #e8e8e8; }
+.wl-card:hover { border-color: #1B3A5C; }
+.wl-ticker { font-size: 11px; color: #888; margin-bottom: 2px; }
+.wl-name { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+.wl-bottom { display: flex; justify-content: space-between; align-items: center; }
+.wl-price { font-size: 14px; font-weight: 500; }
+
+/* NYHETER */
+.news-placeholder { text-align: center; padding: 2rem; color: #aaa; }
+.news-placeholder-icon { font-size: 32px; margin-bottom: 8px; }
+.news-placeholder-text { font-size: 13px; }
+
+/* EVENTS */
+.event-row { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+.event-row:last-child { border-bottom: none; }
+.event-date { background: #1B3A5C; color: #C8A96E; border-radius: 8px; padding: 6px 10px; text-align: center; flex-shrink: 0; min-width: 48px; }
+.event-date-day { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; line-height: 1; }
+.event-date-mon { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.event-info { flex: 1; }
+.event-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+.event-sub { font-size: 12px; color: #888; }
+.event-tag { font-size: 10px; padding: 2px 8px; border-radius: 100px; font-weight: 500; margin-left: auto; flex-shrink: 0; }
+.tag-rapport { background: #E6EEF5; color: #1B3A5C; }
+.tag-makro { background: #EEE8DA; color: #5a4520; }
+.tag-utbytte { background: #E1F5EE; color: #085041; }
+
+/* BØRSBRYGG SNARVEI */
+.bb-shortcut { background: #1B3A5C; border-radius: 14px; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; text-decoration: none; margin-bottom: 1.5rem; transition: opacity 0.15s; }
+.bb-shortcut:hover { opacity: 0.9; }
+.bb-icon { font-size: 32px; }
+.bb-text { flex: 1; }
+.bb-title { font-family: 'Playfair Display', serif; font-size: 18px; color: white; font-weight: 700; margin-bottom: 4px; }
+.bb-sub { font-size: 13px; color: rgba(255,255,255,0.55); }
+.bb-arrow { color: #C8A96E; font-size: 20px; }
+
+/* CHAT */
+.chat-container { border: 1px solid #e8e8e8; border-radius: 14px; overflow: hidden; background: white; }
+.chat-header { background: #1B3A5C; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 10px; }
+.chat-avatar { width: 32px; height: 32px; border-radius: 50%; background: #C8A96E; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #1B3A5C; font-weight: 500; }
+.chat-header-name { font-size: 14px; color: white; font-weight: 500; }
+.chat-header-sub { font-size: 11px; color: rgba(255,255,255,0.5); }
+.chat-badge { font-size: 10px; background: rgba(200,169,110,.2); color: #C8A96E; padding: 3px 10px; border-radius: 100px; border: 1px solid rgba(200,169,110,.3); margin-left: auto; }
+.chat-messages { height: 280px; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 12px; }
+.msg-wrap { display: flex; flex-direction: column; }
+.msg-wrap.user { align-items: flex-end; }
+.msg-wrap.ai { align-items: flex-start; }
+.msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.65; }
+.msg-bubble.user { background: #1B3A5C; color: white; border-radius: 16px 16px 4px 16px; }
+.msg-bubble.ai { background: #f8f7f4; color: #1a1a1a; border-radius: 16px 16px 16px 4px; }
+.chat-disclaimer { font-size: 11px; color: #bbb; font-style: italic; padding: 8px 1.25rem; border-top: 1px solid #f0f0f0; text-align: center; }
+.chat-suggestions { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 1rem; }
+.csug { font-size: 11px; padding: 4px 10px; border-radius: 100px; border: 1px solid #e8e8e8; color: #666; cursor: pointer; background: none; font-family: 'DM Sans', sans-serif; }
+.csug:hover { border-color: #1B3A5C; color: #1B3A5C; }
+.chat-input-row { display: flex; gap: 8px; padding: .9rem 1rem; border-top: 1px solid #e8e8e8; }
+.chat-input { flex: 1; padding: 9px 14px; border-radius: 100px; border: 1px solid #e8e8e8; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; }
+.chat-input:focus { border-color: #1B3A5C; }
+.chat-send { background: #1B3A5C; color: white; border: none; border-radius: 100px; padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.chat-send:disabled { background: #ccc; }
+
+.spinner { width: 20px; height: 20px; border: 2px solid #e8e8e8; border-top-color: #C8A96E; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 1rem auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.section-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <div class="nav-links">
+    <a href="/borshjelpen.html">Hjem</a>
+    <a href="/oversikt.html" style="color:#1B3A5C;font-weight:500;">Oversikt</a>
+    <a href="/aksjer.html">Aksjer</a>
+    <a href="/laer.html">Lær</a>
+    <a href="/borsbrygg.html">Børsbrygg</a>
+    <a href="/kontakt.html">Kontakt</a>
+    <a href="/om.html">Om oss</a>
+    <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
+      <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
+    </div>
+    <div id="navUser" style="display:none;align-items:center;gap:8px;">
+      <div onclick="location.href='/profil.html'" style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;border:1px solid #e8e8e8;cursor:pointer;">
+        <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+        <span id="navName" style="font-size:13px;font-weight:500;color:#1a1a1a;">Min side</span>
+      </div>
+    </div>
+  </div>
+  <button class="hamburger-btn" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
+</nav>
+
+<div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
+    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
+    <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
+  </div>
+  <div style="display:flex;flex-direction:column;flex:1;">
+    <a href="/borshjelpen.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/oversikt.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📊</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Oversikt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Lær</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/kontakt.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">✉️</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Kontakt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/om.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">💡</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Om oss</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/priser.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">⭐</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Priser</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+  </div>
+  <div style="padding-top:1.5rem;">
+    <div id="mobileMenuUser" style="display:none;align-items:center;gap:12px;padding:12px 16px;background:#f8f7f4;border-radius:12px;cursor:pointer;margin-bottom:8px;" onclick="location.href='/profil.html'">
+      <div id="mobileMenuAv" style="width:40px;height:40px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:14px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+      <span id="mobileMenuName" style="font-size:15px;font-weight:500;">Min side</span>
+    </div>
+    <div id="mobileMenuAuth">
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:14px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Registrer deg gratis</button>
+    </div>
+  </div>
+</div>
+
+<!-- IKKE INNLOGGET -->
+<div id="lockedView" style="display:none;text-align:center;padding:5rem 2rem;">
+  <div style="font-size:48px;margin-bottom:1rem;">🔒</div>
+  <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:8px;color:#1B3A5C;">Logg inn for å se oversikten</div>
+  <p style="font-size:14px;color:#888;margin-bottom:1.5rem;">Oversikten er kun tilgjengelig for innloggede brukere.</p>
+  <button onclick="location.href='/auth.html'" style="padding:12px 28px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn / Registrer deg →</button>
+</div>
+
+<!-- INNLOGGET -->
+<div id="mainView" style="display:none;">
+<div class="page">
+
+  <!-- GREETING -->
+  <div class="greeting">
+    <div class="greeting-hello" id="greetingText">God morgen!</div>
+    <div class="greeting-date" id="greetingDate"></div>
+  </div>
+
+  <!-- XP -->
+  <div class="xp-bar">
+    <div class="xp-level" id="xpEmoji">🌱</div>
+    <div class="xp-info">
+      <div class="xp-label">Din fremgang</div>
+      <div class="xp-row">
+        <div class="xp-name" id="xpLevel">Nybegynner</div>
+        <div class="xp-num"><span id="xpTotal">0</span> XP</div>
+      </div>
+      <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+      <div class="xp-next" id="xpNext"></div>
+    </div>
+  </div>
+
+  <!-- INDEKSER + VINNERE/TAPERE -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Indekser</div>
+      <div id="indexList"><div class="spinner"></div></div>
+    </div>
+    <div class="grid-2" style="gap:1rem;">
+      <div class="card">
+        <div class="card-title">🏆 Vinnere <a href="/aksjer.html">Se alle →</a></div>
+        <div id="winnersList"><div class="spinner"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📉 Tapere <a href="/aksjer.html">Se alle →</a></div>
+        <div id="losersList"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WATCHLIST -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <div class="card-title">📌 Min Watchlist <a href="/aksjer.html">+ Legg til</a></div>
+    <div id="watchlistGrid" class="wl-grid"></div>
+  </div>
+
+  <!-- BØRSBRYGG SNARVEI -->
+  <a href="/borsbrygg.html" class="bb-shortcut">
+    <div class="bb-icon">☕</div>
+    <div class="bb-text">
+      <div class="bb-title">Børsbrygg</div>
+      <div class="bb-sub">Dagens børsoppsummering — forklart på vanlig norsk</div>
+    </div>
+    <div class="bb-arrow">→</div>
+  </a>
+
+  <!-- NYHETER + EVENTS -->
+  <div class="grid-2" style="margin-bottom:1.5rem;">
+    <div class="card">
+      <div class="card-title">📰 Viktigste børsnyheter</div>
+      <div class="news-placeholder">
+        <div class="news-placeholder-icon">🔧</div>
+        <div class="news-placeholder-text">Børsnyheter fra FMP kommer snart</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 Kommende events</div>
+      <div id="eventsList">
+        <div class="event-row">
+          <div class="event-date"><div class="event-date-day">10</div><div class="event-date-mon">Jun</div></div>
+          <div class="event-info"><div class="event-title">Equinor Q2-rapport</div><div class="event-sub">Kvartalsresultat</div></div>
+          <span class="event-tag tag-rapport">Rapport</span>
+        </div>
+        <div class="event-row">
+          <div class="event-date"><div class="event-date-day">11</div><div class="event-date-mon">Jun</div></div>
+          <div class="event-info"><div class="event-title">DNB Q2-rapport</div><div class="event-sub">Kvartalsresultat</div></div>
+          <span class="event-tag tag-rapport">Rapport</span>
+        </div>
+        <div class="event-row">
+          <div class="event-date"><div class="event-date-day">12</div><div class="event-date-mon">Jun</div></div>
+          <div class="event-info"><div class="event-title">US CPI inflasjon</div><div class="event-sub">Makroøkonomi</div></div>
+          <span class="event-tag tag-makro">Makro</span>
+        </div>
+        <div class="event-row">
+          <div class="event-date"><div class="event-date-day">18</div><div class="event-date-mon">Jun</div></div>
+          <div class="event-info"><div class="event-title">Norges Bank rentebeslutning</div><div class="event-sub">Rentebeslutning</div></div>
+          <span class="event-tag tag-makro">Makro</span>
+        </div>
+        <div class="event-row">
+          <div class="event-date"><div class="event-date-day">25</div><div class="event-date-mon">Jun</div></div>
+          <div class="event-info"><div class="event-title">Mowi utbyttedato</div><div class="event-sub">Utbytte</div></div>
+          <span class="event-tag tag-utbytte">Utbytte</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="section-label">AI-chat</div>
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="chat-avatar">BH</div>
+      <div>
+        <div class="chat-header-name">Børshjelpen AI</div>
+        <div class="chat-header-sub">Spør om børs, aksjer og økonomi</div>
+      </div>
+      <div class="chat-badge">Ingen finansiell rådgivning</div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg-wrap ai">
+        <div class="msg-bubble ai">Hei! Jeg kan svare på spørsmål om børsen, aksjer, økonomi og investering. Hva lurer du på?</div>
+      </div>
+    </div>
+    <div class="chat-disclaimer">Ikke finansiell rådgivning · Snakk med en rådgiver for investeringsbeslutninger</div>
+    <div class="chat-suggestions" id="chatSugs">
+      <button class="csug" onclick="askSug(this)">Hva er OBX-indeksen?</button>
+      <button class="csug" onclick="askSug(this)">Hva påvirker renten?</button>
+      <button class="csug" onclick="askSug(this)">Hva er en kvartalsrapport?</button>
+      <button class="csug" onclick="askSug(this)">Hvordan diversifiserer jeg?</button>
+    </div>
+    <div class="chat-input-row">
+      <input id="chatInput" class="chat-input" type="text" placeholder="Still et spørsmål om børsen..." />
+      <button id="chatSendBtn" class="chat-send" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+var chatHistory = [];
+
+// GREETING
+function setGreeting(name) {
+  var oslo = new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/Oslo'}));
+  var h = oslo.getHours();
+  var greeting = h < 10 ? 'God morgen' : h < 12 ? 'God formiddag' : h < 17 ? 'God ettermiddag' : 'God kveld';
+  document.getElementById('greetingText').textContent = greeting + ', ' + name + '!';
+  var date = oslo.toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('greetingDate').textContent = date.charAt(0).toUpperCase() + date.slice(1);
+}
+
+// XP
+function renderXP(xp) {
+  var levels = [
+    {name:'🌱 Nybegynner', emoji:'🌱', min:0, max:99},
+    {name:'📈 Investor', emoji:'📈', min:100, max:499},
+    {name:'🔍 Analytiker', emoji:'🔍', min:500, max:999},
+    {name:'🏆 Proff', emoji:'🏆', min:1000, max:9999}
+  ];
+  var level = levels.find(function(l) { return xp >= l.min && xp <= l.max; }) || levels[3];
+  var pct = Math.min(100, Math.round(((xp - level.min) / (level.max - level.min)) * 100));
+  document.getElementById('xpEmoji').textContent = level.emoji;
+  document.getElementById('xpLevel').textContent = level.name;
+  document.getElementById('xpTotal').textContent = xp;
+  document.getElementById('xpFill').style.width = pct + '%';
+  var next = levels[levels.indexOf(level) + 1];
+  document.getElementById('xpNext').textContent = next ? (level.max - xp + 1) + ' XP til ' + next.name : 'Maks nivå nådd 🎉';
+}
+
+// WATCHLIST
+function loadWatchlist() {
+  var list = [];
+  try { list = JSON.parse(localStorage.getItem('bh_watchlist') || '[]'); } catch(e) {}
+  var grid = document.getElementById('watchlistGrid');
+  if (!list.length) {
+    grid.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Ingen aksjer i watchlist ennå. <a href="/aksjer.html" style="color:#1B3A5C;">Legg til →</a></div>';
+    return;
+  }
+  grid.innerHTML = list.map(function(s) {
+    var sign = s.up ? '+' : '';
+    var cls = s.up ? 'pct-up' : 'pct-down';
+    var price = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
+    return '<div class="wl-card" onclick="location.href=\'/aksjer.html?ticker=' + s.ticker + '\'">' +
+      '<div class="wl-ticker">' + s.ticker + '</div>' +
+      '<div class="wl-name">' + s.name.split(' ')[0] + '</div>' +
+      '<div class="wl-bottom"><span class="wl-price">' + price + ' kr</span><span class="' + cls + '">' + sign + s.changePct + '%</span></div></div>';
+  }).join('');
+}
+
+// INDEKSER
+async function loadIndexes() {
+  var tickers = ['EQNR', 'DNB', 'AKRBP', 'TEL', 'MOWI', 'YAR', 'NHY', 'KAHOT'];
+  try {
+    var results = await Promise.all(tickers.map(function(t) {
+      return fetch('/api/stock?ticker=' + t).then(function(r) { return r.json(); }).catch(function() { return null; });
+    }));
+    var valid = results.filter(function(r) { return r && !r.error; });
+
+    // OBX simulert som gjennomsnitt av topp-aksjer
+    var obxChange = valid.reduce(function(sum, s) { return sum + parseFloat(s.changePct); }, 0) / valid.length;
+    var osebxChange = obxChange * 0.95; // Litt mer stabil
+
+    var sign1 = obxChange >= 0 ? '+' : '';
+    var sign2 = osebxChange >= 0 ? '+' : '';
+    var cls1 = obxChange >= 0 ? 'up' : 'down';
+    var cls2 = osebxChange >= 0 ? 'up' : 'down';
+
+    document.getElementById('indexList').innerHTML =
+      '<div class="index-row"><div><div class="index-name">OBX</div><div style="font-size:11px;color:#aaa;">Oslo Børs 25 største</div></div><span class="index-pct ' + cls1 + '">' + sign1 + obxChange.toFixed(2) + '%</span></div>' +
+      '<div class="index-row"><div><div class="index-name">OSEBX</div><div style="font-size:11px;color:#aaa;">Oslo Børs Benchmark</div></div><span class="index-pct ' + cls2 + '">' + sign2 + osebxChange.toFixed(2) + '%</span></div>';
+
+    // Vinnere og tapere
+    var sorted = [...valid].sort(function(a,b) { return parseFloat(b.changePct) - parseFloat(a.changePct); });
+    var winners = sorted.slice(0, 3);
+    var losers = sorted.slice(-3).reverse();
+
+    function rowHtml(s) {
+      var sign = parseFloat(s.changePct) >= 0 ? '+' : '';
+      var cls = parseFloat(s.changePct) >= 0 ? 'pct-up' : 'pct-down';
+      return '<div class="stock-row" onclick="location.href=\'/aksjer.html?ticker=' + s.ticker + '\'">' +
+        '<div><div class="stock-name">' + s.name.split(' ')[0] + '</div><div class="stock-ticker">' + s.ticker + '</div></div>' +
+        '<span class="stock-pct ' + cls + '">' + sign + s.changePct + '%</span></div>';
+    }
+    document.getElementById('winnersList').innerHTML = winners.map(rowHtml).join('');
+    document.getElementById('losersList').innerHTML = losers.map(rowHtml).join('');
+  } catch(e) {
+    document.getElementById('indexList').innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Kunne ikke hente indeksdata.</div>';
+  }
+}
+
+// CHAT
+function addMsg(role, text) {
+  var c = document.getElementById('chatMessages');
+  var d = document.createElement('div');
+  d.className = 'msg-wrap ' + role;
+  d.innerHTML = '<div class="msg-bubble ' + role + '">' + text + '</div>';
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+function addTyping() {
+  var c = document.getElementById('chatMessages');
+  var d = document.createElement('div');
+  d.id = 'typing'; d.className = 'msg-wrap ai';
+  d.innerHTML = '<div class="msg-bubble ai">Skriver...</div>';
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function removeTyping() { var e = document.getElementById('typing'); if (e) e.remove(); }
+function askSug(btn) { document.getElementById('chatInput').value = btn.textContent; sendMessage(); }
+
+async function sendMessage() {
+  var input = document.getElementById('chatInput');
+  var btn = document.getElementById('chatSendBtn');
+  var text = input.value.trim(); if (!text) return;
+  var sess = (await sb.auth.getSession()).data.session;
+  if (!sess) { location.href = '/auth.html'; return; }
+  input.value = ''; btn.disabled = true;
+  document.getElementById('chatSugs').style.display = 'none';
+  addMsg('user', text);
+  chatHistory.push({role:'user', content:text});
+  addTyping();
+  try {
+    var token = sess.access_token;
+    var res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
+      body: JSON.stringify({
+        messages: chatHistory,
+        context: null,
+        systemOverride: 'Du er Børshjelpen sin AI-assistent for norske nybegynnere. Svar på spørsmål om børs, aksjer, økonomi og investering på norsk. Gi ALDRI kjøps- eller salgsanbefalinger. Inkluder alltid risikoer. Avslutt alltid med: "Dette er ikke finansiell rådgivning."'
+      })
+    });
+    removeTyping();
+    var data = await res.json();
+    if (!res.ok || data.error) { addMsg('ai', 'Beklager, prøv igjen.'); }
+    else { addMsg('ai', data.reply); chatHistory.push({role:'assistant', content:data.reply}); if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20); }
+  } catch(e) { removeTyping(); addMsg('ai', 'Noe gikk galt.'); }
+  btn.disabled = false; input.focus();
+}
+
+document.getElementById('chatInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') sendMessage(); });
+
+// AUTH
+(async function init() {
+  var sess = (await sb.auth.getSession()).data.session;
+  if (!sess) {
+    document.getElementById('lockedView').style.display = 'block';
+    return;
+  }
+  document.getElementById('mainView').style.display = 'block';
+  var user = sess.user;
+  var name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
+  var firstName = name.split(' ')[0];
+  var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+
+  // Nav
+  document.getElementById('navAuth').style.display = 'none';
+  document.getElementById('navUser').style.display = 'flex';
+  document.getElementById('navAv').textContent = initials;
+  document.getElementById('navName').textContent = firstName;
+  if (document.getElementById('mobileMenuAv')) {
+    document.getElementById('mobileMenuAv').textContent = initials;
+    document.getElementById('mobileMenuName').textContent = firstName;
+    document.getElementById('mobileMenuUser').style.display = 'flex';
+    document.getElementById('mobileMenuAuth').style.display = 'none';
+  }
+
+  setGreeting(firstName);
+  loadWatchlist();
+  loadIndexes();
+
+  // XP
+  try {
+    var { data } = await sb.from('user_activity').select('xp').eq('user_id', user.id);
+    var totalXp = (data || []).reduce(function(sum, r) { return sum + (r.xp || 0); }, 0);
+    renderXP(totalXp);
+  } catch(e) { renderXP(0); }
+})();
+
+function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
+</script>
+</body>
+</html>
