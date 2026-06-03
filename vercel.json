@@ -4,5 +4,8 @@
       "path": "/api/cron-borsbrygg",
       "schedule": "0 23 * * *"
     }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/borshjelpen.html" }
   ]
 }
