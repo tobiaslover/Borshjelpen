@@ -845,26 +845,7 @@ async function renderWatchlist() {
   }
 }
 function removeFromWatchlist(ticker) { var list = getWatchlist().filter(function(w){return w.ticker!==ticker;}); saveWatchlist(list); renderWatchlist(); if (currentStock&&currentStock.ticker===ticker) renderWatchlistBtn(currentStock); }
-function renderWatchlistBtn(s) {
-  currentStock = s; var btn = document.getElementById('watchlistBtn'); if (!btn) return;
-  var inList = getWatchlist().some(function(w){return w.ticker===s.ticker;});
-  btn.textContent = inList ? '✓ I watchlist' : '+ Legg til watchlist';
-  btn.style.background = inList ? '#E1F5EE' : 'none'; btn.style.color = inList ? '#085041' : '#888'; btn.style.borderColor = inList ? '#a8dcc8' : '#e8e8e8';
-}
-function renderWatchlist() {
-  var list = getWatchlist(); var section = document.getElementById('watchlistSection'); var grid = document.getElementById('watchlistGrid'); var limit = getWatchlistLimit();
-  if (list.length === 0) { section.style.display = 'none'; return; }
-  section.style.display = 'block';
-  document.getElementById('watchlistLimit').textContent = list.length + '/' + (limit===Infinity?'∞':limit) + ' aksjer';
-  grid.innerHTML = list.map(function(s) {
-    var sign = s.up?'+':''; var cls = s.up?'wl-change-up':'wl-change-down';
-    var priceStr = parseFloat(s.price).toLocaleString('nb-NO',{minimumFractionDigits:2,maximumFractionDigits:2});
-    return '<div class="watchlist-card" onclick="search(\'' + s.ticker + '\')">' +
-      '<button class="watchlist-remove" onclick="event.stopPropagation();removeFromWatchlist(\''+s.ticker+'\')" title="Fjern">✕</button>' +
-      '<div class="wl-ticker-tag">'+s.ticker+'</div><div class="wl-name">'+s.name.split(' ')[0]+'</div>' +
-      '<div class="wl-price-row"><span class="wl-price">'+priceStr+' kr</span><span class="'+cls+'">'+sign+s.changePct+'%</span></div></div>';
-  }).join('');
-}
+
 // renderWatchlist() kalles etter auth er satt opp
 
 var portfolio = [];
