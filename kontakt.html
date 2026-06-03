@@ -215,6 +215,8 @@ var userEmail = null;
   const initials = uname.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
   document.getElementById('navAuth').style.display = 'none';
   document.getElementById('navUser').style.display = 'flex';
+  if(document.getElementById('navOversikt')) document.getElementById('navOversikt').style.display = 'block';
+  if(document.getElementById('mobileOversikt')) document.getElementById('mobileOversikt').style.display = 'flex';
   document.getElementById('navAv').textContent = initials;
   document.getElementById('navName').textContent = uname.split(' ')[0];
   if (document.getElementById('mobileMenuAv')) {
