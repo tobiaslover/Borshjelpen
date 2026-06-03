@@ -91,7 +91,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 <body>
 
 <nav>
-  <a href="/borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <a href="/oversikt.html" class="logo">Børs<span>hjelpen</span></a>
   <div class="nav-tabs">
     <a href="/borshjelpen.html" class="ntab">Hjem</a>
     <a href="/oversikt.html" class="ntab">Oversikt</a>
@@ -329,22 +329,22 @@ async function loadStats(userId) {
   } catch(e) {}
 }
 
-function loadWatchlist() {
+async function loadWatchlist() {
   try {
-    const list = JSON.parse(localStorage.getItem('bh_watchlist') || '[]');
     const grid = document.getElementById('watchGrid');
+    const sess = (await sb.auth.getSession()).data.session;
+    if (!sess) { grid.innerHTML = '<div class="wcard add" onclick="location.href='aksjer.html'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>'; return; }
+    const { data } = await sb.from('user_watchlist').select('*').eq('user_id', sess.user.id).order('created_at', {ascending:true});
+    const list = data || [];
     if (list.length === 0) {
-      grid.innerHTML = '<div class="wcard add" onclick="location.href=\'aksjer.html\'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
+      grid.innerHTML = '<div class="wcard add" onclick="location.href='aksjer.html'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
       return;
     }
     grid.innerHTML = list.map(function(s) {
-      const sign = s.up ? '+' : '';
-      const cls = s.up ? 'badge-up' : 'badge-down';
-      const priceStr = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
-      return '<div class="wcard" onclick="location.href=\'aksjer.html?ticker=' + s.ticker + '\'">' +
-        '<div class="wt">' + s.ticker + '</div><div class="wn">' + s.name.split(' ')[0] + '</div>' +
-        '<div class="wrow"><span class="wp">' + priceStr + ' kr</span><span class="' + cls + '">' + sign + s.changePct + '%</span></div></div>';
-    }).join('') + '<div class="wcard add" onclick="location.href=\'aksjer.html\'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
+      return '<div class="wcard" onclick="location.href='aksjer.html?ticker=' + s.ticker + ''">' +
+        '<div class="wt">' + s.ticker + '</div><div class="wn">' + (s.name||s.ticker).split(' ')[0] + '</div>' +
+        '<div class="wrow"><span class="wp">—</span></div></div>';
+    }).join('') + '<div class="wcard add" onclick="location.href='aksjer.html'"><span style="font-size:22px">+</span><span style="font-size:12px">Legg til aksje</span></div>';
   } catch(e) {}
 }
 
