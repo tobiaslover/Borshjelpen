@@ -396,14 +396,26 @@ function getMarketLabel() {
   var oslo = new Date(now.toLocaleString('en-US', {timeZone: 'Europe/Oslo'}));
   var h = oslo.getHours(), m = oslo.getMinutes(), day = oslo.getDay();
   var isWeekday = day >= 1 && day <= 5;
-  var marketOpen = h > 9 || (h === 9 && m >= 0);
-  var marketClosed = h > 16 || (h === 16 && m > 25);
-  var duringTrading = isWeekday && marketOpen && !marketClosed;
-  var afterClose = isWeekday && marketClosed;
-  var beforeOpen = isWeekday && !marketOpen;
+  var beforeOpen = h < 9;
+  var duringTrading = isWeekday && (h > 9 || (h === 9 && m >= 0)) && (h < 16 || (h === 16 && m <= 25));
+  var afterClose = isWeekday && (h > 16 || (h === 16 && m > 25));
 
+  // Børsen er åpen
   if (duringTrading) return 'siden åpning';
+
+  // Etter stengetid samme dag
   if (afterClose) return 'i dag';
+
+  // Lørdag — siste stenging var fredag
+  if (day === 6) return 'ved siste stenging';
+
+  // Søndag — siste stenging var fredag
+  if (day === 0) return 'ved siste stenging';
+
+  // Hverdag før børsen åpner (00:00–08:59)
+  // Kursdata er fra forrige børsdag
+  if (isWeekday && beforeOpen) return 'i går';
+
   return 'i går';
 }
 
