@@ -150,7 +150,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 <body>
 
 <nav class="nav">
-  <a href="/borshjelpen.html" class="logo">Børs<span>hjelpen</span></a>
+  <a href="/oversikt.html" class="logo">Børs<span>hjelpen</span></a>
   <div class="nav-links">
     <a href="/borshjelpen.html">Hjem</a>
     <a href="/oversikt.html" style="color:#1B3A5C;font-weight:500;">Oversikt</a>
@@ -376,23 +376,26 @@ function renderXP(xp) {
 }
 
 // WATCHLIST
-function loadWatchlist() {
-  var list = [];
-  try { list = JSON.parse(localStorage.getItem('bh_watchlist') || '[]'); } catch(e) {}
+async function loadWatchlist() {
   var grid = document.getElementById('watchlistGrid');
-  if (!list.length) {
-    grid.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Ingen aksjer i watchlist ennå. <a href="/aksjer.html" style="color:#1B3A5C;">Legg til →</a></div>';
-    return;
+  try {
+    var sess = (await sb.auth.getSession()).data.session;
+    if (!sess) { grid.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Ingen aksjer ennå. <a href="/aksjer.html" style="color:#1B3A5C;">Legg til →</a></div>'; return; }
+    var { data } = await sb.from('user_watchlist').select('*').eq('user_id', sess.user.id).order('created_at', {ascending:true});
+    var list = data || [];
+    if (!list.length) {
+      grid.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Ingen aksjer ennå. <a href="/aksjer.html" style="color:#1B3A5C;">Legg til →</a></div>';
+      return;
+    }
+    grid.innerHTML = list.map(function(s) {
+      return '<div class="wl-card" onclick="location.href='/aksjer.html?ticker=' + s.ticker + ''">' +
+        '<div class="wl-ticker">' + s.ticker + '</div>' +
+        '<div class="wl-name">' + (s.name||s.ticker).split(' ')[0] + '</div>' +
+        '<div class="wl-bottom"><span class="wl-price">—</span></div></div>';
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Kunne ikke laste watchlist.</div>';
   }
-  grid.innerHTML = list.map(function(s) {
-    var sign = s.up ? '+' : '';
-    var cls = s.up ? 'pct-up' : 'pct-down';
-    var price = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
-    return '<div class="wl-card" onclick="location.href=\'/aksjer.html?ticker=' + s.ticker + '\'">' +
-      '<div class="wl-ticker">' + s.ticker + '</div>' +
-      '<div class="wl-name">' + s.name.split(' ')[0] + '</div>' +
-      '<div class="wl-bottom"><span class="wl-price">' + price + ' kr</span><span class="' + cls + '">' + sign + s.changePct + '%</span></div></div>';
-  }).join('');
 }
 
 // INDEKSER
