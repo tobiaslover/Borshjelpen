@@ -390,6 +390,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   Kursdata levert av Yahoo Finance · Ikke finansiell rådgivning
 </footer>
 
+<script src="/plans.js"></script>
 <script>
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
@@ -456,8 +457,7 @@ if (nlDateEl) {
   nlDateEl.textContent = today.charAt(0).toUpperCase() + today.slice(1);
 }
 
-// Plangrenser — MÅ holdes i synk med PLANS i aksjer.html (Infinity = ubegrenset)
-const PLANS = { free: {aiAnalysis:2, aiChat:5, watchlist:2}, investor: {aiAnalysis:200, aiChat:200, watchlist:10}, proff: {aiAnalysis:200, aiChat:200, watchlist:Infinity} };
+// Plangrenser hentes fra plans.js (window.PLANS) — én sannhetskilde for hele nettstedet
 (function renderPlanLimits() {
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
   setText('freeAnalysis', PLANS.free.aiAnalysis);
