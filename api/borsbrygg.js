@@ -29,6 +29,15 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).end();
 
+  // Auth-sjekk på POST
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Ikke autentisert' });
+  }
+  const token = authHeader.replace('Bearer ', '');
+  const { data: { user }, error: authError } = await sb.auth.getUser(token);
+  if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
+
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
 
   // Sjekk cache
