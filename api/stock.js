@@ -45,15 +45,29 @@ export default async function handler(req, res) {
     if (ratiosRes.ok) { try { const d = await ratiosRes.json(); ratios = Array.isArray(d) ? d[0] : d; } catch(e) {} }
     if (incomeRes.ok) { try { const d = await incomeRes.json(); income = Array.isArray(d) ? d[0] : d; } catch(e) {} }
 
-    // Hjelpefunksjon for USD-formatering
-    function fmtUSD(val) {
+    // Selskaper som rapporterer i USD
+    const USD_SECTORS = ['Shipping', 'Energy', 'Oil', 'Gas', 'Offshore'];
+    const USD_TICKERS = [
+      'FRONTLINE','GOGL','BWLPG','MPCC','BELCO','FLNG','SDRL','SIEM','2020BULKERS',
+      'EQNR','AKRBP','OKEA','SUBC','TGS','AKSO','VAR','BORR','PGS','TDW'
+    ];
+    const sector = profile?.sector || '';
+    const isUSD = USD_TICKERS.includes(upper) ||
+                  USD_SECTORS.some(s => sector.toLowerCase().includes(s.toLowerCase()));
+    const reportCurrency = isUSD ? 'USD' : 'NOK';
+
+    function fmtMoney(val, currency) {
       if (!val) return null;
       const abs = Math.abs(val);
       const sign = val < 0 ? '-' : '';
-      if (abs >= 1e9) return sign + (abs/1e9).toFixed(1) + ' mrd USD';
-      if (abs >= 1e6) return sign + (abs/1e6).toFixed(0) + ' mill USD';
-      return sign + val.toLocaleString('nb-NO') + ' USD';
+      if (abs >= 1e12) return sign + (abs/1e12).toFixed(1) + ' tn ' + currency;
+      if (abs >= 1e9) return sign + (abs/1e9).toFixed(1) + ' mrd ' + currency;
+      if (abs >= 1e6) return sign + (abs/1e6).toFixed(0) + ' mill ' + currency;
+      return sign + val.toLocaleString('nb-NO') + ' ' + currency;
     }
+
+    // Alias for bakoverkompatibilitet
+    function fmtUSD(val) { return fmtMoney(val, reportCurrency); }
 
     // P/E
     let pe = null;
@@ -117,6 +131,7 @@ export default async function handler(req, res) {
       sector: profile?.sector || null,
       industry: profile?.industry || null,
       description: profile?.description || null,
+      reportCurrency,
       profitMargin: ratios?.netProfitMarginTTM ? (parseFloat(ratios.netProfitMarginTTM) * 100).toFixed(1) + '%' : null,
       returnOnEquity: metrics?.returnOnEquityTTM ? (parseFloat(metrics.returnOnEquityTTM) * 100).toFixed(1) + '%' : null,
       evEbitda: metrics?.evToEBITDATTM ? parseFloat(metrics.evToEBITDATTM).toFixed(1) : null,
