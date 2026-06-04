@@ -361,11 +361,16 @@ function setGreeting(name) {
 function renderStreak(streak) {
   var el = document.getElementById('streakDisplay');
   if (!el) return;
-  if (streak <= 0) { el.style.display = 'none'; return; }
   el.style.display = 'flex';
-  el.innerHTML = '🔥 <strong>' + streak + '</strong> dager streak';
+  if (streak <= 0) {
+    el.innerHTML = '<span style="opacity:0.5;">🔥 Logg inn daglig for å starte en streak!</span>';
+    return;
+  }
+  var flame = streak >= 30 ? '🔥🔥🔥' : streak >= 7 ? '🔥🔥' : '🔥';
+  el.innerHTML = flame + ' <strong>' + streak + '</strong> dager streak';
   var next = streak < 3 ? 3 : streak < 7 ? 7 : streak < 14 ? 14 : streak < 30 ? 30 : null;
   if (next) el.innerHTML += ' <span style="font-size:11px;color:rgba(255,255,255,0.5);margin-left:4px;">(' + (next - streak) + ' til neste bonus)</span>';
+  else el.innerHTML += ' <span style="font-size:11px;color:#C8A96E;margin-left:4px;">Maks streak! 🏆</span>';
 }
 
 function renderXP(xp) {
@@ -549,11 +554,59 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
   loadWatchlist();
   loadIndexes();
 
-  // XP + Streak
+  // XP + Streak — oppdater streak ved pageload
   try {
     var { data: planInfo } = await sb.from('user_plans').select('total_xp, streak, last_login').eq('user_id', user.id).maybeSingle();
     var totalXp = (planInfo && planInfo.total_xp) || 0;
     var streak = (planInfo && planInfo.streak) || 0;
+    var lastLogin = planInfo && planInfo.last_login;
+    var todayStr = new Date().toISOString().slice(0, 10);
+    var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+    var yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+    // Oppdater streak hvis ikke allerede gjort i dag
+    if (lastLogin !== todayStr) {
+      var newStreak;
+      if (lastLogin === yesterdayStr) {
+        newStreak = streak + 1; // Fortsetter
+      } else {
+        newStreak = 1; // Nullstill eller første gang
+      }
+
+      // Bonus-XP ved milepæler
+      var bonusXp = 0;
+      var bonusMsg = '';
+      if (newStreak === 3)  { bonusXp = 10;  bonusMsg = '3-dagers streak!'; }
+      if (newStreak === 7)  { bonusXp = 25;  bonusMsg = '7-dagers streak!'; }
+      if (newStreak === 14) { bonusXp = 50;  bonusMsg = '14-dagers streak!'; }
+      if (newStreak === 30) { bonusXp = 100; bonusMsg = '30-dagers streak!'; }
+
+      var newXp = totalXp + 3 + bonusXp;
+
+      await sb.from('user_plans').upsert({
+        user_id: user.id,
+        total_xp: newXp,
+        streak: newStreak,
+        last_login: todayStr
+      }, { onConflict: 'user_id' });
+
+      // Logg aktivitet
+      await sb.from('user_activity').insert({ user_id: user.id, type: 'login', ticker: null, name: 'Daglig innlogging', xp: 3 });
+      if (bonusXp > 0) {
+        await sb.from('user_activity').insert({ user_id: user.id, type: 'streak', ticker: null, name: bonusMsg, xp: bonusXp });
+        setTimeout(function() {
+          var el = document.createElement('div');
+          el.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1B3A5C;color:white;padding:14px 24px;border-radius:100px;font-size:14px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);';
+          el.innerHTML = '🔥 ' + bonusMsg + ' +' + bonusXp + ' bonus XP!';
+          document.body.appendChild(el);
+          setTimeout(function() { el.remove(); }, 4000);
+        }, 1000);
+      }
+
+      totalXp = newXp;
+      streak = newStreak;
+    }
+
     renderXP(totalXp);
     renderStreak(streak);
   } catch(e) { renderXP(0); }
