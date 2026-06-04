@@ -40,7 +40,7 @@ JSON-struktur:
   "hva": "2-3 setninger som forklarer hva selskapet faktisk gjør og hvordan de tjener penger — som om du forklarer det til en venn over kaffe. Ikke start med selskapets navn.",
   "hvorfor_eier_folk": "1-2 setninger om hvorfor investorer typisk eier denne aksjen — utbytte, vekst, stabilitet, eksponering mot en trend?",
   "aktuelt": "Hva skjer med selskapet akkurat nå? Hva bryr markedet seg om denne måneden — kvartalstall, makro, oljepris, renter, konkurranse? Vær spesifikk.",
-  "pris_vurdering": "Er aksjen dyr eller billig relativt til historikk og sektor? Bruk P/E, P/B eller andre tilgjengelige tall — men forklar hva det betyr i praksis.",
+  "pris_vurdering": "Bruk de faktiske P/E, P/B, EV/EBITDA og utbyttetall som er oppgitt. Sammenlign med typiske verdier for sektoren og selskapets historikk. Si konkret om dette er høyt eller lavt — og HVORFOR det er slik akkurat nå. Forklar hva tallene betyr i praksis for en nybegynner. Vær spesifikk — ikke generell.",
   "paavirkere": "Hva er de 2-3 viktigste tingene som påvirker kursen på denne aksjen? Oljepris? Renter? Makroøkonomi? Selskapsspesifikt?",
   "bull": ["Konkret positivt argument 1", "Konkret positivt argument 2", "Konkret positivt argument 3"],
   "bear": ["Konkret risiko 1", "Konkret risiko 2", "Konkret risiko 3"],
