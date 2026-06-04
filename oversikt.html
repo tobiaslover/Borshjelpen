@@ -7,6 +7,7 @@
 <meta name="robots" content="noindex">
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/plans.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; min-height: 100vh; }
@@ -318,6 +319,43 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 var chatHistory = [];
+var DEV_MODE = window.location.hostname.includes('vercel.app');
+
+async function getUserPlan() {
+  if (DEV_MODE) return 'proff';
+  try {
+    var sess = (await sb.auth.getSession()).data.session;
+    if (!sess) return 'free';
+    var r = await sb.from('user_plans').select('plan').eq('user_id', sess.user.id).maybeSingle();
+    return (r.data && r.data.plan) || 'free';
+  } catch(e) { return 'free'; }
+}
+
+async function getTodayChatCount() {
+  try {
+    var sess = (await sb.auth.getSession()).data.session;
+    if (!sess) return 0;
+    var today = new Date().toISOString().slice(0, 10);
+    var r = await sb.from('user_activity').select('*', {count:'exact',head:true}).eq('user_id', sess.user.id).eq('type', 'chat').gte('created_at', today + 'T00:00:00Z');
+    return r.count || 0;
+  } catch(e) { return 0; }
+}
+
+async function logChatActivity() {
+  try {
+    var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
+    var today = new Date().toISOString().slice(0, 10);
+    var xp = 1;
+    var { data: todayActs } = await sb.from('user_activity').select('id').eq('user_id', sess.user.id).eq('type', 'chat').gte('created_at', today + 'T00:00:00Z');
+    if (todayActs && todayActs.length >= 100) xp = 0; // maks 100 XP-givende chat per dag
+    await sb.from('user_activity').insert({ user_id: sess.user.id, type: 'chat', ticker: null, name: 'Chat (oversikt)', xp: xp });
+    if (xp > 0) {
+      var { data: plan } = await sb.from('user_plans').select('total_xp').eq('user_id', sess.user.id).maybeSingle();
+      var cur = (plan && plan.total_xp) || 0;
+      await sb.from('user_plans').upsert({ user_id: sess.user.id, total_xp: cur + xp }, { onConflict: 'user_id' });
+    }
+  } catch(e) {}
+}
 
 function setGreeting(name) {
   var oslo = new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/Oslo'}));
@@ -345,15 +383,15 @@ function renderStreak(streak) {
 
 function renderXP(xp) {
   var levels = [
-    {name:'🌱 Nybegynner', emoji:'🌱', min:0, max:99},
-    {name:'📈 Investor', emoji:'📈', min:100, max:499},
-    {name:'🔍 Analytiker', emoji:'🔍', min:500, max:999},
-    {name:'🏆 Proff', emoji:'🏆', min:1000, max:9999}
+    {name:'🌱 Nybegynner', label:'Nybegynner', emoji:'🌱', min:0, max:99},
+    {name:'📈 Investor', label:'Investor', emoji:'📈', min:100, max:499},
+    {name:'🔍 Analytiker', label:'Analytiker', emoji:'🔍', min:500, max:999},
+    {name:'🏆 Proff', label:'Proff', emoji:'🏆', min:1000, max:9999}
   ];
   var level = levels.find(function(l) { return xp >= l.min && xp <= l.max; }) || levels[3];
   var pct = Math.min(100, Math.round(((xp - level.min) / (level.max - level.min)) * 100));
   document.getElementById('xpEmoji').textContent = level.emoji;
-  document.getElementById('xpLevel').textContent = level.name;
+  document.getElementById('xpLevel').textContent = level.label;
   document.getElementById('xpTotal').textContent = xp;
   document.getElementById('xpFill').style.width = pct + '%';
   var next = levels[levels.indexOf(level) + 1];
@@ -385,11 +423,12 @@ async function loadWatchlist() {
           if (data && !data.error) {
             var priceEl = document.getElementById('wlprice-' + s.ticker);
             var pctEl = document.getElementById('wlpct-' + s.ticker);
-            if (priceEl) priceEl.textContent = parseFloat(data.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
+            var p = parseFloat(data.price);
+            if (priceEl && !isNaN(p)) priceEl.textContent = p.toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
             if (pctEl) {
-              var sign = parseFloat(data.changePct) >= 0 ? '+' : '';
+              var sign = data.up ? '+' : '-';
               pctEl.textContent = sign + data.changePct + '%';
-              pctEl.style.color = parseFloat(data.changePct) >= 0 ? '#2C7A5C' : '#A32D2D';
+              pctEl.style.color = data.up ? '#2C7A5C' : '#A32D2D';
               pctEl.style.fontSize = '12px';
               pctEl.style.fontWeight = '500';
             }
@@ -461,6 +500,8 @@ async function loadIndexes() {
 
   } catch(e) {
     document.getElementById('indexList').innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente indeksdata.</div>';
+    var wl = document.getElementById('winnersList'); if (wl) wl.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente data.</div>';
+    var ll = document.getElementById('losersList'); if (ll) ll.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente data.</div>';
   }
 }
 
@@ -495,6 +536,16 @@ async function sendMessage() {
   var text = input.value.trim(); if (!text) return;
   var sess = (await sb.auth.getSession()).data.session;
   if (!sess) { location.href = '/auth.html'; return; }
+  // Daglig chat-grense per plan (samme som aksjer.html)
+  var plan = await getUserPlan();
+  var limits = (window.PLANS && (window.PLANS[plan] || window.PLANS.free)) || { aiChat: 5 };
+  if (limits.aiChat > 0) {
+    var used = await getTodayChatCount();
+    if (used >= limits.aiChat) {
+      addMsg('ai', 'Du har nådd dagens grense på ' + limits.aiChat + ' spørsmål. <a href="/priser.html" style="color:#1B3A5C;font-weight:500;">Oppgrader</a> for flere.');
+      return;
+    }
+  }
   input.value = ''; btn.disabled = true;
   document.getElementById('chatSugs').style.display = 'none';
   addMsg('user', text);
@@ -514,7 +565,7 @@ async function sendMessage() {
     removeTyping();
     var data = await res.json();
     if (!res.ok || data.error) { addMsg('ai', 'Beklager, prøv igjen.'); }
-    else { addMsg('ai', data.reply); chatHistory.push({role:'assistant', content:data.reply}); if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20); }
+    else { addMsg('ai', data.reply); chatHistory.push({role:'assistant', content:data.reply}); if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20); logChatActivity(); }
   } catch(e) { removeTyping(); addMsg('ai', 'Noe gikk galt.'); }
   btn.disabled = false; input.focus();
 }
@@ -555,9 +606,11 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
     var totalXp = (planInfo && planInfo.total_xp) || 0;
     var streak = (planInfo && planInfo.streak) || 0;
     var lastLogin = planInfo && planInfo.last_login;
-    var todayStr = new Date().toISOString().slice(0, 10);
+    // Oslo-dato (YYYY-MM-DD) — sv-SE gir ISO-format. Unngår at streaken ruller ved UTC-midnatt.
+    function osloDate(d) { return new Date(d).toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' }); }
+    var todayStr = osloDate(new Date());
     var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-    var yesterdayStr = yesterday.toISOString().slice(0, 10);
+    var yesterdayStr = osloDate(yesterday);
 
     if (lastLogin !== todayStr) {
       var newStreak;
@@ -614,7 +667,8 @@ function openMoversModal() {
     return;
   }
 
-  var sorted = window._moversData.all || [];
+  var d = window._moversData;
+  var sorted = (d.all && d.all.length) ? d.all : [].concat(d.winners || [], d.losers || []);
   body.innerHTML = sorted.map(function(s) {
     var sign = s.up ? '+' : '-';
     var color = s.up ? '#2C7A5C' : '#A32D2D';
