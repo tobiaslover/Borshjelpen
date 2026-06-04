@@ -661,25 +661,7 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
 })();
 
 async function loadNews() {
-  var list = document.getElementById('newsList');
-  if (!list) return;
-  // Nyheter med AI-oppsummering implementeres med Vercel Pro
-  // Midlertidig: vis lenker til norske finansmedier
-  list.innerHTML =
-    '<div style="display:flex;flex-direction:column;gap:10px;">' +
-    '<a href="https://e24.no/bors-og-finans" target="_blank" rel="noopener" class="news-item">' +
-      '<div class="news-title">E24 — Siste børsnyheter</div>' +
-      '<div class="news-meta"><span class="news-ticker">E24</span><span>e24.no</span></div>' +
-    '</a>' +
-    '<a href="https://www.dn.no/marked" target="_blank" rel="noopener" class="news-item">' +
-      '<div class="news-title">Dagens Næringsliv — Marked</div>' +
-      '<div class="news-meta"><span class="news-ticker">DN</span><span>dn.no</span></div>' +
-    '</a>' +
-    '<a href="https://finansavisen.no" target="_blank" rel="noopener" class="news-item">' +
-      '<div class="news-title">Finansavisen — Siste nyheter</div>' +
-      '<div class="news-meta"><span class="news-ticker">FA</span><span>finansavisen.no</span></div>' +
-    '</a>' +
-    '</div>';
+  // Implementeres med Vercel Pro nyhets-API
 }
 
 
