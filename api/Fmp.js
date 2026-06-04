@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await sb.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
 
-  // Rate limit: gratis 100/dag, investor/proff 500/dag
+  // Rate limit
   const LIMITS = { free: 100, investor: 500, proff: 500 };
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
   const { data: planData } = await sb.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle();
@@ -29,14 +29,15 @@ export default async function handler(req, res) {
   if (!ticker) return res.status(400).json({ error: 'Ticker mangler' });
 
   const apiKey = process.env.FMP_API_KEY;
-  const t = ticker.toUpperCase();
+  const upper = ticker.toUpperCase().replace('.OL', '').replace(':OSE', '');
+  const olSymbol = upper + '.OL';
 
   try {
     const [profileRes, ratiosRes, earningsRes, keyMetricsRes] = await Promise.all([
-      fetch(`https://financialmodelingprep.com/api/v3/profile/${t}?apikey=${apiKey}`),
-      fetch(`https://financialmodelingprep.com/api/v3/ratios-ttm/${t}?apikey=${apiKey}`),
-      fetch(`https://financialmodelingprep.com/api/v3/earnings-surprises/${t}?apikey=${apiKey}`),
-      fetch(`https://financialmodelingprep.com/api/v3/key-metrics-ttm/${t}?apikey=${apiKey}`),
+      fetch(`https://financialmodelingprep.com/stable/profile?symbol=${olSymbol}&apikey=${apiKey}`),
+      fetch(`https://financialmodelingprep.com/stable/ratios-ttm?symbol=${olSymbol}&apikey=${apiKey}`),
+      fetch(`https://financialmodelingprep.com/stable/earnings-surprises?symbol=${olSymbol}&apikey=${apiKey}`),
+      fetch(`https://financialmodelingprep.com/stable/key-metrics-ttm?symbol=${olSymbol}&apikey=${apiKey}`),
     ]);
 
     const [profileData, ratiosData, earningsData, keyMetricsData] = await Promise.all([
@@ -45,9 +46,6 @@ export default async function handler(req, res) {
       earningsRes.json(),
       keyMetricsRes.json(),
     ]);
-
-    console.log('FMP profile status:', profileRes.status);
-    console.log('FMP ratios status:', ratiosRes.status);
 
     const profile = Array.isArray(profileData) ? profileData[0] : profileData;
     const ratios = Array.isArray(ratiosData) ? ratiosData[0] : ratiosData;
@@ -65,13 +63,12 @@ export default async function handler(req, res) {
       employees: profile?.fullTimeEmployees || null,
       website: profile?.website || null,
       country: profile?.country || null,
-      exchange: profile?.exchangeShortName || null,
 
-      // Verdsettelse
+      // Verdsettelse — feltnavnene matcher renderFMPData() i aksjer.html
       peRatio: fmt(ratios?.peRatioTTM),
       pbRatio: fmt(ratios?.priceToBookRatioTTM),
       psRatio: fmt(ratios?.priceToSalesRatioTTM),
-      evEbitda: fmt(keyMetrics?.enterpriseValueOverEBITDATTM),
+      evEbitda: fmt(keyMetrics?.evToEBITDATTM ?? keyMetrics?.enterpriseValueOverEBITDATTM),
       dividendYield: ratios?.dividendYieldTTM ? fmt(ratios.dividendYieldTTM * 100, 2, '%') : null,
 
       // Lønnsomhet
