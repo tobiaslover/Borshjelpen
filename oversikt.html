@@ -63,27 +63,23 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .card-title { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
 .card-title a { font-size: 11px; color: #C8A96E; text-decoration: none; font-weight: 400; }
 
-/* INDEKS */
-.index-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+/* INDEKS — font matched to watchlist */
+.index-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
 .index-row:last-child { border-bottom: none; }
-.index-name { font-size: 15px; font-weight: 500; }
-.index-sub { font-size: 12px; color: #aaa; margin-top: 2px; }
-.index-up { font-size: 15px; font-weight: 500; color: #2C7A5C; }
-.index-down { font-size: 15px; font-weight: 500; color: #A32D2D; }
-.index-val { font-size: 14px; font-weight: 500; }
-.index-pct { font-size: 13px; font-weight: 500; padding: 3px 10px; border-radius: 100px; }
+.index-name { font-size: 13px; font-weight: 500; }
+.index-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+.index-price { font-size: 14px; font-weight: 500; }
+.index-pct { font-size: 12px; font-weight: 500; padding: 3px 8px; border-radius: 100px; }
 .up { background: #E1F5EE; color: #085041; }
 .down { background: #FCEBEB; color: #A32D2D; }
 
-/* VINNERE/TAPERE */
-.stock-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
-.stock-row:last-child { border-bottom: none; }
-.stock-row:hover { opacity: 0.75; }
-.stock-name { font-size: 13px; font-weight: 500; }
-.stock-ticker { font-size: 11px; color: #aaa; }
-.stock-pct { font-size: 13px; font-weight: 500; }
-.pct-up { color: #2C7A5C; }
-.pct-down { color: #A32D2D; }
+/* VINNERE/TAPERE — font matched to watchlist */
+.mover-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+.mover-row:last-child { border-bottom: none; }
+.mover-name { font-size: 13px; font-weight: 500; }
+.mover-ticker { font-size: 11px; color: #aaa; margin-top: 2px; }
+.mover-up { font-size: 12px; font-weight: 500; color: #2C7A5C; }
+.mover-down { font-size: 12px; font-weight: 500; color: #A32D2D; }
 
 /* WATCHLIST */
 .wl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -97,8 +93,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 
 /* NYHETER */
 .news-placeholder { text-align: center; padding: 2rem; color: #aaa; }
-.news-placeholder-icon { font-size: 32px; margin-bottom: 8px; }
-.news-placeholder-text { font-size: 13px; }
 
 /* EVENTS */
 .event-row { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
@@ -149,22 +143,12 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 
 .spinner { width: 20px; height: 20px; border: 2px solid #e8e8e8; border-top-color: #C8A96E; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 1rem auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.section-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
 .news-item { display: flex; flex-direction: column; gap: 4px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer; text-decoration: none; color: inherit; }
 .news-item:last-child { border-bottom: none; }
 .news-item:hover .news-title { color: #1B3A5C; }
 .news-title { font-size: 13px; font-weight: 500; line-height: 1.4; color: #1a1a1a; }
 .news-meta { display: flex; gap: 8px; font-size: 11px; color: #aaa; align-items: center; }
 .news-ticker { background: #E6EEF5; color: #1B3A5C; padding: 2px 7px; border-radius: 100px; font-weight: 500; }
-
-.index-up { color: #2C7A5C; font-size: 15px; font-weight: 500; }
-.index-down { color: #A32D2D; font-size: 15px; font-weight: 500; }
-.mover-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
-.mover-row:last-child { border-bottom: none; }
-.mover-name { font-size: 14px; font-weight: 500; }
-.mover-ticker { font-size: 12px; color: #aaa; margin-top: 2px; }
-.mover-up { font-size: 13px; font-weight: 500; color: #2C7A5C; }
-.mover-down { font-size: 13px; font-weight: 500; color: #A32D2D; }
 </style>
 </head>
 <body>
@@ -335,7 +319,6 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 var chatHistory = [];
 
-// GREETING
 function setGreeting(name) {
   var oslo = new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/Oslo'}));
   var h = oslo.getHours();
@@ -345,7 +328,6 @@ function setGreeting(name) {
   document.getElementById('greetingDate').textContent = date.charAt(0).toUpperCase() + date.slice(1);
 }
 
-// XP
 function renderStreak(streak) {
   var el = document.getElementById('streakDisplay');
   if (!el) return;
@@ -378,7 +360,6 @@ function renderXP(xp) {
   document.getElementById('xpNext').textContent = next ? (level.max - xp + 1) + ' XP til ' + next.name : 'Maks nivå nådd 🎉';
 }
 
-// WATCHLIST
 async function loadWatchlist() {
   var grid = document.getElementById('watchlistGrid');
   try {
@@ -397,7 +378,6 @@ async function loadWatchlist() {
       card += '<div class="wl-bottom"><span class="wl-price" id="wlprice-' + s.ticker + '">—</span><span class="wl-pct" id="wlpct-' + s.ticker + '"></span></div></div>';
       return card;
     }).join('');
-    // Hent live kurs for hver aksje
     list.forEach(function(s) {
       fetch('/api/stock?ticker=' + s.ticker)
         .then(function(r) { return r.json(); })
@@ -421,49 +401,50 @@ async function loadWatchlist() {
   }
 }
 
-// INDEKSER
 async function loadIndexes() {
   try {
     var res = await fetch('/api/movers');
     var data = await res.json();
     if (!res.ok) throw new Error('movers feil');
-    window._moversData = data; // inneholder winners, losers og all (alle 25 OBX)
+    window._moversData = data;
 
-    // Ekte indekser fra Yahoo Finance
     var obx = data.obx;
     var osebx = data.osebx;
+
     function renderIndex(name, sub, idx) {
-      if (!idx) return '<div class="index-row"><div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div><div style="color:#aaa">—</div></div>';
+      if (!idx) return '<div class="index-row"><div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div><div style="color:#aaa;font-size:13px;">—</div></div>';
       var sign = idx.up ? '+' : '-';
-      var cls = idx.up ? 'index-up' : 'index-down';
+      var cls = idx.up ? 'up' : 'down';
       return '<div class="index-row">' +
         '<div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div>' +
         '<div style="text-align:right;">' +
-          (idx.price ? '<div style="font-size:16px;font-weight:500;">' + idx.price + '</div>' : '') +
-          '<div class="' + cls + '">' + sign + idx.changePct + '%</div>' +
+          (idx.price ? '<div class="index-price">' + idx.price + '</div>' : '') +
+          '<span class="index-pct ' + cls + '">' + sign + idx.changePct + '%</span>' +
         '</div>' +
       '</div>';
     }
+
     document.getElementById('indexList').innerHTML =
       renderIndex('OBX', 'Oslo Børs 25 største', obx) +
       renderIndex('OSEBX', 'Oslo Børs Benchmark', osebx);
 
-    // Vinnere
     var winners = data.winners || [];
     var losers = data.losers || [];
-    var winnersMore = winners.slice(3);
-    var losersMore = losers.slice(3);
 
     function renderMover(s) {
       var sign = s.up ? '+' : '-';
       var cls = s.up ? 'mover-up' : 'mover-down';
-      return '<div class="mover-row">' +
-        '<div style="min-width:0;flex:1;"><div class="mover-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</div><div class="mover-ticker">' + s.ticker + '</div></div>' +
+      return '<div class="mover-row" onclick="location.href=\'/aksjer.html?ticker=' + s.ticker + '\'" style="cursor:pointer;">' +
+        '<div style="min-width:0;flex:1;">' +
+          '<div class="mover-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</div>' +
+          '<div class="mover-ticker">' + s.ticker + '</div>' +
+        '</div>' +
         '<div class="' + cls + '" style="flex-shrink:0;white-space:nowrap;">' + sign + s.changePct + '%</div>' +
       '</div>';
     }
 
     var wHtml = winners.slice(0,3).map(renderMover).join('');
+    var winnersMore = winners.slice(3);
     if (winnersMore.length) {
       wHtml += '<div id="winnersMore" style="display:none;">' + winnersMore.map(renderMover).join('') + '</div>';
       wHtml += '<div style="text-align:center;padding:8px 0;"><button onclick="toggleMovers(this.dataset.t)" data-t="winners" id="winnersBtn" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;">Se alle →</button></div>';
@@ -471,6 +452,7 @@ async function loadIndexes() {
     document.getElementById('winnersList').innerHTML = wHtml;
 
     var lHtml = losers.slice(0,3).map(renderMover).join('');
+    var losersMore = losers.slice(3);
     if (losersMore.length) {
       lHtml += '<div id="losersMore" style="display:none;">' + losersMore.map(renderMover).join('') + '</div>';
       lHtml += '<div style="text-align:center;padding:8px 0;"><button onclick="toggleMovers(this.dataset.t)" data-t="losers" id="losersBtn" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;">Se alle →</button></div>';
@@ -486,23 +468,16 @@ function toggleMovers(type) {
   var el = document.getElementById(type + 'More');
   var btn = document.getElementById(type + 'Btn');
   if (!el) return;
-  if (el.style.display === 'none') {
-    el.style.display = 'block';
-    btn.textContent = 'Skjul ↑';
-  } else {
-    el.style.display = 'none';
-    btn.textContent = 'Se alle →';
-  }
+  if (el.style.display === 'none') { el.style.display = 'block'; btn.textContent = 'Skjul ↑'; }
+  else { el.style.display = 'none'; btn.textContent = 'Se alle →'; }
 }
 
-// CHAT
 function addMsg(role, text) {
   var c = document.getElementById('chatMessages');
   var d = document.createElement('div');
   d.className = 'msg-wrap ' + role;
   d.innerHTML = '<div class="msg-bubble ' + role + '">' + text + '</div>';
-  c.appendChild(d);
-  c.scrollTop = c.scrollHeight;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
 }
 function addTyping() {
   var c = document.getElementById('chatMessages');
@@ -546,7 +521,6 @@ async function sendMessage() {
 
 document.getElementById('chatInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') sendMessage(); });
 
-// AUTH
 (async function init() {
   var sess = (await sb.auth.getSession()).data.session;
   if (!sess) {
@@ -559,7 +533,6 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
   var firstName = name.split(' ')[0];
   var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
 
-  // Nav
   document.getElementById('navAuth').style.display = 'none';
   document.getElementById('navUser').style.display = 'flex';
   document.getElementById('navAv').textContent = initials;
@@ -577,7 +550,6 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
   loadNews();
   loadEvents();
 
-  // XP + Streak — oppdater streak ved pageload
   try {
     var { data: planInfo } = await sb.from('user_plans').select('total_xp, streak, last_login').eq('user_id', user.id).maybeSingle();
     var totalXp = (planInfo && planInfo.total_xp) || 0;
@@ -587,16 +559,11 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
     var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
     var yesterdayStr = yesterday.toISOString().slice(0, 10);
 
-    // Oppdater streak hvis ikke allerede gjort i dag
     if (lastLogin !== todayStr) {
       var newStreak;
-      if (lastLogin === yesterdayStr) {
-        newStreak = streak + 1; // Fortsetter
-      } else {
-        newStreak = 1; // Nullstill eller første gang
-      }
+      if (lastLogin === yesterdayStr) { newStreak = streak + 1; }
+      else { newStreak = 1; }
 
-      // Bonus-XP ved milepæler
       var bonusXp = 0;
       var bonusMsg = '';
       if (newStreak === 3)  { bonusXp = 10;  bonusMsg = '3-dagers streak!'; }
@@ -613,7 +580,6 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
         last_login: todayStr
       }, { onConflict: 'user_id' });
 
-      // Logg aktivitet
       await sb.from('user_activity').insert({ user_id: user.id, type: 'login', ticker: null, name: 'Daglig innlogging', xp: 3 });
       if (bonusXp > 0) {
         await sb.from('user_activity').insert({ user_id: user.id, type: 'streak', ticker: null, name: bonusMsg, xp: bonusXp });
@@ -635,10 +601,7 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
   } catch(e) { renderXP(0); }
 })();
 
-async function loadNews() {
-  // Implementeres med Vercel Pro nyhets-API
-}
-
+async function loadNews() {}
 
 function openMoversModal() {
   var modal = document.getElementById('moversModal');
@@ -652,14 +615,13 @@ function openMoversModal() {
   }
 
   var sorted = window._moversData.all || [];
-
   body.innerHTML = sorted.map(function(s) {
     var sign = s.up ? '+' : '-';
     var color = s.up ? '#2C7A5C' : '#A32D2D';
     return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
-      '<div><div style="font-size:14px;font-weight:500;">' + s.name + '</div>' +
-      '<div style="font-size:12px;color:#aaa;">' + s.ticker + '</div></div>' +
-      '<div style="font-size:13px;font-weight:500;color:' + color + ';">' + sign + s.changePct + '%</div>' +
+      '<div><div style="font-size:13px;font-weight:500;">' + s.name + '</div>' +
+      '<div style="font-size:11px;color:#aaa;">' + s.ticker + '</div></div>' +
+      '<div style="font-size:12px;font-weight:500;color:' + color + ';">' + sign + s.changePct + '%</div>' +
     '</div>';
   }).join('');
 }
@@ -670,9 +632,7 @@ function closeMoversModal() {
 }
 window.addEventListener('DOMContentLoaded', function() {
   var mm = document.getElementById('moversModal');
-  if (mm) mm.addEventListener('click', function(e) {
-    if (e.target === this) closeMoversModal();
-  });
+  if (mm) mm.addEventListener('click', function(e) { if (e.target === this) closeMoversModal(); });
 });
 
 async function loadEvents() {
@@ -702,7 +662,7 @@ async function loadEvents() {
         '</div>' +
         '<div style="flex:1;min-width:0;">' +
           '<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (e.name || e.ticker) + '</div>' +
-          '<div style="font-size:11px;color:#aaa;">' + 
+          '<div style="font-size:11px;color:#aaa;">' +
           (e.type === 'utbytte' ? 'Utbytte' + (e.amount ? ': ' + e.amount + ' NOK' : '') : 'Kvartalsrapport') +
         '</div>' +
         '</div>' +
@@ -714,13 +674,13 @@ async function loadEvents() {
     if (el2) el2.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente events.</div>';
   }
 }
+
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
   <div style="text-align:center;font-size:11px;color:#aaa;font-style:italic;padding:1rem 2rem 2rem;">
     Kursdata fra Yahoo Finance · Fundamentals fra Financial Modeling Prep · Ikke finansiell rådgivning
   </div>
-
 
 <!-- Movers Modal -->
 <div id="moversModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;">
