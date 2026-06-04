@@ -587,7 +587,7 @@ function renderStock(s) {
       (s.profitMargin ? '<div class="stat-row"><span class="stat-label">Profittmargin</span><span class="stat-val">' + s.profitMargin + '</span></div>' : '') +
       (s.industry ? '<div class="stat-row"><span class="stat-label">Bransje</span><span class="stat-val">' + s.industry + '</span></div>' : '') +
       (s.volume ? '<div class="stat-row"><span class="stat-label">Volum</span><span class="stat-val">' + s.volume + '</span></div>' : '') +
-      '<div style="font-size:11px;color:#aaa;margin-top:8px;font-style:italic;">Nøkkeltall i USD · Kurs i NOK</div>' +
+      '<div style="font-size:11px;color:#aaa;margin-top:8px;font-style:italic;">Nøkkeltall i ' + (s.reportCurrency || 'USD') + ' · Kurs i NOK</div>' +
     '</div>' +
     '<div class="disclaimer">Data fra Yahoo Finance · Forsinket ca. 15–20 min · Ikke finansiell rådgivning</div>';
   document.getElementById('trending').innerHTML = '';
