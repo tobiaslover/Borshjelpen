@@ -44,8 +44,11 @@ export default async function handler(req, res) {
 
     let events = [];
 
+    console.log('earnings status:', earningsRes.status);
+    console.log('dividend status:', dividendRes.status);
     if (earningsRes.ok) {
       const earningsData = await earningsRes.json();
+      console.log('earnings raw:', JSON.stringify(earningsData).slice(0, 200));
       if (Array.isArray(earningsData)) {
         earningsData.forEach(e => {
           const ticker = (e.symbol || '').replace('.OL', '');
