@@ -83,6 +83,21 @@ export default async function handler(req, res) {
     const winners = sorted.slice(0, 5);
     const losers = sorted.slice(-5).reverse();
 
+    // Fallback: beregn OBX fra aksjene hvis Yahoo-indeksene ikke fungerer
+    if (!obx || obx.price === '0' || obx.changePct === '0.00') {
+      const validChanges = stocks.map(s => s.changePctRaw);
+      const avgChange = validChanges.reduce((a, b) => a + b, 0) / validChanges.length;
+      obx = {
+        price: '—',
+        change: avgChange.toFixed(2),
+        changePct: Math.abs(avgChange).toFixed(2),
+        up: avgChange >= 0
+      };
+    }
+    if (!osebx || osebx.price === '0' || osebx.changePct === '0.00') {
+      osebx = obx ? { ...obx, price: '—' } : null;
+    }
+
     return res.status(200).json({ winners, losers, obx, osebx });
   } catch(e) {
     console.error('movers error:', e.message);
