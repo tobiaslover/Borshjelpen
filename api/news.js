@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-// Parse RSS XML enkelt
 function parseRSS(xml) {
   const items = [];
   const itemRegex = /<item>([\s\S]*?)<\/item>/g;
@@ -30,22 +29,31 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await sb.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
 
-  // RSS-kilder
   const feeds = [
     { url: 'https://e24.no/rss/feed', source: 'E24' },
-    { url: 'https://finansavisen.no/rss', source: 'Finansavisen' },
     { url: 'https://www.dn.no/rss/', source: 'DN' },
+    { url: 'https://finansavisen.no/rss', source: 'Finansavisen' },
   ];
 
   let allItems = [];
 
   for (const feed of feeds) {
     try {
-      const r = await fetch(feed.url, { headers: { 'User-Agent': 'Borshjelpen/1.0' } });
-      if (!r.ok) continue;
-      const xml = await r.text();
-      const items = parseRSS(xml).slice(0, 5).map(item => ({ ...item, source: feed.source }));
+      // Bruk rss2json API som proxy
+      const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}&count=5`;
+      const r = await fetch(proxyUrl);
+      if (!r.ok) { console.log('rss2json feil', feed.source, r.status); continue; }
+      const data = await r.json();
+      if (data.status !== 'ok' || !data.items) { console.log('rss2json ingen items', feed.source); continue; }
+      const items = data.items.map(item => ({
+        title: item.title,
+        link: item.link,
+        description: (item.description || '').replace(/<[^>]+>/g, '').slice(0, 300),
+        pubDate: item.pubDate,
+        source: feed.source
+      }));
       allItems = allItems.concat(items);
+      console.log('rss2json OK', feed.source, items.length, 'artikler');
     } catch(e) {
       console.log('RSS feil', feed.source, e.message);
       continue;
@@ -54,14 +62,12 @@ export default async function handler(req, res) {
 
   if (!allItems.length) return res.status(200).json({ news: [] });
 
-  // Filtrer på finansrelevante nøkkelord
-  const keywords = ['aksje','børs','økonomi','rente','inflasjon','kvartal','resultat','Equinor','DNB','Norges Bank','Oslo Børs','investering','marked','olje','shipping','finans'];
+  const keywords = ['aksje','børs','økonomi','rente','inflasjon','kvartal','resultat','Equinor','DNB','Norges Bank','Oslo Børs','investering','marked','olje','shipping','finans','fond'];
   let relevant = allItems.filter(item =>
     keywords.some(kw => (item.title + item.description).toLowerCase().includes(kw.toLowerCase()))
   );
   if (!relevant.length) relevant = allItems;
 
-  // Ta topp 6 og lag AI-oppsummering
   const top = relevant.slice(0, 6);
 
   try {
@@ -70,36 +76,27 @@ export default async function handler(req, res) {
       try {
         const completion = await openai.chat.completions.create({
           model: 'gpt-4o-mini',
-          max_tokens: 80,
-          messages: [{
-            role: 'user',
-            content: `Skriv EN kort setning (maks 20 ord) på norsk som oppsummerer denne overskriften. Ikke sitér direkte. Svar kun med setningen.\n\nOverskrift: ${item.title}\nIngress: ${item.description}`
-          }]
+          max_tokens: 60,
+          messages: [{ role: 'user', content: `Skriv én kort setning (maks 15 ord) på norsk som oppsummerer denne overskriften. Svar kun med setningen.\n\nOverskrift: ${item.title}` }]
         });
         return { ...item, summary: completion.choices[0].message.content.trim() };
-      } catch(e) {
-        return { ...item, summary: null };
-      }
+      } catch(e) { return { ...item, summary: null }; }
     }));
 
-    const news = summaries.map(item => ({
+    return res.status(200).json({ news: summaries.map(item => ({
       title: item.title,
       summary: item.summary,
       url: item.link,
       source: item.source,
       published: item.pubDate,
-    }));
-
-    return res.status(200).json({ news });
+    }))});
   } catch(e) {
-    // Fallback uten AI
-    const news = top.map(item => ({
+    return res.status(200).json({ news: top.map(item => ({
       title: item.title,
       summary: null,
       url: item.link,
       source: item.source,
       published: item.pubDate,
-    }));
-    return res.status(200).json({ news });
+    }))});
   }
 }
