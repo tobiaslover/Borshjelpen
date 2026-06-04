@@ -269,5 +269,27 @@ strong { color: #1a1a1a; font-weight: 500; }
 
 </article>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async function checkAuth() {
+  try {
+    var sb = supabase.createClient(
+      'https://twckvtwzyadevqbyehnu.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
+    );
+    var sess = (await sb.auth.getSession()).data.session;
+    if (sess) {
+      var name = (sess.user.user_metadata && sess.user.user_metadata.full_name) || sess.user.email.split('@')[0];
+      var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      var navAuth = document.getElementById('navAuth');
+      var navUser = document.getElementById('navUser');
+      if (navAuth) navAuth.style.display = 'none';
+      if (navUser) navUser.style.display = 'flex';
+      if (document.getElementById('navAv')) document.getElementById('navAv').textContent = initials;
+      if (document.getElementById('navName')) document.getElementById('navName').textContent = name.split(' ')[0];
+    }
+  } catch(e) {}
+})();
+</script>
 </body>
 </html>
