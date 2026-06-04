@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   if (!ticker) return res.status(400).json({ error: 'Ticker mangler' });
 
   const upper = ticker.toUpperCase().replace('.OL','').replace(':OSE','');
-  const symbol = upper + '.OL';
+  const olSymbol = upper + '.OL';
   const apiKey = process.env.FMP_API_KEY;
 
   const headers = {
@@ -17,14 +17,15 @@ export default async function handler(req, res) {
   };
 
   try {
-    const [yahooRes, profileRes, metricsRes] = await Promise.all([
-      fetch(`https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`, { headers }),
-      fetch(`https://financialmodelingprep.com/stable/profile?symbol=${upper}&apikey=${apiKey}`),
-      fetch(`https://financialmodelingprep.com/stable/key-metrics-ttm?symbol=${upper}&apikey=${apiKey}`),
+    const [yahooRes, profileRes, metricsRes, ratiosRes] = await Promise.all([
+      fetch(`https://query2.finance.yahoo.com/v8/finance/chart/${olSymbol}?interval=1d&range=5d`, { headers }),
+      fetch(`https://financialmodelingprep.com/stable/profile?symbol=${olSymbol}&apikey=${apiKey}`),
+      fetch(`https://financialmodelingprep.com/stable/key-metrics-ttm?symbol=${olSymbol}&apikey=${apiKey}`),
+      fetch(`https://financialmodelingprep.com/stable/ratios-ttm?symbol=${olSymbol}&apikey=${apiKey}`),
     ]);
 
     if (!yahooRes.ok) {
-      return res.status(404).json({ error: `Aksje "${upper}" ikke funnet.` });
+      return res.status(404).json({ error: `Aksje "${upper}" ikke funnet. Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI.` });
     }
 
     const yahooData = await yahooRes.json();
@@ -37,20 +38,24 @@ export default async function handler(req, res) {
     const changePct = prevClose ? +((change / prevClose) * 100).toFixed(2) : 0;
     const name = meta?.longName || meta?.shortName || upper;
 
-    let profile = null, metrics = null;
-    if (profileRes.ok) {
-      try { const d = await profileRes.json(); profile = Array.isArray(d) ? d[0] : d; } catch(e) {}
-    }
-    if (metricsRes.ok) {
-      try { const d = await metricsRes.json(); metrics = Array.isArray(d) ? d[0] : d; } catch(e) {}
-    }
+    let profile = null, metrics = null, ratios = null;
+    if (profileRes.ok) { try { const d = await profileRes.json(); profile = Array.isArray(d) ? d[0] : d; } catch(e) {} }
+    if (metricsRes.ok) { try { const d = await metricsRes.json(); metrics = Array.isArray(d) ? d[0] : d; } catch(e) {} }
+    if (ratiosRes.ok) { try { const d = await ratiosRes.json(); ratios = Array.isArray(d) ? d[0] : d; } catch(e) {} }
 
-    const pe = metrics?.peRatioTTM ? parseFloat(metrics.peRatioTTM).toFixed(1) : null;
-    const dividendYield = metrics?.dividendYieldTTM ? (parseFloat(metrics.dividendYieldTTM) * 100).toFixed(2) + '%' :
-                          (profile?.lastDiv && price) ? ((profile.lastDiv / price) * 100).toFixed(2) + '%' : null;
+    // P/E: fra ratios eller beregn fra earningsYield
+    let pe = null;
+    if (ratios?.peRatioTTM) pe = parseFloat(ratios.peRatioTTM).toFixed(1);
+    else if (metrics?.earningsYieldTTM && metrics.earningsYieldTTM > 0) pe = (1 / metrics.earningsYieldTTM).toFixed(1);
 
+    // Utbytte
+    let dividendYield = null;
+    if (ratios?.dividendYieldTTM) dividendYield = (parseFloat(ratios.dividendYieldTTM) * 100).toFixed(2) + '%';
+    else if (profile?.lastDiv && price) dividendYield = ((profile.lastDiv / price) * 100).toFixed(2) + '%';
+
+    // Markedsverdi
     let marketCap = null;
-    const mc = profile?.marketCap || profile?.mktCap;
+    const mc = metrics?.marketCap || profile?.marketCap || profile?.mktCap;
     if (mc) {
       marketCap = mc >= 1e12 ? (mc/1e12).toFixed(1) + ' tn' :
                   mc >= 1e9  ? (mc/1e9).toFixed(1) + ' mrd' :
@@ -75,9 +80,16 @@ export default async function handler(req, res) {
       volume: meta?.regularMarketVolume?.toLocaleString('nb-NO') || null,
       sector: profile?.sector || null,
       industry: profile?.industry || null,
-      profitMargin: metrics?.netProfitMarginTTM ? (parseFloat(metrics.netProfitMarginTTM) * 100).toFixed(1) + '%' : null,
-      returnOnEquity: metrics?.roeTTM ? (parseFloat(metrics.roeTTM) * 100).toFixed(1) + '%' : null,
+      profitMargin: ratios?.netProfitMarginTTM ? (parseFloat(ratios.netProfitMarginTTM) * 100).toFixed(1) + '%' :
+                    metrics?.returnOnAssetsTTM ? null : null,
+      returnOnEquity: metrics?.returnOnEquityTTM ? (parseFloat(metrics.returnOnEquityTTM) * 100).toFixed(1) + '%' : null,
       description: profile?.description || null,
+      // Ekstra nøkkeltall fra metrics
+      pb: ratios?.priceToBookRatioTTM ? parseFloat(ratios.priceToBookRatioTTM).toFixed(1) : null,
+      evEbitda: metrics?.evToEBITDATTM ? parseFloat(metrics.evToEBITDATTM).toFixed(1) : null,
+      roe: metrics?.returnOnEquityTTM ? (parseFloat(metrics.returnOnEquityTTM) * 100).toFixed(1) + '%' : null,
+      fcfYield: metrics?.freeCashFlowYieldTTM ? (parseFloat(metrics.freeCashFlowYieldTTM) * 100).toFixed(1) + '%' : null,
+      debtEquity: ratios?.debtEquityRatioTTM ? parseFloat(ratios.debtEquityRatioTTM).toFixed(2) : null,
     });
   } catch (err) {
     console.error('stock error:', err.message);
