@@ -432,6 +432,85 @@ async function search(ticker) {
   } catch(e) { showError('Kunne ikke koble til server.'); return; }
   renderStock(s);
   generateAI(s);
+  loadFMPData(s);
+}
+
+async function loadFMPData(s) {
+  try {
+    var sb = window._sb; if (!sb) return;
+    var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
+    var token = sess.access_token;
+    var res = await fetch('/api/fmp?ticker=' + encodeURIComponent(s.ticker), {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!res.ok) return;
+    var fmp = await res.json();
+    if (fmp.error) return;
+    renderFMPData(fmp, s);
+  } catch(e) {}
+}
+
+function renderFMPData(fmp, s) {
+  // Oppdater nøkkeltall-seksjonen
+  var existing = document.querySelector('.card .card-title');
+  if (!existing || existing.textContent !== 'Nøkkeltall') return;
+  var card = existing.parentElement;
+
+  // Bygg utvidet nøkkeltall-tabell
+  var rows = [];
+  if (fmp.peRatio) rows.push(['P/E (TTM)', fmp.peRatio]);
+  if (fmp.pbRatio) rows.push(['P/B (TTM)', fmp.pbRatio]);
+  if (fmp.psRatio) rows.push(['P/S (TTM)', fmp.psRatio]);
+  if (fmp.evEbitda) rows.push(['EV/EBITDA', fmp.evEbitda]);
+  if (fmp.dividendYield) rows.push(['Utbytteyield', fmp.dividendYield]);
+  if (fmp.roe) rows.push(['Egenkapitalavkastning (ROE)', fmp.roe]);
+  if (fmp.roa) rows.push(['Totalkapitalavkastning (ROA)', fmp.roa]);
+  if (fmp.grossMargin) rows.push(['Bruttomargin', fmp.grossMargin]);
+  if (fmp.netMargin) rows.push(['Nettomargín', fmp.netMargin]);
+  if (fmp.debtEquity) rows.push(['Gjeld/Egenkapital', fmp.debtEquity]);
+  if (fmp.currentRatio) rows.push(['Likviditetsgrad', fmp.currentRatio]);
+  if (fmp.freeCashFlowYield) rows.push(['Fri kontantstrøm-yield', fmp.freeCashFlowYield]);
+  if (s.fiftyTwoWeekHigh) rows.push(['52-ukers høy', s.fiftyTwoWeekHigh + ' ' + s.currency]);
+  if (s.fiftyTwoWeekLow) rows.push(['52-ukers lav', s.fiftyTwoWeekLow + ' ' + s.currency]);
+  if (fmp.employees) rows.push(['Ansatte', parseInt(fmp.employees).toLocaleString('nb-NO')]);
+  if (fmp.ceo) rows.push(['CEO', fmp.ceo]);
+
+  card.innerHTML = '<div class="card-title">Nøkkeltall</div>' +
+    rows.map(function(r) {
+      return '<div class="stat-row"><span class="stat-label">' + r[0] + '</span><span class="stat-val">' + r[1] + '</span></div>';
+    }).join('');
+
+  // Legg til selskapsbeskrivelse fra FMP
+  if (fmp.description) {
+    var aiSection = document.getElementById('ai-section');
+    if (aiSection) {
+      var descEl = document.createElement('div');
+      descEl.className = 'card';
+      descEl.style.marginBottom = '1rem';
+      descEl.innerHTML = '<div class="card-title">Om selskapet</div><p style="font-size:13px;line-height:1.7;color:#555;">' + fmp.description.slice(0, 500) + (fmp.description.length > 500 ? '...' : '') + '</p>';
+    }
+  }
+
+  // Legg til kvartalsresultater
+  if (fmp.earnings && fmp.earnings.length) {
+    var earningsHtml = fmp.earnings.map(function(e) {
+      var surpriseColor = e.surprise && parseFloat(e.surprise) > 0 ? '#2C7A5C' : '#A32D2D';
+      return '<div class="stat-row">' +
+        '<span class="stat-label">' + (e.date || '') + '</span>' +
+        '<span class="stat-val" style="display:flex;gap:12px;align-items:center;">' +
+          '<span>Faktisk: ' + (e.actual || '—') + '</span>' +
+          '<span style="color:#aaa">Est: ' + (e.estimated || '—') + '</span>' +
+          (e.surprise ? '<span style="color:' + surpriseColor + ';font-size:11px;">' + (parseFloat(e.surprise) > 0 ? '+' : '') + e.surprise + '</span>' : '') +
+        '</span>' +
+        '</div>';
+    }).join('');
+
+    var qBox = document.getElementById('qBody');
+    if (qBox && !qBox.querySelector('.earnings-row')) {
+      var earningsCard = '<div class="quarterly-card" style="grid-column:1/-1;"><div class="quarterly-card-title">Inntjeningshistorikk (EPS)</div>' + earningsHtml + '</div>';
+      qBox.insertAdjacentHTML('beforeend', earningsCard);
+    }
+  }
 }
 
 function getMarketLabel() {
