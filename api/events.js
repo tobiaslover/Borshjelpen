@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       .select('events, updated_at')
       .eq('id', 'obx')
       .maybeSingle();
-    if (cached && cached.events) {
+    if (cached && cached.events && cached.events.length > 0) {
       const age = Date.now() - new Date(cached.updated_at).getTime();
       if (age < 7 * 24 * 60 * 60 * 1000) {
         return res.status(200).json({ events: cached.events, cached: true });
@@ -34,51 +34,57 @@ export default async function handler(req, res) {
     const today = new Date().toISOString().slice(0, 10);
     const future = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-    // Hent kvartalsrapporter og utbytter parallelt for alle OBX-tickers
+    // Bygg OBX symbol-sett med alle mulige varianter
+    const obxVariants = new Set([
+      ...OBX_TICKERS,
+      ...OBX_TICKERS.map(t => t + '.OL'),
+      ...OBX_TICKERS.map(t => t + ':OSE'),
+    ]);
+
+    // Hent earnings per ticker (v3 format) + dividends kalender parallelt
+    const earningsSymbols = OBX_TICKERS.map(t => t + '.OL').join(',');
+    
     const [earningsRes, dividendsRes] = await Promise.all([
-      // Earning calendar — hent alle, filtrer på OBX
-      fetch(`https://financialmodelingprep.com/stable/earning-calendar?from=${today}&to=${future}&apikey=${apiKey}`),
-      // Dividends calendar — hent alle, filtrer på OBX
+      fetch(`https://financialmodelingprep.com/stable/earnings-surprises?symbol=${OBX_TICKERS[0]}.OL&apikey=${apiKey}`),
       fetch(`https://financialmodelingprep.com/stable/dividends-calendar?from=${today}&to=${future}&apikey=${apiKey}`),
     ]);
 
-    console.log('earnings status:', earningsRes.status);
-    console.log('dividends status:', dividendsRes.status);
+    // For earnings — hent for hver ticker individuelt
+    const earningsPromises = OBX_TICKERS.map(t =>
+      fetch(`https://financialmodelingprep.com/stable/earnings-calendar?symbol=${t}.OL&apikey=${apiKey}`)
+        .then(r => r.ok ? r.json() : [])
+        .catch(() => [])
+    );
+    const earningsResults = await Promise.all(earningsPromises);
 
     let events = [];
-    const obxSet = new Set(OBX_TICKERS.map(t => t + '.OL'));
-    const obxSetPlain = new Set(OBX_TICKERS);
 
-    if (earningsRes.ok) {
-      const data = await earningsRes.json();
-      console.log('earnings count:', Array.isArray(data) ? data.length : 'not array');
+    // Parse kvartalsrapporter
+    earningsResults.forEach((data, i) => {
+      const ticker = OBX_TICKERS[i];
       if (Array.isArray(data)) {
-        data.forEach(e => {
-          const sym = e.symbol || '';
-          const ticker = sym.replace('.OL', '');
-          if (obxSet.has(sym) || obxSetPlain.has(ticker)) {
-            events.push({
-              date: e.date,
-              ticker,
-              name: e.name || ticker,
-              type: 'rapport',
-              label: 'Kvartalsrapport'
-            });
-          }
+        data.filter(e => e.date && e.date >= today && e.date <= future).forEach(e => {
+          events.push({
+            date: e.date,
+            ticker,
+            name: e.name || ticker,
+            type: 'rapport',
+            label: 'Kvartalsrapport'
+          });
         });
       }
-    }
+    });
 
+    // Parse utbytter
     if (dividendsRes.ok) {
-      const data = await dividendsRes.json();
-      console.log('dividends count:', Array.isArray(data) ? data.length : 'not array');
-      if (Array.isArray(data)) {
-        data.forEach(d => {
-          const sym = d.symbol || '';
-          const ticker = sym.replace('.OL', '');
-          if (obxSet.has(sym) || obxSetPlain.has(ticker)) {
+      const divData = await dividendsRes.json();
+      if (Array.isArray(divData)) {
+        divData.forEach(d => {
+          const sym = (d.symbol || '').toUpperCase();
+          const ticker = sym.replace('.OL','').replace(':OSE','');
+          if (obxVariants.has(sym) || OBX_TICKERS.includes(ticker)) {
             events.push({
-              date: d.date || d.paymentDate || d.recordDate,
+              date: d.date || d.paymentDate,
               ticker,
               name: d.name || ticker,
               type: 'utbytte',
@@ -90,9 +96,9 @@ export default async function handler(req, res) {
       }
     }
 
-    console.log('total events:', events.length);
+    console.log('rapport events:', events.filter(e => e.type === 'rapport').length);
+    console.log('utbytte events:', events.filter(e => e.type === 'utbytte').length);
 
-    // Sorter på dato og ta de nærmeste
     events = events
       .filter(e => e.date && e.date >= today)
       .sort((a, b) => new Date(a.date) - new Date(b.date));
