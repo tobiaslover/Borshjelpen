@@ -441,8 +441,10 @@ async function loadWatchlist() {
 async function loadIndexes() {
   try {
     var res = await fetch('/api/movers');
-    if (!res.ok) throw new Error('movers feil');
+    console.log('movers status:', res.status);
     var data = await res.json();
+    console.log('movers data:', JSON.stringify(data).slice(0, 300));
+    if (!res.ok) throw new Error('movers feil: ' + res.status);
 
     // Ekte indekser fra Yahoo Finance
     var obx = data.obx;
