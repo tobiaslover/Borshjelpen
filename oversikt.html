@@ -151,6 +151,15 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .news-title { font-size: 13px; font-weight: 500; line-height: 1.4; color: #1a1a1a; }
 .news-meta { display: flex; gap: 8px; font-size: 11px; color: #aaa; align-items: center; }
 .news-ticker { background: #E6EEF5; color: #1B3A5C; padding: 2px 7px; border-radius: 100px; font-weight: 500; }
+
+.index-up { color: #2C7A5C; font-size: 15px; font-weight: 500; }
+.index-down { color: #A32D2D; font-size: 15px; font-weight: 500; }
+.mover-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+.mover-row:last-child { border-bottom: none; }
+.mover-name { font-size: 13px; font-weight: 500; }
+.mover-ticker { font-size: 11px; color: #aaa; margin-top: 1px; }
+.mover-up { font-size: 13px; font-weight: 500; color: #2C7A5C; }
+.mover-down { font-size: 13px; font-weight: 500; color: #A32D2D; }
 </style>
 </head>
 <body>
@@ -453,9 +462,11 @@ async function loadIndexes() {
       if (!idx) return '<div class="index-row"><div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div><div style="color:#aaa">—</div></div>';
       var sign = idx.up ? '+' : '-';
       var cls = idx.up ? 'index-up' : 'index-down';
+      var priceStr = idx.price && idx.price !== '—' ? parseFloat(idx.price).toLocaleString('nb-NO') : '';
       return '<div class="index-row"><div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div>' +
         '<div style="text-align:right;"><div class="' + cls + '">' + sign + idx.changePct + '%</div>' +
-        '<div style="font-size:11px;color:#aaa;">' + parseFloat(idx.price).toLocaleString('nb-NO') + '</div></div></div>';
+        (priceStr ? '<div style="font-size:11px;color:#aaa;">' + priceStr + '</div>' : '') +
+        '</div></div>';
     }
     document.getElementById('indexList').innerHTML =
       renderIndex('OBX', 'Oslo Børs 25 største', obx) +
