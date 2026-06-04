@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
@@ -17,6 +18,13 @@ export default async function handler(req, res) {
 
   const { ticker, name } = req.body || {};
   if (!ticker) return res.status(400).json({ error: 'Ticker mangler' });
+
+  // Kun Proff-plan
+  const { data: planData } = await sb.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle();
+  const plan = planData?.plan || 'free';
+  if (plan !== 'proff') {
+    return res.status(403).json({ error: 'Kvartalsrapporter krever Proff-abonnement.', plan });
+  }
 
   const olSymbol = ticker.toUpperCase() + '.OL';
   const apiKey = process.env.FMP_API_KEY;
