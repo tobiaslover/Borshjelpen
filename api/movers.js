@@ -84,21 +84,23 @@ export default async function handler(req, res) {
     const losers = sorted.slice(-5).reverse();
 
     // Fallback: beregn OBX fra aksjene hvis Yahoo-indeksene ikke fungerer
-    if (!obx || obx.price === '0' || obx.changePct === '0.00') {
+    let obxFinal = obx;
+    let osebxFinal = osebx;
+    if (!obxFinal || obxFinal.price === '0' || obxFinal.changePct === '0.00') {
       const validChanges = stocks.map(s => s.changePctRaw);
       const avgChange = validChanges.reduce((a, b) => a + b, 0) / validChanges.length;
-      obx = {
+      obxFinal = {
         price: '—',
         change: avgChange.toFixed(2),
         changePct: Math.abs(avgChange).toFixed(2),
         up: avgChange >= 0
       };
     }
-    if (!osebx || osebx.price === '0' || osebx.changePct === '0.00') {
-      osebx = obx ? { ...obx, price: '—' } : null;
+    if (!osebxFinal || osebxFinal.price === '0' || osebxFinal.changePct === '0.00') {
+      osebxFinal = obxFinal ? Object.assign({}, obxFinal, { price: '—' }) : null;
     }
 
-    return res.status(200).json({ winners, losers, obx, osebx });
+    return res.status(200).json({ winners, losers, obx: obxFinal, osebx: osebxFinal });
   } catch(e) {
     console.error('movers error:', e.message);
     return res.status(500).json({ error: e.message });
