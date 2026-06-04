@@ -650,51 +650,23 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
 async function loadNews() {
   var list = document.getElementById('newsList');
   if (!list) return;
-  list.innerHTML = '<div class="spinner"></div>';
-  try {
-    // Hent RSS direkte fra klienten via rss2json (ingen Vercel-funksjon nødvendig)
-    var feeds = [
-      { url: 'https://e24.no/rss/feed', source: 'E24' },
-      { url: 'https://www.dn.no/rss/', source: 'DN' },
-      { url: 'https://finansavisen.no/rss', source: 'Finansavisen' }
-    ];
-    var allItems = [];
-    for (var i = 0; i < feeds.length; i++) {
-      try {
-        var proxyUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feeds[i].url) + '&count=5';
-        var r = await fetch(proxyUrl);
-        if (!r.ok) continue;
-        var d = await r.json();
-        if (d.status !== 'ok' || !d.items) continue;
-        d.items.forEach(function(item) {
-          allItems.push({ title: item.title, url: item.link, source: feeds[i].source, published: item.pubDate });
-        });
-      } catch(e) { continue; }
-    }
-    var data = { news: allItems };
-    if (!data.news || !data.news.length) {
-      list.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Ingen nyheter tilgjengelig.</div>';
-      return;
-    }
-    list.innerHTML = data.news.map(function(n) {
-      var ago = '';
-      try {
-        var diff = Math.floor((Date.now() - new Date(n.published)) / 60000);
-        if (diff < 60) ago = diff + ' min siden';
-        else if (diff < 1440) ago = Math.floor(diff/60) + ' t siden';
-        else ago = Math.floor(diff/1440) + ' d siden';
-      } catch(e) {}
-      return '<a class="news-item" href="' + n.url + '" target="_blank" rel="noopener">' +
-        '<div class="news-title">' + n.title + '</div>' +
-        (n.summary ? '<div style="font-size:12px;color:#555;line-height:1.5;margin-top:3px;">' + n.summary + '</div>' : '') +
-        '<div class="news-meta">' +
-        '<span class="news-ticker">' + (n.source || '') + '</span>' +
-        '<span>' + ago + '</span>' +
-        '</div></a>';
-    }).join('');
-  } catch(e) {
-    list.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Kunne ikke laste nyheter.</div>';
-  }
+  // Nyheter med AI-oppsummering implementeres med Vercel Pro
+  // Midlertidig: vis lenker til norske finansmedier
+  list.innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:10px;">' +
+    '<a href="https://e24.no/bors-og-finans" target="_blank" rel="noopener" class="news-item">' +
+      '<div class="news-title">E24 — Siste børsnyheter</div>' +
+      '<div class="news-meta"><span class="news-ticker">E24</span><span>e24.no</span></div>' +
+    '</a>' +
+    '<a href="https://www.dn.no/marked" target="_blank" rel="noopener" class="news-item">' +
+      '<div class="news-title">Dagens Næringsliv — Marked</div>' +
+      '<div class="news-meta"><span class="news-ticker">DN</span><span>dn.no</span></div>' +
+    '</a>' +
+    '<a href="https://finansavisen.no" target="_blank" rel="noopener" class="news-item">' +
+      '<div class="news-title">Finansavisen — Siste nyheter</div>' +
+      '<div class="news-meta"><span class="news-ticker">FA</span><span>finansavisen.no</span></div>' +
+    '</a>' +
+    '</div>';
 }
 
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
