@@ -1,35 +1,42 @@
+import { createClient } from '@supabase/supabase-js';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
+  if (req.method !== 'GET') return res.status(405).end();
 
-  const apiKey = process.env.FMP_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'FMP_API_KEY mangler' });
-
-  const { ticker } = req.query;
+  // Verifiser JWT
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Ikke autentisert' });
+  }
+  const token = authHeader.replace('Bearer ', '');
+  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+  const { data: { user }, error: authError } = await sb.auth.getUser(token);
+  if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
 
   try {
-    const url = ticker
-      ? `https://financialmodelingprep.com/api/v3/stock_news?tickers=${ticker.toUpperCase()}.OL&limit=10&apikey=${apiKey}`
-      : `https://financialmodelingprep.com/api/v3/stock_news?limit=20&apikey=${apiKey}`;
+    const tickers = 'EQNR,DNB,AKRBP,TEL,MOWI,YAR,NHY,KAHOT';
+    const url = `https://financialmodelingprep.com/api/v3/stock_news?tickers=${tickers}&limit=10&apikey=${process.env.FMP_API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
 
-    const newsRes = await fetch(url);
-    const newsData = await newsRes.json();
+    if (!response.ok || !Array.isArray(data)) {
+      return res.status(500).json({ error: 'Kunne ikke hente nyheter' });
+    }
 
-    if (!Array.isArray(newsData)) return res.status(200).json({ articles: [] });
+    // Filtrer og formater
+    const news = data.map(item => ({
+      title: item.title,
+      url: item.url,
+      source: item.site,
+      ticker: item.symbol,
+      published: item.publishedDate,
+      image: item.image || null
+    }));
 
-    const articles = newsData.map(function(a) {
-      return {
-        title: a.title,
-        summary: a.text ? a.text.slice(0, 200) + '...' : '',
-        source: a.site || '',
-        url: a.url || '',
-        publishedAt: a.publishedDate || '',
-        ticker: a.symbol || ''
-      };
-    });
-
-    res.status(200).json({ articles });
-  } catch(err) {
-    res.status(500).json({ error: 'Serverfeil', detail: err.message });
+    return res.status(200).json({ news });
+  } catch(e) {
+    return res.status(500).json({ error: e.message });
   }
 }
