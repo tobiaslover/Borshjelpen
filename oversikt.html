@@ -474,13 +474,19 @@ async function loadIndexes() {
       '</div>';
     }
 
-    document.getElementById('winnersList').innerHTML = winners.slice(0, 3).map(renderMover).join('') +
-      (winnersMore.length ? '<div id="winnersMore" style="display:none;">' + winnersMore.map(renderMover).join('') + '</div>' +
-      '<div style="text-align:center;padding:8px 0;"><button onclick="toggleMovers('winners')" id="winnersBtn" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;">Se alle →</button></div>' : '');
+    var wHtml = winners.slice(0,3).map(renderMover).join('');
+    if (winnersMore.length) {
+      wHtml += '<div id="winnersMore" style="display:none;">' + winnersMore.map(renderMover).join('') + '</div>';
+      wHtml += '<div style="text-align:center;padding:8px 0;"><button onclick="toggleMovers('winners')" id="winnersBtn" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;">Se alle →</button></div>';
+    }
+    document.getElementById('winnersList').innerHTML = wHtml;
 
-    document.getElementById('losersList').innerHTML = losers.slice(0, 3).map(renderMover).join('') +
-      (losersMore.length ? '<div id="losersMore" style="display:none;">' + losersMore.map(renderMover).join('') + '</div>' +
-      '<div style="text-align:center;padding:8px 0;"><button onclick="toggleMovers('losers')" id="losersBtn" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;">Se alle →</button></div>' : '');
+    var lHtml = losers.slice(0,3).map(renderMover).join('');
+    if (losersMore.length) {
+      lHtml += '<div id="losersMore" style="display:none;">' + losersMore.map(renderMover).join('') + '</div>';
+      lHtml += '<div style="text-align:center;padding:8px 0;"><button onclick="toggleMovers('losers')" id="losersBtn" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;">Se alle →</button></div>';
+    }
+    document.getElementById('losersList').innerHTML = lHtml;
 
   } catch(e) {
     document.getElementById('indexList').innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente indeksdata.</div>';
