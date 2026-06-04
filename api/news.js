@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
   if (req.method !== 'GET') return res.status(405).end();
 
   const authHeader = req.headers.authorization;
@@ -17,40 +17,41 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.FMP_API_KEY;
 
-  // Prøv nye stabile endepunkter i rekkefølge
+  // Norske Oslo Børs tickers
+  const norwegianTickers = 'EQNR,DNB,AKRBP,TEL,MOWI,YAR,NHY,ORK,SALM,SUBC';
+
   const endpoints = [
-    `https://financialmodelingprep.com/stable/news/stock?limit=10&apikey=${apiKey}`,
-    `https://financialmodelingprep.com/stable/news/general?limit=10&apikey=${apiKey}`,
-    `https://financialmodelingprep.com/api/v3/stock_news?limit=10&apikey=${apiKey}`,
+    `https://financialmodelingprep.com/stable/news/stock?symbols=${norwegianTickers}&limit=10&apikey=${apiKey}`,
+    `https://financialmodelingprep.com/stable/news/stock?limit=20&apikey=${apiKey}`,
   ];
 
   for (const url of endpoints) {
     try {
-      console.log('Trying:', url.replace(apiKey, 'HIDDEN'));
       const r = await fetch(url);
-      const text = await r.text();
-      console.log('Status:', r.status, text.slice(0, 200));
-
       if (r.status !== 200) continue;
-
+      const text = await r.text();
       let d;
       try { d = JSON.parse(text); } catch(e) { continue; }
       if (!Array.isArray(d) || !d.length) continue;
 
-      const news = d.slice(0, 10).map(item => ({
+      // Hvis andre endpoint (generell), filtrer på norske tickers
+      const norske = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','ORK','SALM','SUBC'];
+      let filtered = d.filter(item => norske.includes(item.symbol));
+      if (!filtered.length) filtered = d; // Fallback til alt hvis ingen norske
+
+      const news = filtered.slice(0, 10).map(item => ({
         title: item.title,
         url: item.url,
-        source: item.site || item.publisher || '',
+        source: item.site || '',
         ticker: item.symbol || null,
         published: item.publishedDate || item.date || '',
       }));
 
       return res.status(200).json({ news });
     } catch(e) {
-      console.error('Endpoint error:', e.message);
       continue;
     }
   }
 
-  return res.status(200).json({ news: [], error: 'Ingen nyhetsendepunkter fungerte' });
+  return res.status(200).json({ news: [] });
 }
