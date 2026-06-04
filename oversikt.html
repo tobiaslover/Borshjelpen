@@ -462,11 +462,13 @@ async function loadIndexes() {
       if (!idx) return '<div class="index-row"><div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div><div style="color:#aaa">—</div></div>';
       var sign = idx.up ? '+' : '-';
       var cls = idx.up ? 'index-up' : 'index-down';
-      var priceStr = idx.price && idx.price !== '—' ? parseFloat(idx.price).toLocaleString('nb-NO') : '';
-      return '<div class="index-row"><div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div>' +
-        '<div style="text-align:right;"><div class="' + cls + '">' + sign + idx.changePct + '%</div>' +
-        (priceStr ? '<div style="font-size:11px;color:#aaa;">' + priceStr + '</div>' : '') +
-        '</div></div>';
+      return '<div class="index-row">' +
+        '<div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div>' +
+        '<div style="text-align:right;">' +
+          (idx.price ? '<div style="font-size:16px;font-weight:500;">' + idx.price + '</div>' : '') +
+          '<div class="' + cls + '">' + sign + idx.changePct + '%</div>' +
+        '</div>' +
+      '</div>';
     }
     document.getElementById('indexList').innerHTML =
       renderIndex('OBX', 'Oslo Børs 25 største', obx) +
