@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-const OBX_TICKERS = new Set([
+const OBX_TICKERS = [
   'EQNR','VAR','DNB','NHY','FRO','AKRBP','NAS','KOG','MOWI','ORK',
   'YAR','TEL','VEND','PROT','SUBC','SALM','KMAR','STB','NOD','DOFG',
   'GJF','TOM','WAWI','BWLPG','HAUTO','BAKKA'
-]);
+];
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,19 +13,13 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
   const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-  const apiKey = process.env.FMP_API_KEY;
   const today = new Date().toISOString().slice(0, 10);
-  const future = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-
-  // Sjekk cache — hopp over hvis force=1
   const force = req.query.force === '1';
+
+  // Sjekk cache
   if (!force) {
     try {
-      const { data: cached } = await sb
-        .from('events_cache')
-        .select('events, updated_at')
-        .eq('id', 'obx')
-        .maybeSingle();
+      const { data: cached } = await sb.from('events_cache').select('events, updated_at').eq('id', 'obx').maybeSingle();
       if (cached?.events?.length > 0) {
         const age = Date.now() - new Date(cached.updated_at).getTime();
         if (age < 7 * 24 * 60 * 60 * 1000) {
@@ -35,64 +29,69 @@ export default async function handler(req, res) {
     } catch(e) {}
   }
 
-  try {
-    // ETT kall for dividends + ETT for earnings på OSE-børsen
-    const [divRes, earnRes] = await Promise.all([
-      fetch(`https://financialmodelingprep.com/stable/dividends-calendar?from=${today}&to=${future}&apikey=${apiKey}`),
-      fetch(`https://financialmodelingprep.com/stable/earning-calendar?from=${today}&to=${future}&exchange=OSL&apikey=${apiKey}`),
-    ]);
+  const yHeaders = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    'Accept': 'application/json',
+    'Referer': 'https://finance.yahoo.com/',
+  };
 
-    console.log('div:', divRes.status, 'earn:', earnRes.status);
+  try {
+    // Hent earnings dates fra Yahoo Finance for alle OBX-tickers parallelt
+    const results = await Promise.all(
+      OBX_TICKERS.map(t =>
+        fetch(`https://query1.finance.yahoo.com/v10/finance/quoteSummary/${t}.OL?modules=calendarEvents,summaryDetail`, { headers: yHeaders })
+          .then(r => r.ok ? r.json() : null)
+          .catch(() => null)
+      )
+    );
 
     let events = [];
 
-    // Parse dividends
-    if (divRes.ok) {
-      const data = await divRes.json();
-      if (Array.isArray(data)) {
-        data.forEach(d => {
-          const raw = (d.symbol || '').toUpperCase();
-          const ticker = raw.replace('.OL','').replace(':OSE','');
-          if (OBX_TICKERS.has(ticker) || OBX_TICKERS.has(raw)) {
-            const date = d.date || d.paymentDate || d.recordDate;
-            if (date && date >= today) {
-              events.push({ date, ticker, name: d.name || ticker, type: 'utbytte', label: 'Utbyttedato', amount: d.dividend ? parseFloat(d.dividend).toFixed(2) : null });
-            }
-          }
-        });
-      }
-      console.log('div events funnet:', events.filter(e=>e.type==='utbytte').length);
-    }
+    results.forEach((data, i) => {
+      const ticker = OBX_TICKERS[i];
+      if (!data) return;
+      try {
+        const result = data?.quoteSummary?.result?.[0];
+        const cal = result?.calendarEvents;
+        const sd = result?.summaryDetail;
 
-    // Parse earnings
-    if (earnRes.ok) {
-      const data = await earnRes.json();
-      console.log('earn count:', Array.isArray(data) ? data.length : typeof data, Array.isArray(data) ? JSON.stringify(data[0]).slice(0,100) : '');
-      if (Array.isArray(data)) {
-        data.forEach(e => {
-          const raw = (e.symbol || '').toUpperCase();
-          const ticker = raw.replace('.OL','').replace(':OSE','');
-          if (OBX_TICKERS.has(ticker) || OBX_TICKERS.has(raw)) {
-            if (e.date && e.date >= today) {
-              events.push({ date: e.date, ticker, name: e.name || ticker, type: 'rapport', label: 'Kvartalsrapport' });
+        // Kvartalsrapport-dato
+        const earningsDates = cal?.earnings?.earningsDate;
+        if (Array.isArray(earningsDates) && earningsDates.length > 0) {
+          const raw = earningsDates[0]?.raw;
+          if (raw) {
+            const date = new Date(raw * 1000).toISOString().slice(0, 10);
+            if (date >= today) {
+              events.push({ date, ticker, name: ticker, type: 'rapport', label: 'Kvartalsrapport' });
             }
           }
-        });
-      }
-      console.log('rapport events funnet:', events.filter(e=>e.type==='rapport').length);
-    }
+        }
+
+        // Ex-dividend dato
+        const exDiv = cal?.exDividendDate?.raw || sd?.exDividendDate?.raw;
+        if (exDiv) {
+          const date = new Date(exDiv * 1000).toISOString().slice(0, 10);
+          if (date >= today) {
+            const divAmount = sd?.dividendRate?.raw ? sd.dividendRate.raw.toFixed(2) : null;
+            events.push({ date, ticker, name: ticker, type: 'utbytte', label: 'Utbyttedato', amount: divAmount });
+          }
+        }
+      } catch(e) {}
+    });
+
+    console.log('rapport:', events.filter(e=>e.type==='rapport').length);
+    console.log('utbytte:', events.filter(e=>e.type==='utbytte').length);
 
     events.sort((a, b) => new Date(a.date) - new Date(b.date));
-    console.log('total:', events.length);
 
-    // Lagre cache
+    // Cache i Supabase
     try {
       await sb.from('events_cache').upsert({ id: 'obx', events, updated_at: new Date().toISOString() });
-    } catch(e) { console.error('cache err:', e.message); }
+    } catch(e) {}
 
     return res.status(200).json({ events, cached: false });
   } catch(e) {
-    console.error('error:', e.message);
+    console.error('events error:', e.message);
     return res.status(500).json({ error: e.message });
   }
 }
