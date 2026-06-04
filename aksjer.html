@@ -376,7 +376,7 @@ function showError(msg) {
   document.getElementById('result').innerHTML = '<div class="error-box"><p style="font-size:32px;margin-bottom:1rem">🔍</p><p style="font-size:15px;font-weight:500">' + msg + '</p><p style="font-size:13px;color:#aaa">Prøv f.eks. EQNR, DNB, TEL</p></div>';
 }
 
-async // Cache for kursdata — unngår doble API-kall
+// Cache for kursdata — unngår doble API-kall
 var _stockCache = {};
 var _cacheTime = {};
 var CACHE_TTL = 60000; // 60 sekunder
