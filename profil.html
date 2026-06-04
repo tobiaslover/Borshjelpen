@@ -181,7 +181,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px;">
         <div class="profile-plan" style="background:#E6EEF5;color:#1B3A5C;">🔵 Gratis</div>
         <div class="profile-plan" id="profilePlan" style="background:#1B3A5C;color:#C8A96E;">🌱 Nybegynner</div>
-        <div id="streakBadge" style="display:none;font-size:11px;padding:3px 12px;border-radius:100px;background:#1B3A5C;color:#C8A96E;font-weight:500;"></div>
+        <div id="streakBadge" style="display:inline-flex;font-size:11px;padding:3px 12px;border-radius:100px;background:#1B3A5C;color:#C8A96E;font-weight:500;"></div>
         <button onclick="doLogout()" style="font-size:11px;padding:3px 12px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg ut</button>
       </div>
     </div>
@@ -333,11 +333,18 @@ async function loadStats(userId) {
     const streak = (planInfo && planInfo.streak) || 0;
     const streakEl = document.getElementById('streakBadge');
     if (streakEl) {
-      if (streak > 0) {
-        streakEl.textContent = '🔥 ' + streak + ' dagers streak';
-        streakEl.style.display = 'inline-flex';
+      streakEl.style.display = 'inline-flex';
+      if (streak <= 0) {
+        streakEl.textContent = '🔥 Start din streak!';
+        streakEl.style.opacity = '0.5';
+        streakEl.style.background = '#f0f0f0';
+        streakEl.style.color = '#aaa';
       } else {
-        streakEl.style.display = 'none';
+        var flame = streak >= 30 ? '🔥🔥🔥' : streak >= 7 ? '🔥🔥' : '🔥';
+        streakEl.textContent = flame + ' ' + streak + ' dagers streak';
+        streakEl.style.opacity = '1';
+        streakEl.style.background = '#1B3A5C';
+        streakEl.style.color = '#C8A96E';
       }
     }
   } catch(e) {}
