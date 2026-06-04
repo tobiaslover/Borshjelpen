@@ -158,8 +158,13 @@ async function doLogin() {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
-      await sb.from('user_activity').insert({ user_id: session.user.id, type: 'login', ticker: null, name: 'Daglig innlogging', xp: 3 });
-      try { var apd = await sb.from('user_plans').select('total_xp').eq('user_id', session.user.id).maybeSingle(); var axp = (apd.data && apd.data.total_xp) || 0; await sb.from('user_plans').upsert({ user_id: session.user.id, total_xp: axp + 3 }, { onConflict: 'user_id' }); } catch(e) {}
+      // Kun 1 login-XP per dag
+      var loginToday = new Date().toISOString().slice(0, 10);
+      var { data: loginCheck } = await sb.from('user_activity').select('id').eq('user_id', session.user.id).eq('type', 'login').gte('created_at', loginToday + 'T00:00:00Z').limit(1);
+      if (!loginCheck || loginCheck.length === 0) {
+        await sb.from('user_activity').insert({ user_id: session.user.id, type: 'login', ticker: null, name: 'Daglig innlogging', xp: 3 });
+        try { var apd = await sb.from('user_plans').select('total_xp').eq('user_id', session.user.id).maybeSingle(); var axp = (apd.data && apd.data.total_xp) || 0; await sb.from('user_plans').upsert({ user_id: session.user.id, total_xp: axp + 3 }, { onConflict: 'user_id' }); } catch(e) {}
+      }
     }
   } catch(e) {}
   window.location.href = '/borshjelpen.html';
