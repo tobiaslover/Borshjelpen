@@ -131,7 +131,7 @@ export default async function handler(req, res) {
     const winners = sorted.slice(0, 5);
     const losers = sorted.slice(-5).reverse();
 
-    return res.status(200).json({ winners, losers, obx, osebx });
+    return res.status(200).json({ winners, losers, all: sorted, obx: obxFinal, osebx: osebxFinal });
   } catch(e) {
     console.error('movers error:', e.message);
     return res.status(500).json({ error: e.message });
