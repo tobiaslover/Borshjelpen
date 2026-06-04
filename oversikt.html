@@ -57,7 +57,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 }
 
 /* CARDS */
-.card { background: white; border-radius: 14px; border: 1px solid #e8e8e8; padding: 1.25rem; height: 100%; }
+.card { background: white; border-radius: 14px; border: 1px solid #e8e8e8; padding: 1.25rem; }
 .card-title { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
 .card-title a { font-size: 11px; color: #C8A96E; text-decoration: none; font-weight: 400; }
 
@@ -252,20 +252,18 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   </div>
 
   <!-- INDEKSER + VINNERE/TAPERE -->
-  <div style="display:grid;grid-template-columns:1fr 2fr;gap:1.5rem;margin-bottom:1.5rem;align-items:stretch;">
-    <div class="card" style="align-self:start;">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+    <div class="card">
       <div class="card-title">Indekser</div>
       <div id="indexList"><div class="spinner"></div></div>
     </div>
-    <div class="grid-2" style="gap:1rem;">
-      <div class="card">
-        <div class="card-title">🏆 OBX Vinnere <button onclick="openMoversModal()" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;">Se alle →</button></div>
-        <div id="winnersList"><div class="spinner"></div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📉 OBX Tapere <button onclick="openMoversModal()" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;">Se alle →</button></div>
-        <div id="losersList"><div class="spinner"></div></div>
-      </div>
+    <div class="card">
+      <div class="card-title">🏆 OBX Vinnere <button onclick="openMoversModal()" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;">Se alle →</button></div>
+      <div id="winnersList"><div class="spinner"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📉 OBX Tapere <button onclick="openMoversModal()" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;">Se alle →</button></div>
+      <div id="losersList"><div class="spinner"></div></div>
     </div>
   </div>
 
