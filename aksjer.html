@@ -957,14 +957,28 @@ async function loadQuarterlyReport(s) {
         '<div class="quarterly-card-title">Nøkkeltall</div>' +
         tableHtml +
       '</div>' +
-      '<div class="quarterly-card">' +
+      '<div class="quarterly-card" style="grid-column:1/-1;">' +
         '<div class="quarterly-card-title">Sammendrag</div>' +
-        '<p style="font-size:13px;line-height:1.6;">' + (ai.sammendrag || '—') + '</p>' +
-        (ai.vs_fjoraar ? '<p style="font-size:12px;color:#888;margin-top:8px;">' + ai.vs_fjoraar + '</p>' : '') +
+        '<p style="font-size:13px;line-height:1.7;">' + (ai.sammendrag || '—') + '</p>' +
+      '</div>' +
+      (ai.vs_fjoraar ? '<div class="quarterly-card" style="grid-column:1/-1;">' +
+        '<div class="quarterly-card-title">Vs. samme kvartal i fjor</div>' +
+        '<p style="font-size:13px;line-height:1.7;">' + ai.vs_fjoraar + '</p>' +
+      '</div>' : '') +
+      (ai.eps_forklaring ? '<div class="quarterly-card">' +
+        '<div class="quarterly-card-title">EPS og analytiker-estimater</div>' +
+        '<p style="font-size:13px;line-height:1.7;">' + ai.eps_forklaring + '</p>' +
+      '</div>' : '') +
+      (ai.marginer ? '<div class="quarterly-card">' +
+        '<div class="quarterly-card-title">Marginer</div>' +
+        '<p style="font-size:13px;line-height:1.7;">' + ai.marginer + '</p>' +
+      '</div>' : '') +
+      '<div class="quarterly-card">' +
+        '<div class="quarterly-card-title">Positive signaler</div>' +
+        '<div style="color:#2C7A5C;">' + positiveHtml + '</div>' +
       '</div>' +
       '<div class="quarterly-card">' +
-        '<div class="quarterly-card-title">Signaler</div>' +
-        '<div style="color:#2C7A5C;margin-bottom:8px;">' + positiveHtml + '</div>' +
+        '<div class="quarterly-card-title">Negative signaler</div>' +
         '<div style="color:#A32D2D;">' + negativeHtml + '</div>' +
       '</div>' +
       (ai.nybegynner_tips ? '<div class="quarterly-card" style="grid-column:1/-1;background:#EEE8DA;">' +
