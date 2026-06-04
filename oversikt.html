@@ -41,7 +41,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .xp-next { font-size: 11px; color: #aaa; margin-top: 4px; }
 
 /* GRID LAYOUT */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; align-items: stretch; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
 @media (max-width: 700px) {
   .grid-2 { grid-template-columns: 1fr; }
@@ -57,7 +57,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 }
 
 /* CARDS */
-.card { background: white; border-radius: 14px; border: 1px solid #e8e8e8; padding: 1.25rem; }
+.card { background: white; border-radius: 14px; border: 1px solid #e8e8e8; padding: 1.25rem; height: 100%; }
 .card-title { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
 .card-title a { font-size: 11px; color: #C8A96E; text-decoration: none; font-weight: 400; }
 
@@ -259,11 +259,11 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
     </div>
     <div class="grid-2" style="gap:1rem;">
       <div class="card">
-        <div class="card-title">🏆 OBX Vinnere <a href="/aksjer.html" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;">Se alle →</a></div>
+        <div class="card-title">🏆 OBX Vinnere <button onclick="openMoversModal()" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;">Se alle →</button></div>
         <div id="winnersList"><div class="spinner"></div></div>
       </div>
       <div class="card">
-        <div class="card-title">📉 OBX Tapere <a href="/aksjer.html" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;">Se alle →</a></div>
+        <div class="card-title">📉 OBX Tapere <button onclick="openMoversModal()" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;">Se alle →</button></div>
         <div id="losersList"><div class="spinner"></div></div>
       </div>
     </div>
@@ -455,6 +455,7 @@ async function loadIndexes() {
     var res = await fetch('/api/movers');
     var data = await res.json();
     if (!res.ok) throw new Error('movers feil');
+    window._moversData = data;
 
     // Ekte indekser fra Yahoo Finance
     var obx = data.obx;
@@ -683,11 +684,58 @@ async function loadNews() {
     '</div>';
 }
 
+
+function openMoversModal() {
+  var modal = document.getElementById('moversModal');
+  var body = document.getElementById('moversModalBody');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  if (!window._moversData) {
+    body.innerHTML = '<div style="text-align:center;padding:2rem;color:#aaa;">Laster...</div>';
+    return;
+  }
+
+  var all = [...(window._moversData.winners || []), ...[...( window._moversData.losers || [])].reverse()];
+  var sorted = all.sort(function(a, b) {
+    return (parseFloat(b.changePct) * (b.up ? 1 : -1)) - (parseFloat(a.changePct) * (a.up ? 1 : -1));
+  });
+
+  body.innerHTML = sorted.map(function(s) {
+    var sign = s.up ? '+' : '-';
+    var color = s.up ? '#2C7A5C' : '#A32D2D';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
+      '<div><div style="font-size:14px;font-weight:500;">' + s.name + '</div>' +
+      '<div style="font-size:12px;color:#aaa;">' + s.ticker + '</div></div>' +
+      '<div style="font-size:13px;font-weight:500;color:' + color + ';">' + sign + s.changePct + '%</div>' +
+    '</div>';
+  }).join('');
+}
+
+function closeMoversModal() {
+  document.getElementById('moversModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('moversModal').addEventListener('click', function(e) {
+  if (e.target === this) closeMoversModal();
+});
+
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
   <div style="text-align:center;font-size:11px;color:#aaa;font-style:italic;padding:1rem 2rem 2rem;">
     Kursdata fra Yahoo Finance · Fundamentals fra Financial Modeling Prep · Ikke finansiell rådgivning
   </div>
+
+<!-- Movers Modal -->
+<div id="moversModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;">
+  <div style="background:white;border-radius:16px;max-width:500px;width:100%;margin:auto;overflow:hidden;">
+    <div style="background:#1B3A5C;padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;color:white;font-weight:700;">OBX Vinnere & Tapere</div>
+      <button onclick="closeMoversModal()" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div id="moversModalBody" style="padding:1.25rem;max-height:70vh;overflow-y:auto;"></div>
+  </div>
+</div>
 </body>
 </html>
