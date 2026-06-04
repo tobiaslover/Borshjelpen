@@ -318,7 +318,9 @@ async function loadStats(userId) {
     const all = data || [];
     document.getElementById('statSearch').textContent = all.filter(d => d.type === 'search').length;
     document.getElementById('statAI').textContent = all.filter(d => d.type === 'chat').length;
-    document.getElementById('statNews').textContent = all.filter(d => d.type === 'borsbrygg').length;
+    // Tell unike dager med borsbrygg
+const bbDays = new Set(all.filter(d => d.type === 'borsbrygg').map(d => d.created_at.slice(0, 10)));
+document.getElementById('statNews').textContent = bbDays.size;
     const xp = all.reduce((sum, d) => sum + (d.xp || 0), 0);
     document.getElementById('statXP').textContent = xp;
     let level = '🌱 Nybegynner';
