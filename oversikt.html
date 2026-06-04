@@ -683,7 +683,7 @@ async function loadEvents() {
     var res = await fetch('/api/events');
     if (!res.ok) throw new Error('feil');
     var data = await res.json();
-    var events = (data.events || []).slice(0, 8);
+    var events = (data.events || []).slice(0, 5);
     if (!events.length) {
       el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen kommende events.</div>';
       return;
@@ -703,7 +703,9 @@ async function loadEvents() {
         '</div>' +
         '<div style="flex:1;min-width:0;">' +
           '<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (e.name || e.ticker) + '</div>' +
-          '<div style="font-size:11px;color:#aaa;">' + e.ticker + (e.amount ? ' · ' + e.amount + ' NOK' : '') + '</div>' +
+          '<div style="font-size:11px;color:#aaa;">' + 
+          (e.type === 'utbytte' ? 'Utbytte' + (e.amount ? ': ' + e.amount + ' NOK' : '') : 'Kvartalsrapport') +
+        '</div>' +
         '</div>' +
         '<span style="font-size:10px;background:' + badgeBg + ';color:' + badgeColor + ';padding:3px 8px;border-radius:100px;font-weight:500;flex-shrink:0;">' + badgeText + '</span>' +
       '</div>';
