@@ -45,9 +45,30 @@ JSON-struktur:
   "bull": ["Konkret positivt argument 1", "Konkret positivt argument 2", "Konkret positivt argument 3"],
   "bear": ["Konkret risiko 1", "Konkret risiko 2", "Konkret risiko 3"],
   "scenarios": [
-    {"label": "Optimistisk scenario", "prob": 35, "return": "+15% til +30%", "color": "#2C7A5C", "barColor": "#2C7A5C"},
-    {"label": "Nøytralt scenario", "prob": 40, "return": "-5% til +10%", "color": "#888", "barColor": "#888"},
-    {"label": "Pessimistisk scenario", "prob": 25, "return": "-20% til -10%", "color": "#A32D2D", "barColor": "#A32D2D"}
+    {
+      "label": "Skriv et konkret optimistisk scenarionavn basert på selskapets faktiske situasjon (f.eks. 'Høy oljepris + sterk etterspørsel')",
+      "prob": "Realistisk sannsynlighet basert på makro, historikk og selskapsdata — typisk 25-40%",
+      "return": "Realistisk kursutvikling basert på verdsettelse og historisk volatilitet",
+      "drivers": "1-2 setninger om hva som må til for at dette skjer",
+      "color": "#2C7A5C",
+      "barColor": "#2C7A5C"
+    },
+    {
+      "label": "Konkret basisscenario-navn (f.eks. 'Stabil oljepris, moderat vekst')",
+      "prob": "Typisk 35-45%",
+      "return": "Realistisk for basisscenario",
+      "drivers": "Hva som karakteriserer dette scenariet",
+      "color": "#888",
+      "barColor": "#888"
+    },
+    {
+      "label": "Konkret pessimistisk scenarionavn (f.eks. 'Oljepriskollaps + rentepress')",
+      "prob": "Typisk 20-35%",
+      "return": "Realistisk nedside basert på historiske krasj og risikoer",
+      "drivers": "Hva som trigger dette scenariet",
+      "color": "#A32D2D",
+      "barColor": "#A32D2D"
+    }
   ],
   "risiko": "De viktigste risikoene — konkret og ærlig. Ikke generell advarsel, men spesifikt for dette selskapet.",
   "historisk": "Kort og interessant historisk perspektiv — har aksjen vært volatil? Gitt godt utbytte over tid? Hatt store fall?",
