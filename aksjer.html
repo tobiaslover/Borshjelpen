@@ -812,15 +812,15 @@ async function generateAI(s) {
     var bullHtml = (ai.bull||[]).map(function(p) { return '<div class="point"><div class="dot-up"></div><span>' + p + '</span></div>'; }).join('');
     var bearHtml = (ai.bear||[]).map(function(p) { return '<div class="point"><div class="dot-down"></div><span>' + p + '</span></div>'; }).join('');
     sec.innerHTML =
-      '<div class="card" style="margin-bottom:1rem"><div class="card-title">Hva gjør selskapet?</div><p>' + (ai.hva||'—') + '</p></div>' +
-      (ai.hvorfor_eier_folk ? '<div class="card" style="margin-bottom:1rem"><div class="card-title">Hvorfor eier folk denne aksjen?</div><p>' + ai.hvorfor_eier_folk + '</p></div>' : '') +
+      '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva gjør selskapet?</div><p>' + (ai.hva||'—') + '</p></div>' +
+      (ai.hvorfor_eier_folk ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hvorfor eier folk denne aksjen?</div><p>' + ai.hvorfor_eier_folk + '</p></div>' : '') +
       (ai.aktuelt ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva skjer akkurat nå?</div><p>' + ai.aktuelt + '</p></div>' : '') +
-      (ai.pris_vurdering ? '<div class="card" style="margin-bottom:1rem"><div class="card-title">Er aksjen dyr eller billig?</div><p>' + ai.pris_vurdering + '</p></div>' : '') +
-      (ai.paavirkere ? '<div class="card" style="margin-bottom:1rem"><div class="card-title">Hva påvirker kursen?</div><p>' + ai.paavirkere + '</p></div>' : '') +
+      (ai.pris_vurdering ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Er aksjen dyr eller billig?</div><p>' + ai.pris_vurdering + '</p></div>' : '') +
+      (ai.paavirkere ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva påvirker kursen?</div><p>' + ai.paavirkere + '</p></div>' : '') +
       '<div id="newsSection"></div>' +
       '<div class="bull-bear"><div class="card bull"><div class="card-title">Bull-case</div>' + bullHtml + '</div><div class="card bear"><div class="card-title">Bear-case</div>' + bearHtml + '</div></div>' +
-      '<div class="card" style="margin-bottom:1rem"><div class="card-title">Scenarioer neste 12 måneder</div>' + scenariosHtml + '</div>' +
-      '<div class="card" style="margin-bottom:1rem"><div class="card-title">Risiko</div><p style="font-size:13px;line-height:1.7">' + (ai.risiko||'—') + '</p></div>' +
+      '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Scenarioer neste 12 måneder</div>' + scenariosHtml + '</div>' +
+      '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Risiko</div><p style="font-size:13px;line-height:1.7">' + (ai.risiko||'—') + '</p></div>' +
       (ai.historisk ? '<div class="historical-card"><div class="historical-title">📊 Historisk sett</div><div class="historical-text">' + ai.historisk + '</div></div>' : '') +
       (ai.nybegynner_tips ? '<div class="tip-box"><div class="tip-text"><strong>Tips:</strong> ' + ai.nybegynner_tips + '</div></div>' : '');
     loadNews(s.ticker, plan);
