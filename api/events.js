@@ -17,20 +17,23 @@ export default async function handler(req, res) {
   const today = new Date().toISOString().slice(0, 10);
   const future = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-  // Sjekk cache — kun bruk hvis den er fra i dag eller nyere
-  try {
-    const { data: cached } = await sb
-      .from('events_cache')
-      .select('events, updated_at')
-      .eq('id', 'obx')
-      .maybeSingle();
-    if (cached?.events?.length > 0) {
-      const cacheDate = new Date(cached.updated_at).toISOString().slice(0, 10);
-      if (cacheDate === today) {
-        return res.status(200).json({ events: cached.events, cached: true });
+  // Sjekk cache — hopp over hvis force=1
+  const force = req.query.force === '1';
+  if (!force) {
+    try {
+      const { data: cached } = await sb
+        .from('events_cache')
+        .select('events, updated_at')
+        .eq('id', 'obx')
+        .maybeSingle();
+      if (cached?.events?.length > 0) {
+        const age = Date.now() - new Date(cached.updated_at).getTime();
+        if (age < 7 * 24 * 60 * 60 * 1000) {
+          return res.status(200).json({ events: cached.events, cached: true });
+        }
       }
-    }
-  } catch(e) {}
+    } catch(e) {}
+  }
 
   try {
     // ETT kall for dividends + ETT for earnings på OSE-børsen
