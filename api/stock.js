@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'public, max-age=60');
 
   const { ticker } = req.query;
   if (!ticker) return res.status(400).json({ error: 'Ticker mangler' });
@@ -17,11 +17,10 @@ export default async function handler(req, res) {
   };
 
   try {
-    const [yahooRes, fmpProfileRes, fmpMetricsRes, fmpQuoteRes] = await Promise.all([
+    const [yahooRes, profileRes, metricsRes] = await Promise.all([
       fetch(`https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`, { headers }),
-      fetch(`https://financialmodelingprep.com/api/v3/profile/${upper}?apikey=${apiKey}`),
+      fetch(`https://financialmodelingprep.com/stable/profile?symbol=${upper}&apikey=${apiKey}`),
       fetch(`https://financialmodelingprep.com/stable/key-metrics-ttm?symbol=${upper}&apikey=${apiKey}`),
-      fetch(`https://financialmodelingprep.com/api/v3/quote/${upper}?apikey=${apiKey}`),
     ]);
 
     if (!yahooRes.ok) {
@@ -38,28 +37,20 @@ export default async function handler(req, res) {
     const changePct = prevClose ? +((change / prevClose) * 100).toFixed(2) : 0;
     const name = meta?.longName || meta?.shortName || upper;
 
-    // Parse FMP
-    const profileText = await fmpProfileRes.text();
-    const metricsText = await fmpMetricsRes.text();
-    const quoteText = await fmpQuoteRes.text();
+    let profile = null, metrics = null;
+    if (profileRes.ok) {
+      try { const d = await profileRes.json(); profile = Array.isArray(d) ? d[0] : d; } catch(e) {}
+    }
+    if (metricsRes.ok) {
+      try { const d = await metricsRes.json(); metrics = Array.isArray(d) ? d[0] : d; } catch(e) {}
+    }
 
-    console.log('FMP profile:', fmpProfileRes.status, profileText.slice(0, 150));
-    console.log('FMP metrics:', fmpMetricsRes.status, metricsText.slice(0, 150));
-    console.log('FMP quote:', fmpQuoteRes.status, quoteText.slice(0, 150));
-
-    let profile = null, metrics = null, quote = null;
-    try { const p = JSON.parse(profileText); profile = Array.isArray(p) ? p[0] : p; } catch(e) {}
-    try { const m = JSON.parse(metricsText); metrics = Array.isArray(m) ? m[0] : m; } catch(e) {}
-    try { const q = JSON.parse(quoteText); quote = Array.isArray(q) ? q[0] : q; } catch(e) {}
-
-    const pe = quote?.pe ? parseFloat(quote.pe).toFixed(1) :
-               metrics?.peRatioTTM ? parseFloat(metrics.peRatioTTM).toFixed(1) : null;
-
+    const pe = metrics?.peRatioTTM ? parseFloat(metrics.peRatioTTM).toFixed(1) : null;
     const dividendYield = metrics?.dividendYieldTTM ? (parseFloat(metrics.dividendYieldTTM) * 100).toFixed(2) + '%' :
-                          (profile?.lastDiv && profile?.price) ? ((profile.lastDiv / profile.price) * 100).toFixed(2) + '%' : null;
+                          (profile?.lastDiv && price) ? ((profile.lastDiv / price) * 100).toFixed(2) + '%' : null;
 
     let marketCap = null;
-    const mc = quote?.marketCap || profile?.mktCap;
+    const mc = profile?.marketCap || profile?.mktCap;
     if (mc) {
       marketCap = mc >= 1e12 ? (mc/1e12).toFixed(1) + ' tn' :
                   mc >= 1e9  ? (mc/1e9).toFixed(1) + ' mrd' :
