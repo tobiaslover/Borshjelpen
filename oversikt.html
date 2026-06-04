@@ -358,6 +358,16 @@ function setGreeting(name) {
 }
 
 // XP
+function renderStreak(streak) {
+  var el = document.getElementById('streakDisplay');
+  if (!el) return;
+  if (streak <= 0) { el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  el.innerHTML = '🔥 <strong>' + streak + '</strong> dager streak';
+  var next = streak < 3 ? 3 : streak < 7 ? 7 : streak < 14 ? 14 : streak < 30 ? 30 : null;
+  if (next) el.innerHTML += ' <span style="font-size:11px;color:rgba(255,255,255,0.5);margin-left:4px;">(' + (next - streak) + ' til neste bonus)</span>';
+}
+
 function renderXP(xp) {
   var levels = [
     {name:'🌱 Nybegynner', emoji:'🌱', min:0, max:99},
@@ -539,11 +549,13 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
   loadWatchlist();
   loadIndexes();
 
-  // XP
+  // XP + Streak
   try {
-    var { data } = await sb.from('user_activity').select('xp').eq('user_id', user.id);
-    var totalXp = (data || []).reduce(function(sum, r) { return sum + (r.xp || 0); }, 0);
+    var { data: planInfo } = await sb.from('user_plans').select('total_xp, streak, last_login').eq('user_id', user.id).maybeSingle();
+    var totalXp = (planInfo && planInfo.total_xp) || 0;
+    var streak = (planInfo && planInfo.streak) || 0;
     renderXP(totalXp);
+    renderStreak(streak);
   } catch(e) { renderXP(0); }
 })();
 
