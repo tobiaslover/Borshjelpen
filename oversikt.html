@@ -622,22 +622,27 @@ async function loadNews() {
   if (!list) return;
   list.innerHTML = '<div class="spinner"></div>';
   try {
-    // Vent litt for å sikre at sb er klar
-    if (!sb) { console.error('sb ikke klar'); return; }
-    var sessData = await sb.auth.getSession();
-    var sess = sessData && sessData.data && sessData.data.session;
-    if (!sess) { 
-      console.error('Ingen sesjon i loadNews');
-      list.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Logg inn for å se nyheter.</div>';
-      return; 
+    // Hent RSS direkte fra klienten via rss2json (ingen Vercel-funksjon nødvendig)
+    var feeds = [
+      { url: 'https://e24.no/rss/feed', source: 'E24' },
+      { url: 'https://www.dn.no/rss/', source: 'DN' },
+      { url: 'https://finansavisen.no/rss', source: 'Finansavisen' }
+    ];
+    var allItems = [];
+    for (var i = 0; i < feeds.length; i++) {
+      try {
+        var proxyUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feeds[i].url) + '&count=5';
+        var r = await fetch(proxyUrl);
+        if (!r.ok) continue;
+        var d = await r.json();
+        if (d.status !== 'ok' || !d.items) continue;
+        d.items.forEach(function(item) {
+          allItems.push({ title: item.title, url: item.link, source: feeds[i].source, published: item.pubDate });
+        });
+      } catch(e) { continue; }
     }
-    var token = sess.access_token;
-    console.log('loadNews: sender med token', token ? 'OK' : 'MANGLER');
-    var res = await fetch('/api/news', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    var data = await res.json();
-    if (!res.ok || !data.news || !data.news.length) {
+    var data = { news: allItems };
+    if (!data.news || !data.news.length) {
       list.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Ingen nyheter tilgjengelig.</div>';
       return;
     }
@@ -665,5 +670,8 @@ async function loadNews() {
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
+  <div style="text-align:center;font-size:11px;color:#aaa;font-style:italic;padding:1rem 2rem 2rem;">
+    Kursdata fra Yahoo Finance · Fundamentals fra Financial Modeling Prep · Ikke finansiell rådgivning
+  </div>
 </body>
 </html>
