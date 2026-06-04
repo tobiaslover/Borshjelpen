@@ -34,9 +34,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .nav-links a { font-size: 14px; color: #666; text-decoration: none; }
 .nav-links a:hover { color: #1B3A5C; }
 .nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-.mobile-nav-DISABLED { display: none; background: white; border-bottom: 1px solid #e8e8e8; padding: 0; }
-.mobile-nav a { flex: 1; text-align: center; padding: 10px 4px; font-size: 12px; color: #666; text-decoration: none; border-bottom: 2px solid transparent; font-family: 'DM Sans', sans-serif; }
-.mobile-nav a.active { color: #1B3A5C; border-bottom-color: #1B3A5C; font-weight: 500; }
 .search-hero { background: #1B3A5C; padding: 2.5rem 2rem; text-align: center; }
 .search-title { font-family: 'Playfair Display', serif; font-size: 28px; color: white; margin-bottom: 6px; }
 .search-sub { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; }
@@ -124,7 +121,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .chat-input:focus { border-color: #1B3A5C; }
 .chat-send { background: #1B3A5C; color: white; border: none; border-radius: 100px; padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer; }
 .chat-send:disabled { background: #ccc; }
-@media (max-width: 768px) { .nav-links a { display: none; } .mobile-nav-DISABLED { display: flex; } }
+@media (max-width: 768px) { .nav-links a { display: none; } }
 @media (max-width: 480px) { .metrics { grid-template-columns: repeat(2, 1fr) !important; } .bull-bear { grid-template-columns: 1fr; } .result-header { flex-direction: column; gap: 1rem; } .price-block { text-align: left; } .trending-grid { grid-template-columns: repeat(2, 1fr); } .chat-widget { padding: 0 1rem; } .content { padding: 1rem; } }
 .search-wrap { position: relative; max-width: 520px; margin: 0 auto; z-index: 200; }
 .autocomplete-list { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); overflow: hidden; z-index: 9999; }
@@ -693,7 +690,6 @@ function getStockType(s) {
   }
 
   // Børs
-  var stockMkt = stockInfo ? null : null;
   badges.push({label:'Oslo Børs', cls:'badge-small'});
 
   return badges;
@@ -750,7 +746,7 @@ async function logActivity(type, ticker, name) {
     var xp = XP_VALUES[type] || 0;
     var today = new Date().toISOString().slice(0, 10);
 
-    // Begrens XP: search og chat — maks 10 per dag, watchlist — maks 1 per aksje totalt
+    // Begrens XP: search og chat — maks 100 per type per dag, watchlist — maks 1 per aksje totalt
     if (xp > 0) {
       if (type === 'search' || type === 'chat') {
         var { data: todayActs } = await sb.from('user_activity').select('id')
@@ -844,10 +840,6 @@ async function generateAI(s) {
 
 function doSearch() { var v = document.getElementById('searchInput').value.trim(); if (v) search(v); }
 
-var _searchDebounce = null;
-document.getElementById('searchInput').addEventListener('input', function(e) {
-  clearTimeout(_searchDebounce);
-});
 document.getElementById('searchInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') { document.getElementById('acList').style.display = 'none'; doSearch(); }
   if (e.key === 'Escape') document.getElementById('acList').style.display = 'none';
