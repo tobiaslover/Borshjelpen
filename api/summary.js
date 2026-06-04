@@ -21,6 +21,19 @@ export default async function handler(req, res) {
   const stock = req.body;
   if (!stock || !stock.ticker) return res.status(400).json({ error: 'Aksjedata mangler' });
 
+  // Rate limit: gratis 2/dag, investor/proff 200/dag
+  const LIMITS = { free: 2, investor: 200, proff: 200 };
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
+  const { data: planData } = await sb.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle();
+  const plan = planData?.plan || 'free';
+  const limit = LIMITS[plan] ?? 2;
+  const { count } = await sb.from('user_activity').select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id).eq('activity', 'ai_analyse').gte('created_at', today + 'T00:00:00+02:00');
+  if ((count || 0) >= limit) {
+    return res.status(429).json({ error: `Du har nådd dagens grense på ${limit} AI-analyser.`, limit, plan });
+  }
+  await sb.from('user_activity').insert({ user_id: user.id, activity: 'ai_analyse', xp: 2 });
+
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   try {
