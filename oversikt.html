@@ -439,42 +439,64 @@ async function loadWatchlist() {
 
 // INDEKSER
 async function loadIndexes() {
-  var tickers = ['EQNR', 'DNB', 'AKRBP', 'TEL', 'MOWI', 'YAR', 'NHY'];
   try {
-    var results = await Promise.all(tickers.map(function(t) {
-      return fetch('/api/stock?ticker=' + t).then(function(r) { return r.json(); }).catch(function() { return null; });
-    }));
-    var valid = results.filter(function(r) { return r && !r.error; });
+    var res = await fetch('/api/movers');
+    if (!res.ok) throw new Error('movers feil');
+    var data = await res.json();
 
-    // OBX simulert som gjennomsnitt av topp-aksjer
-    var obxChange = valid.reduce(function(sum, s) { return sum + parseFloat(s.changePct); }, 0) / valid.length;
-    var osebxChange = obxChange * 0.95; // Litt mer stabil
-
-    var sign1 = obxChange >= 0 ? '+' : '';
-    var sign2 = osebxChange >= 0 ? '+' : '';
-    var cls1 = obxChange >= 0 ? 'up' : 'down';
-    var cls2 = osebxChange >= 0 ? 'up' : 'down';
-
-    document.getElementById('indexList').innerHTML =
-      '<div class="index-row"><div><div class="index-name">OBX</div><div style="font-size:11px;color:#aaa;">Oslo Børs 25 største</div></div><span class="index-pct ' + cls1 + '">' + sign1 + obxChange.toFixed(2) + '%</span></div>' +
-      '<div class="index-row"><div><div class="index-name">OSEBX</div><div style="font-size:11px;color:#aaa;">Oslo Børs Benchmark</div></div><span class="index-pct ' + cls2 + '">' + sign2 + osebxChange.toFixed(2) + '%</span></div>';
-
-    // Vinnere og tapere
-    var sorted = [...valid].sort(function(a,b) { return parseFloat(b.changePct) - parseFloat(a.changePct); });
-    var winners = sorted.slice(0, 3);
-    var losers = sorted.slice(-3).reverse();
-
-    function rowHtml(s) {
-      var sign = parseFloat(s.changePct) >= 0 ? '+' : '';
-      var cls = parseFloat(s.changePct) >= 0 ? 'pct-up' : 'pct-down';
-      return '<div class="stock-row" onclick="location.href=\'/aksjer.html?ticker=' + s.ticker + '\'">' +
-        '<div><div class="stock-name">' + s.name.split(' ')[0] + '</div><div class="stock-ticker">' + s.ticker + '</div></div>' +
-        '<span class="stock-pct ' + cls + '">' + sign + s.changePct + '%</span></div>';
+    // Ekte indekser fra Yahoo Finance
+    var obx = data.obx;
+    var osebx = data.osebx;
+    function renderIndex(name, sub, idx) {
+      if (!idx) return '<div class="index-row"><div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div><div style="color:#aaa">—</div></div>';
+      var sign = idx.up ? '+' : '-';
+      var cls = idx.up ? 'index-up' : 'index-down';
+      return '<div class="index-row"><div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div>' +
+        '<div style="text-align:right;"><div class="' + cls + '">' + sign + idx.changePct + '%</div>' +
+        '<div style="font-size:11px;color:#aaa;">' + parseFloat(idx.price).toLocaleString('nb-NO') + '</div></div></div>';
     }
-    document.getElementById('winnersList').innerHTML = winners.map(rowHtml).join('');
-    document.getElementById('losersList').innerHTML = losers.map(rowHtml).join('');
+    document.getElementById('indexList').innerHTML =
+      renderIndex('OBX', 'Oslo Børs 25 største', obx) +
+      renderIndex('OSEBX', 'Oslo Børs Benchmark', osebx);
+
+    // Vinnere
+    var winners = data.winners || [];
+    var losers = data.losers || [];
+    var winnersMore = winners.slice(3);
+    var losersMore = losers.slice(3);
+
+    function renderMover(s) {
+      var sign = s.up ? '+' : '-';
+      var cls = s.up ? 'mover-up' : 'mover-down';
+      return '<div class="mover-row">' +
+        '<div><div class="mover-name">' + s.name + '</div><div class="mover-ticker">' + s.ticker + '</div></div>' +
+        '<div class="' + cls + '">' + sign + s.changePct + '%</div>' +
+      '</div>';
+    }
+
+    document.getElementById('winnersList').innerHTML = winners.slice(0, 3).map(renderMover).join('') +
+      (winnersMore.length ? '<div id="winnersMore" style="display:none;">' + winnersMore.map(renderMover).join('') + '</div>' +
+      '<div style="text-align:center;padding:8px 0;"><button onclick="toggleMovers('winners')" id="winnersBtn" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;">Se alle →</button></div>' : '');
+
+    document.getElementById('losersList').innerHTML = losers.slice(0, 3).map(renderMover).join('') +
+      (losersMore.length ? '<div id="losersMore" style="display:none;">' + losersMore.map(renderMover).join('') + '</div>' +
+      '<div style="text-align:center;padding:8px 0;"><button onclick="toggleMovers('losers')" id="losersBtn" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;">Se alle →</button></div>' : '');
+
   } catch(e) {
-    document.getElementById('indexList').innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Kunne ikke hente indeksdata.</div>';
+    document.getElementById('indexList').innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente indeksdata.</div>';
+  }
+}
+
+function toggleMovers(type) {
+  var el = document.getElementById(type + 'More');
+  var btn = document.getElementById(type + 'Btn');
+  if (!el) return;
+  if (el.style.display === 'none') {
+    el.style.display = 'block';
+    btn.textContent = 'Skjul ↑';
+  } else {
+    el.style.display = 'none';
+    btn.textContent = 'Se alle →';
   }
 }
 
