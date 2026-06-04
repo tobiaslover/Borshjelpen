@@ -2,10 +2,34 @@
 // - OBX og OSEBX indekspriser fra Yahoo Finance
 // - Vinnere og tapere fra OBX-aksjene (25 mest likvide) via Yahoo Finance
 
+// OBX-komponenter (oppdatert juni 2026)
 const OBX_TICKERS = [
-  'AKRBP','BWLPG','DNB','EQNR','FRO','GJF','GOGL','HAFNI','HAUTO',
-  'KOG','MOWI','MPCC','NHY','ORK','RECSI','SALM','SCATC','STB',
-  'SUBC','TEL','TGS','YAR','AKER','AUSS','LSG'
+  'EQNR',   // Equinor
+  'VAR',    // Vår Energi
+  'DNB',    // DNB
+  'NHY',    // Norsk Hydro
+  'FRO',    // Frontline
+  'AKRBP',  // Aker BP
+  'NAS',    // Norwegian Air Shuttle
+  'KOG',    // Kongsberg Gruppen
+  'MOWI',   // Mowi
+  'ORK',    // Orkla
+  'YAR',    // Yara
+  'TEL',    // Telenor
+  'VEND',   // Vend (Adevinta)
+  'PROT',   // Protector Forsikring
+  'SUBC',   // Subsea 7
+  'SALM',   // SalMar
+  'KMAR',   // Kongsberg Maritime
+  'STB',    // Storebrand
+  'NOD',    // Nordic Semiconductor
+  'DOFG',   // DOF Group
+  'GJF',    // Gjensidige
+  'TOM',    // Tomra
+  'WAWI',   // Wallenius Wilhelmsen
+  'BWLPG',  // BW LPG
+  'HAUTO',  // Höegh Autoliners
+  'BAKKA',  // Bakkafrost
 ];
 
 export default async function handler(req, res) {
