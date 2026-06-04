@@ -17,42 +17,40 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.FMP_API_KEY;
 
-  try {
-    // v4 endepunkt
-    const url = `https://financialmodelingprep.com/api/v4/stock_news_sentiments_rss_feed?page=0&apikey=${apiKey}`;
-    console.log('Fetching FMP v4 news');
+  // Prøv nye stabile endepunkter i rekkefølge
+  const endpoints = [
+    `https://financialmodelingprep.com/stable/news/stock?limit=10&apikey=${apiKey}`,
+    `https://financialmodelingprep.com/stable/news/general?limit=10&apikey=${apiKey}`,
+    `https://financialmodelingprep.com/api/v3/stock_news?limit=10&apikey=${apiKey}`,
+  ];
 
-    const r = await fetch(url);
-    const text = await r.text();
-    console.log('FMP v4 status:', r.status, text.slice(0, 300));
+  for (const url of endpoints) {
+    try {
+      console.log('Trying:', url.replace(apiKey, 'HIDDEN'));
+      const r = await fetch(url);
+      const text = await r.text();
+      console.log('Status:', r.status, text.slice(0, 200));
 
-    let d;
-    try { d = JSON.parse(text); } catch(e) { d = []; }
+      if (r.status !== 200) continue;
 
-    if (!Array.isArray(d) || !d.length) {
-      // Fallback: prøv general_news
-      const r2 = await fetch(`https://financialmodelingprep.com/api/v4/general_news?page=0&apikey=${apiKey}`);
-      const t2 = await r2.text();
-      console.log('FMP general_news status:', r2.status, t2.slice(0, 300));
-      try { d = JSON.parse(t2); } catch(e) { d = []; }
+      let d;
+      try { d = JSON.parse(text); } catch(e) { continue; }
+      if (!Array.isArray(d) || !d.length) continue;
+
+      const news = d.slice(0, 10).map(item => ({
+        title: item.title,
+        url: item.url,
+        source: item.site || item.publisher || '',
+        ticker: item.symbol || null,
+        published: item.publishedDate || item.date || '',
+      }));
+
+      return res.status(200).json({ news });
+    } catch(e) {
+      console.error('Endpoint error:', e.message);
+      continue;
     }
-
-    if (!Array.isArray(d) || !d.length) {
-      return res.status(200).json({ news: [], debug: 'no data' });
-    }
-
-    const news = d.slice(0, 10).map(item => ({
-      title: item.title,
-      url: item.url,
-      source: item.site || item.publisher || '',
-      ticker: item.symbol || null,
-      published: item.publishedDate || item.date || '',
-      sentiment: item.sentiment || null
-    }));
-
-    return res.status(200).json({ news });
-  } catch(e) {
-    console.error('News error:', e.message);
-    return res.status(500).json({ error: e.message });
   }
+
+  return res.status(200).json({ news: [], error: 'Ingen nyhetsendepunkter fungerte' });
 }
