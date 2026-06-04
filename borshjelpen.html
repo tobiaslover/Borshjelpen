@@ -116,7 +116,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 @media (max-width: 768px) {
   .nav { padding: .75rem 1rem; }
   .logo { font-size: 14px; letter-spacing: 1.5px; }
-  #navAuth button:first-child { display: none; }
   .nav-cta { font-size: 11px; padding: 6px 10px; }
   .hero { grid-template-columns: 1fr !important; padding: 1.5rem 1rem; gap: 1.5rem; }
   .hero-right { display: none !important; }
@@ -245,9 +244,9 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
         <div class="phone-section">
           <div class="phone-section-title">Risiko</div>
           <div class="risk-bars" id="heroRiskBars">
-            <div class="risk-row"><span style="min-width:70px">Oljepris</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:85%;background:#E24B4A"></div></div><span>Høy</span></div>
-            <div class="risk-row"><span style="min-width:70px">Valuta</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:55%;background:#EF9F27"></div></div><span>Middels</span></div>
-            <div class="risk-row"><span style="min-width:70px">Politisk</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:35%;background:#C8A96E"></div></div><span>Lav</span></div>
+            <div class="risk-row"><span style="min-width:70px;font-size:10px">Oljepris</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:85%;background:#E24B4A"></div></div><span style="font-size:10px">Høy</span></div>
+            <div class="risk-row"><span style="min-width:70px;font-size:10px">Valuta</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:55%;background:#EF9F27"></div></div><span style="font-size:10px">Middels</span></div>
+            <div class="risk-row"><span style="min-width:70px;font-size:10px">Politisk</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:35%;background:#C8A96E"></div></div><span style="font-size:10px">Lav</span></div>
           </div>
         </div>
         <div class="pill-row" id="heroPills"></div>
@@ -435,13 +434,22 @@ async function loadHeroStock() {
     document.getElementById('heroName').textContent = s.name;
     document.getElementById('heroPrice').textContent = price.toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
     const sign = s.up ? '+' : '';
+    const change = parseFloat(s.change);
+    const changePct = parseFloat(s.changePct);
     const badge = document.getElementById('heroBadge');
-    badge.textContent = sign + s.change + ' kr (' + sign + s.changePct + '%)';
+    if (!isNaN(change) && !isNaN(changePct)) {
+      badge.textContent = sign + change.toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr (' + sign + changePct.toFixed(2) + '%)';
+    }
     badge.className = s.up ? 'badge-up' : 'badge-down';
     document.getElementById('heroDesc').textContent = descriptions[s.ticker] || 'Notert på Oslo Børs.';
     const mock = document.getElementById('heroMock');
     mock.style.cursor = 'pointer';
-    mock.onclick = function() { location.href = '/aksjer.html?ticker=' + s.ticker; };
+    mock.setAttribute('role', 'link');
+    mock.setAttribute('tabindex', '0');
+    mock.setAttribute('aria-label', 'Se full analyse av ' + s.name);
+    function goToStock() { location.href = '/aksjer.html?ticker=' + s.ticker; }
+    mock.onclick = goToStock;
+    mock.onkeydown = function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToStock(); } };
     const risks = riskProfiles[s.ticker] || riskProfiles['EQNR'];
     document.getElementById('heroRiskBars').innerHTML = risks.map(function(r) {
       return '<div class="risk-row"><span style="min-width:70px;font-size:10px">' + r.label + '</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:' + r.pct + '%;background:' + r.color + '"></div></div><span style="font-size:10px">' + r.level + '</span></div>';
@@ -457,13 +465,16 @@ if (nlDateEl) {
   nlDateEl.textContent = today.charAt(0).toUpperCase() + today.slice(1);
 }
 
-// Plangrenser hentes fra plans.js (window.PLANS) — én sannhetskilde for hele nettstedet
+// Plangrenser hentes fra plans.js (window.PLANS) — én sannhetskilde for hele nettstedet.
+// Hvis plans.js mangler, beholdes tallene som står i HTML-en (fallback).
 (function renderPlanLimits() {
+  var P = window.PLANS;
+  if (!P) return;
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
-  setText('freeAnalysis', PLANS.free.aiAnalysis);
-  setText('freeChat', PLANS.free.aiChat);
-  setText('freeWatchlist', PLANS.free.watchlist);
-  setText('investorWatchlist', PLANS.investor.watchlist === Infinity ? 'ubegrenset' : PLANS.investor.watchlist);
+  setText('freeAnalysis', P.free.aiAnalysis);
+  setText('freeChat', P.free.aiChat);
+  setText('freeWatchlist', P.free.watchlist);
+  setText('investorWatchlist', P.investor.watchlist === Infinity ? 'ubegrenset' : P.investor.watchlist);
 })();
 
 (async function checkAuth() {
