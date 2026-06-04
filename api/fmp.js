@@ -13,6 +13,18 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await sb.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
 
+  // Rate limit: gratis 100/dag, investor/proff 500/dag
+  const LIMITS = { free: 100, investor: 500, proff: 500 };
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
+  const { data: planData } = await sb.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle();
+  const plan = planData?.plan || 'free';
+  const limit = LIMITS[plan] ?? 100;
+  const { count } = await sb.from('user_activity').select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id).eq('activity', 'sok').gte('created_at', today + 'T00:00:00+02:00');
+  if ((count || 0) >= limit) {
+    return res.status(429).json({ error: `Du har nådd dagens grense på ${limit} aksjesøk.`, limit, plan });
+  }
+
   const { ticker } = req.query;
   if (!ticker) return res.status(400).json({ error: 'Ticker mangler' });
 
