@@ -45,16 +45,9 @@ export default async function handler(req, res) {
     if (ratiosRes.ok) { try { const d = await ratiosRes.json(); ratios = Array.isArray(d) ? d[0] : d; } catch(e) {} }
     if (incomeRes.ok) { try { const d = await incomeRes.json(); income = Array.isArray(d) ? d[0] : d; } catch(e) {} }
 
-    // Selskaper som rapporterer i USD
-    const USD_SECTORS = ['Shipping', 'Energy', 'Oil', 'Gas', 'Offshore'];
-    const USD_TICKERS = [
-      'FRONTLINE','GOGL','BWLPG','MPCC','BELCO','FLNG','SDRL','SIEM','2020BULKERS',
-      'EQNR','AKRBP','OKEA','SUBC','TGS','AKSO','VAR','BORR','PGS','TDW'
-    ];
-    const sector = profile?.sector || '';
-    const isUSD = USD_TICKERS.includes(upper) ||
-                  USD_SECTORS.some(s => sector.toLowerCase().includes(s.toLowerCase()));
-    const reportCurrency = isUSD ? 'USD' : 'NOK';
+    // Alt rapporteres i NOK som standard
+    // USD-liste oppdateres når bruker sender liste
+    const reportCurrency = 'NOK';
 
     function fmtMoney(val, currency) {
       if (!val) return null;
@@ -66,7 +59,6 @@ export default async function handler(req, res) {
       return sign + val.toLocaleString('nb-NO') + ' ' + currency;
     }
 
-    // Alias for bakoverkompatibilitet
     function fmtUSD(val) { return fmtMoney(val, reportCurrency); }
 
     // P/E
