@@ -17,10 +17,11 @@ export default async function handler(req, res) {
   };
 
   try {
-    const [yahooRes, fmpProfileRes, fmpRatiosRes] = await Promise.all([
+    const [yahooRes, fmpProfileRes, fmpMetricsRes, fmpQuoteRes] = await Promise.all([
       fetch(`https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`, { headers }),
       fetch(`https://financialmodelingprep.com/api/v3/profile/${upper}?apikey=${apiKey}`),
-      fetch(`https://financialmodelingprep.com/api/v3/ratios-ttm/${upper}?apikey=${apiKey}`),
+      fetch(`https://financialmodelingprep.com/stable/key-metrics-ttm?symbol=${upper}&apikey=${apiKey}`),
+      fetch(`https://financialmodelingprep.com/api/v3/quote/${upper}?apikey=${apiKey}`),
     ]);
 
     if (!yahooRes.ok) {
@@ -37,28 +38,32 @@ export default async function handler(req, res) {
     const changePct = prevClose ? +((change / prevClose) * 100).toFixed(2) : 0;
     const name = meta?.longName || meta?.shortName || upper;
 
-    // Debug FMP
-    const fmpProfileText = await fmpProfileRes.text();
-    const fmpRatiosText = await fmpRatiosRes.text();
-    console.log('FMP profile status:', fmpProfileRes.status, fmpProfileText.slice(0, 200));
-    console.log('FMP ratios status:', fmpRatiosRes.status, fmpRatiosText.slice(0, 200));
+    // Parse FMP
+    const profileText = await fmpProfileRes.text();
+    const metricsText = await fmpMetricsRes.text();
+    const quoteText = await fmpQuoteRes.text();
 
-    let profile = null, ratios = null;
-    try { profile = JSON.parse(fmpProfileText); profile = Array.isArray(profile) ? profile[0] : profile; } catch(e) {}
-    try { ratios = JSON.parse(fmpRatiosText); ratios = Array.isArray(ratios) ? ratios[0] : ratios; } catch(e) {}
+    console.log('FMP profile:', fmpProfileRes.status, profileText.slice(0, 150));
+    console.log('FMP metrics:', fmpMetricsRes.status, metricsText.slice(0, 150));
+    console.log('FMP quote:', fmpQuoteRes.status, quoteText.slice(0, 150));
 
-    const pe = ratios?.peRatioTTM ? parseFloat(ratios.peRatioTTM).toFixed(1) :
-               profile?.pe ? parseFloat(profile.pe).toFixed(1) : null;
+    let profile = null, metrics = null, quote = null;
+    try { const p = JSON.parse(profileText); profile = Array.isArray(p) ? p[0] : p; } catch(e) {}
+    try { const m = JSON.parse(metricsText); metrics = Array.isArray(m) ? m[0] : m; } catch(e) {}
+    try { const q = JSON.parse(quoteText); quote = Array.isArray(q) ? q[0] : q; } catch(e) {}
 
-    const dividendYield = ratios?.dividendYieldTTM ? (parseFloat(ratios.dividendYieldTTM) * 100).toFixed(2) + '%' :
+    const pe = quote?.pe ? parseFloat(quote.pe).toFixed(1) :
+               metrics?.peRatioTTM ? parseFloat(metrics.peRatioTTM).toFixed(1) : null;
+
+    const dividendYield = metrics?.dividendYieldTTM ? (parseFloat(metrics.dividendYieldTTM) * 100).toFixed(2) + '%' :
                           (profile?.lastDiv && profile?.price) ? ((profile.lastDiv / profile.price) * 100).toFixed(2) + '%' : null;
 
     let marketCap = null;
-    const mc = profile?.mktCap || profile?.marketCap;
+    const mc = quote?.marketCap || profile?.mktCap;
     if (mc) {
-      marketCap = mc >= 1e12 ? (mc/1e12).toFixed(1) + ' tn USD' :
-                  mc >= 1e9  ? (mc/1e9).toFixed(1) + ' mrd USD' :
-                  mc >= 1e6  ? (mc/1e6).toFixed(0) + ' mill USD' : String(mc);
+      marketCap = mc >= 1e12 ? (mc/1e12).toFixed(1) + ' tn' :
+                  mc >= 1e9  ? (mc/1e9).toFixed(1) + ' mrd' :
+                  mc >= 1e6  ? (mc/1e6).toFixed(0) + ' mill' : String(mc);
     }
 
     res.status(200).json({
@@ -79,8 +84,8 @@ export default async function handler(req, res) {
       volume: meta?.regularMarketVolume?.toLocaleString('nb-NO') || null,
       sector: profile?.sector || null,
       industry: profile?.industry || null,
-      profitMargin: ratios?.netProfitMarginTTM ? (parseFloat(ratios.netProfitMarginTTM) * 100).toFixed(1) + '%' : null,
-      returnOnEquity: ratios?.returnOnEquityTTM ? (parseFloat(ratios.returnOnEquityTTM) * 100).toFixed(1) + '%' : null,
+      profitMargin: metrics?.netProfitMarginTTM ? (parseFloat(metrics.netProfitMarginTTM) * 100).toFixed(1) + '%' : null,
+      returnOnEquity: metrics?.roeTTM ? (parseFloat(metrics.roeTTM) * 100).toFixed(1) + '%' : null,
       description: profile?.description || null,
     });
   } catch (err) {
