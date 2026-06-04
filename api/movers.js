@@ -1,5 +1,6 @@
-// Henter OBX-indeks og vinnere/tapere fra Yahoo Finance
-// Bruker de 25 OBX-aksjene + indeksene i parallelle kall
+// Henter:
+// - OBX og OSEBX indekspriser fra Yahoo Finance
+// - Vinnere og tapere fra OBX-aksjene (25 mest likvide) via Yahoo Finance
 
 const OBX_TICKERS = [
   'AKRBP','BWLPG','DNB','EQNR','FRO','GJF','GOGL','HAFNI','HAUTO',
@@ -19,7 +20,7 @@ export default async function handler(req, res) {
     'Referer': 'https://finance.yahoo.com/',
   };
 
-  function parseChart(data, ticker) {
+  function parseStock(data, ticker) {
     try {
       const result = data?.chart?.result?.[0];
       const meta = result?.meta;
@@ -30,7 +31,9 @@ export default async function handler(req, res) {
       const changePct = prevClose ? (change / prevClose) * 100 : 0;
       return {
         ticker,
-        name: (meta?.longName || meta?.shortName || ticker).replace(' ASA','').replace(' PLC','').split(' ').slice(0,2).join(' '),
+        name: (meta?.longName || meta?.shortName || ticker)
+          .replace(' ASA','').replace(' PLC','').replace(' Limited','')
+          .split(' ').slice(0,2).join(' '),
         price: price.toFixed(2),
         changePct: Math.abs(changePct).toFixed(2),
         changePctRaw: changePct,
@@ -39,11 +42,30 @@ export default async function handler(req, res) {
     } catch(e) { return null; }
   }
 
+  function parseIndex(data) {
+    try {
+      const result = data?.chart?.result?.[0];
+      const meta = result?.meta;
+      const closes = (result?.indicators?.quote?.[0]?.close || []).filter(v => v != null);
+      const price = meta?.regularMarketPrice || closes[closes.length - 1] || 0;
+      const prevClose = meta?.chartPreviousClose || closes[closes.length - 2] || price;
+      const change = price - prevClose;
+      const changePct = prevClose ? (change / prevClose) * 100 : 0;
+      if (!price) return null;
+      return {
+        price: Math.round(price).toLocaleString('nb-NO'),
+        change: change.toFixed(2),
+        changePct: Math.abs(changePct).toFixed(2),
+        up: change >= 0
+      };
+    } catch(e) { return null; }
+  }
+
   try {
-    // Hent indekser + OBX-aksjer parallelt
+    // Hent alt parallelt: 2 indekser + 25 OBX-aksjer
     const allFetches = [
-      fetch('https://query2.finance.yahoo.com/v8/finance/chart/%5EOBX?interval=1d&range=2d', { headers: yHeaders }),
-      fetch('https://query2.finance.yahoo.com/v8/finance/chart/%5EOSEBX?interval=1d&range=2d', { headers: yHeaders }),
+      fetch('https://query2.finance.yahoo.com/v8/finance/chart/%5EOBX?interval=1d&range=5d', { headers: yHeaders }),
+      fetch('https://query2.finance.yahoo.com/v8/finance/chart/%5EOSEBX?interval=1d&range=5d', { headers: yHeaders }),
       ...OBX_TICKERS.map(t =>
         fetch(`https://query2.finance.yahoo.com/v8/finance/chart/${t}.OL?interval=1d&range=2d`, { headers: yHeaders })
       )
@@ -53,54 +75,39 @@ export default async function handler(req, res) {
     const jsons = await Promise.all(responses.map(r => r.ok ? r.json() : null));
 
     // Parse indekser
-    function parseIndex(data) {
-      if (!data) return null;
-      try {
-        const result = data?.chart?.result?.[0];
-        const meta = result?.meta;
-        const closes = (result?.indicators?.quote?.[0]?.close || []).filter(v => v != null);
-        const price = meta?.regularMarketPrice || closes[closes.length - 1] || 0;
-        const prevClose = meta?.chartPreviousClose || closes[closes.length - 2] || price;
-        const change = price - prevClose;
-        const changePct = prevClose ? (change / prevClose) * 100 : 0;
-        return {
-          price: price.toFixed(0),
-          change: change.toFixed(2),
-          changePct: Math.abs(changePct).toFixed(2),
-          up: change >= 0
-        };
-      } catch(e) { return null; }
-    }
+    let obx = parseIndex(jsons[0]);
+    let osebx = parseIndex(jsons[1]);
 
-    const obx = parseIndex(jsons[0]);
-    const osebx = parseIndex(jsons[1]);
+    // Parse OBX-aksjer
+    const stocks = OBX_TICKERS.map((t, i) => parseStock(jsons[i + 2], t)).filter(Boolean);
 
-    // Parse aksjer
-    const stocks = OBX_TICKERS.map((t, i) => parseChart(jsons[i + 2], t)).filter(Boolean);
-
-    // Sorter
-    const sorted = [...stocks].sort((a, b) => b.changePctRaw - a.changePctRaw);
-    const winners = sorted.slice(0, 5);
-    const losers = sorted.slice(-5).reverse();
-
-    // Fallback: beregn OBX fra aksjene hvis Yahoo-indeksene ikke fungerer
-    let obxFinal = obx;
-    let osebxFinal = osebx;
-    if (!obxFinal || obxFinal.price === '0' || obxFinal.changePct === '0.00') {
-      const validChanges = stocks.map(s => s.changePctRaw);
-      const avgChange = validChanges.reduce((a, b) => a + b, 0) / validChanges.length;
-      obxFinal = {
-        price: '—',
+    // Fallback hvis Yahoo-indekser ikke fungerer: beregn fra aksjene
+    if (!obx || !obx.price) {
+      const avgChange = stocks.reduce((sum, s) => sum + s.changePctRaw, 0) / stocks.length;
+      obx = {
+        price: null,
         change: avgChange.toFixed(2),
         changePct: Math.abs(avgChange).toFixed(2),
         up: avgChange >= 0
       };
     }
-    if (!osebxFinal || osebxFinal.price === '0' || osebxFinal.changePct === '0.00') {
-      osebxFinal = obxFinal ? Object.assign({}, obxFinal, { price: '—' }) : null;
+    if (!osebx || !osebx.price) {
+      // OSEBX er bredere enn OBX — estimert litt mer stabil
+      const avgChange = stocks.reduce((sum, s) => sum + s.changePctRaw, 0) / stocks.length * 0.95;
+      osebx = {
+        price: null,
+        change: avgChange.toFixed(2),
+        changePct: Math.abs(avgChange).toFixed(2),
+        up: avgChange >= 0
+      };
     }
 
-    return res.status(200).json({ winners, losers, obx: obxFinal, osebx: osebxFinal });
+    // Sorter OBX-aksjer for vinnere/tapere
+    const sorted = [...stocks].sort((a, b) => b.changePctRaw - a.changePctRaw);
+    const winners = sorted.slice(0, 5);
+    const losers = sorted.slice(-5).reverse();
+
+    return res.status(200).json({ winners, losers, obx, osebx });
   } catch(e) {
     console.error('movers error:', e.message);
     return res.status(500).json({ error: e.message });
