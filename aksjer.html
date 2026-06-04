@@ -1461,11 +1461,12 @@ async function renderWatchlist() {
       var ticker = list[i].ticker;
       var priceEl = document.getElementById('wlprice-' + ticker);
       var pctEl = document.getElementById('wlpct-' + ticker);
-      if (priceEl) priceEl.textContent = parseFloat(data.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
+      var p = parseFloat(data.price);
+      if (priceEl && !isNaN(p)) priceEl.textContent = p.toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
       if (pctEl) {
-        var sign = parseFloat(data.changePct) >= 0 ? '+' : '';
+        var sign = data.up ? '+' : '-';
         pctEl.textContent = sign + data.changePct + '%';
-        pctEl.style.color = parseFloat(data.changePct) >= 0 ? '#2C7A5C' : '#A32D2D';
+        pctEl.style.color = data.up ? '#2C7A5C' : '#A32D2D';
         pctEl.style.fontSize = '12px';
         pctEl.style.fontWeight = '500';
       }
