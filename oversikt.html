@@ -156,10 +156,10 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .index-down { color: #A32D2D; font-size: 15px; font-weight: 500; }
 .mover-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
 .mover-row:last-child { border-bottom: none; }
-.mover-name { font-size: 13px; font-weight: 500; }
-.mover-ticker { font-size: 11px; color: #aaa; margin-top: 1px; }
-.mover-up { font-size: 13px; font-weight: 500; color: #2C7A5C; }
-.mover-down { font-size: 13px; font-weight: 500; color: #A32D2D; }
+.mover-name { font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+.mover-ticker { font-size: 11px; color: #aaa; margin-top: 1px; font-family: 'DM Sans', sans-serif; }
+.mover-up { font-size: 13px; font-weight: 500; color: #2C7A5C; font-family: 'DM Sans', sans-serif; }
+.mover-down { font-size: 13px; font-weight: 500; color: #A32D2D; font-family: 'DM Sans', sans-serif; }
 </style>
 </head>
 <body>
@@ -256,11 +256,11 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
     </div>
     <div class="grid-2" style="gap:1rem;">
       <div class="card">
-        <div class="card-title">🏆 Vinnere <a href="/aksjer.html">Se alle →</a></div>
+        <div class="card-title">🏆 OBX Vinnere <a href="/aksjer.html" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;">Se alle →</a></div>
         <div id="winnersList"><div class="spinner"></div></div>
       </div>
       <div class="card">
-        <div class="card-title">📉 Tapere <a href="/aksjer.html">Se alle →</a></div>
+        <div class="card-title">📉 OBX Tapere <a href="/aksjer.html" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;">Se alle →</a></div>
         <div id="losersList"><div class="spinner"></div></div>
       </div>
     </div>
@@ -450,10 +450,8 @@ async function loadWatchlist() {
 async function loadIndexes() {
   try {
     var res = await fetch('/api/movers');
-    console.log('movers status:', res.status);
     var data = await res.json();
-    console.log('movers data:', JSON.stringify(data).slice(0, 300));
-    if (!res.ok) throw new Error('movers feil: ' + res.status);
+    if (!res.ok) throw new Error('movers feil');
 
     // Ekte indekser fra Yahoo Finance
     var obx = data.obx;
