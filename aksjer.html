@@ -566,19 +566,28 @@ function renderStock(s) {
     '</div>' +
     '<div class="metrics">' +
       '<div class="metric"><div class="metric-label">P/E</div><div class="metric-val ' + (!s.pe ? 'na' : '') + '">' + fmt(s.pe) + '</div></div>' +
-      '<div class="metric"><div class="metric-label">Utbytte</div><div class="metric-val ' + (!s.dividendYield ? 'na' : '') + '">' + fmt(s.dividendYield) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Direkteavkastning</div><div class="metric-val ' + (!s.dividendYield ? 'na' : '') + '">' + fmt(s.dividendYield) + '</div></div>' +
       '<div class="metric"><div class="metric-label">Markedsverdi</div><div class="metric-val ' + (!s.marketCap ? 'na' : '') + '">' + fmt(s.marketCap) + '</div></div>' +
-      '<div class="metric"><div class="metric-label">Beta</div><div class="metric-val ' + (!s.beta ? 'na' : '') + '">' + fmt(s.beta) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">P/B</div><div class="metric-val ' + (!s.pb ? 'na' : '') + '">' + fmt(s.pb) + '</div></div>' +
     '</div>' +
     '<div id="ai-section"><div class="ai-loading"><div class="ai-spinner"></div><p>AI analyserer selskapet...</p></div></div>' +
     '<div class="card" style="margin-bottom:1rem;margin-top:1rem">' +
       '<div class="card-title">Nøkkeltall</div>' +
-      '<div class="stat-row"><span class="stat-label">52 ukers høy</span><span class="stat-val">' + fmt(s.fiftyTwoWeekHigh) + ' ' + s.currency + '</span></div>' +
-      '<div class="stat-row"><span class="stat-label">52 ukers lav</span><span class="stat-val">' + fmt(s.fiftyTwoWeekLow) + ' ' + s.currency + '</span></div>' +
-      '<div class="stat-row"><span class="stat-label">Profittmargin</span><span class="stat-val">' + fmt(s.profitMargin) + '</span></div>' +
-      '<div class="stat-row"><span class="stat-label">Egenkapitalavkastning</span><span class="stat-val">' + fmt(s.returnOnEquity) + '</span></div>' +
+      (s.marketCap ? '<div class="stat-row"><span class="stat-label">Markedsverdi</span><span class="stat-val">' + s.marketCap + '</span></div>' : '') +
+      (s.revenue ? '<div class="stat-row"><span class="stat-label">Omsetning (TTM)</span><span class="stat-val">' + s.revenue + '</span></div>' : '') +
+      (s.ebit ? '<div class="stat-row"><span class="stat-label">EBIT</span><span class="stat-val">' + s.ebit + '</span></div>' : '') +
+      (s.eps ? '<div class="stat-row"><span class="stat-label">EPS</span><span class="stat-val">' + s.eps + '</span></div>' : '') +
+      (s.dividendPerShare ? '<div class="stat-row"><span class="stat-label">Utbytte per aksje</span><span class="stat-val">' + s.dividendPerShare + '</span></div>' : '') +
+      (s.dividendYield ? '<div class="stat-row"><span class="stat-label">Direkteavkastning</span><span class="stat-val">' + s.dividendYield + '</span></div>' : '') +
+      (s.pe ? '<div class="stat-row"><span class="stat-label">P/E</span><span class="stat-val">' + s.pe + '</span></div>' : '') +
+      (s.pb ? '<div class="stat-row"><span class="stat-label">P/B</span><span class="stat-val">' + s.pb + '</span></div>' : '') +
+      '<div class="stat-row"><span class="stat-label">52 ukers høy</span><span class="stat-val">' + fmt(s.fiftyTwoWeekHigh) + ' NOK</span></div>' +
+      '<div class="stat-row"><span class="stat-label">52 ukers lav</span><span class="stat-val">' + fmt(s.fiftyTwoWeekLow) + ' NOK</span></div>' +
+      (s.returnOnEquity ? '<div class="stat-row"><span class="stat-label">Egenkapitalavkastning (ROE)</span><span class="stat-val">' + s.returnOnEquity + '</span></div>' : '') +
+      (s.profitMargin ? '<div class="stat-row"><span class="stat-label">Profittmargin</span><span class="stat-val">' + s.profitMargin + '</span></div>' : '') +
       (s.industry ? '<div class="stat-row"><span class="stat-label">Bransje</span><span class="stat-val">' + s.industry + '</span></div>' : '') +
       (s.volume ? '<div class="stat-row"><span class="stat-label">Volum</span><span class="stat-val">' + s.volume + '</span></div>' : '') +
+      '<div style="font-size:11px;color:#aaa;margin-top:8px;font-style:italic;">Nøkkeltall i USD · Kurs i NOK</div>' +
     '</div>' +
     '<div class="disclaimer">Data fra Yahoo Finance · Forsinket ca. 15–20 min · Ikke finansiell rådgivning</div>';
   document.getElementById('trending').innerHTML = '';
