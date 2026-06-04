@@ -439,7 +439,7 @@ async function loadWatchlist() {
 
 // INDEKSER
 async function loadIndexes() {
-  var tickers = ['EQNR', 'DNB', 'AKRBP', 'TEL', 'MOWI', 'YAR', 'NHY', 'KAHOT'];
+  var tickers = ['EQNR', 'DNB', 'AKRBP', 'TEL', 'MOWI', 'YAR', 'NHY'];
   try {
     var results = await Promise.all(tickers.map(function(t) {
       return fetch('/api/stock?ticker=' + t).then(function(r) { return r.json(); }).catch(function() { return null; });
