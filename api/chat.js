@@ -1,6 +1,8 @@
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
+const LIMITS = { free: 5, investor: 200, proff: 200 };
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST');
@@ -22,6 +24,42 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'messages mangler' });
   }
 
+  // --- RATE LIMIT SJEKK ---
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
+
+  // Hent plan
+  const { data: planData } = await sb
+    .from('user_plans')
+    .select('plan')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  const plan = planData?.plan || 'free';
+  const limit = LIMITS[plan] ?? LIMITS.free;
+
+  // Tell chat-kall i dag
+  const { count } = await sb
+    .from('user_activity')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('activity', 'chat')
+    .gte('created_at', today + 'T00:00:00+02:00');
+
+  if ((count || 0) >= limit) {
+    return res.status(429).json({
+      error: `Du har nådd dagens grense på ${limit} chat-meldinger.`,
+      limit,
+      plan
+    });
+  }
+
+  // Logg aktivitet
+  await sb.from('user_activity').insert({
+    user_id: user.id,
+    activity: 'chat',
+    xp: 1
+  });
+
+  // --- OPENAI KALL ---
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   const contextInfo = context ? `
