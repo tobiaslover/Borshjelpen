@@ -622,10 +622,19 @@ async function loadNews() {
   if (!list) return;
   list.innerHTML = '<div class="spinner"></div>';
   try {
-    var sess = (await sb.auth.getSession()).data.session;
-    if (!sess) return;
+    // Vent litt for å sikre at sb er klar
+    if (!sb) { console.error('sb ikke klar'); return; }
+    var sessData = await sb.auth.getSession();
+    var sess = sessData && sessData.data && sessData.data.session;
+    if (!sess) { 
+      console.error('Ingen sesjon i loadNews');
+      list.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Logg inn for å se nyheter.</div>';
+      return; 
+    }
+    var token = sess.access_token;
+    console.log('loadNews: sender med token', token ? 'OK' : 'MANGLER');
     var res = await fetch('/api/news', {
-      headers: { 'Authorization': 'Bearer ' + sess.access_token }
+      headers: { 'Authorization': 'Bearer ' + token }
     });
     var data = await res.json();
     if (!res.ok || !data.news || !data.news.length) {
