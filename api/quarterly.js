@@ -82,32 +82,34 @@ export default async function handler(req, res) {
 
     // Sende til AI for oppsummering
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const prompt = `Du er Børshjelpen sin finansanalytiker for norske nybegynnere.
+    const prompt = `Du er Børshjelpen sin finansanalytiker — du snakker som en ærlig, engasjert venn som kan finans godt. Forklar kvartalsrapporten grundig og konkret. Bruk de faktiske tallene aktivt i analysen.
 
-Analyser denne kvartalsrapporten for ${name || ticker} (${qData.period}):
+Kvartalsrapport for ${name || ticker} (${qData.period}):
 
 RESULTATREGNSKAP:
 - Omsetning: ${qData.revenue} ${qData.revenueChange ? '(' + qData.revenueChange + ' vs samme kvartal i fjor)' : ''}
 - EBIT: ${qData.ebit} ${qData.ebitChange ? '(' + qData.ebitChange + ' vs fjorår)' : ''}
 - Nettoresultat: ${qData.netIncome} ${qData.netIncomeChange ? '(' + qData.netIncomeChange + ' vs fjorår)' : ''}
-- EPS: ${qData.eps || '—'} ${qData.epsEstimated ? '(estimert: ' + qData.epsEstimated + ')' : ''}
-${qData.epsSurprise ? '- EPS-overraskelse: ' + qData.epsSurprise : ''}
+- EPS: ${qData.eps || '—'} ${qData.epsEstimated ? '(analytikerne ventet: ' + qData.epsEstimated + ')' : ''}
+${qData.epsSurprise ? '- Slo/bommet estimat med: ' + qData.epsSurprise : ''}
 - Bruttomargin: ${qData.grossMargin || '—'}
 - Driftsmargin: ${qData.operatingMargin || '—'}
 ${qData.freeCashFlow ? '- Fri kontantstrøm: ' + qData.freeCashFlow : ''}
 
-Svar KUN med gyldig JSON:
+Svar KUN med gyldig JSON. Vær gjerne utfyllende der det er nyttig — ikke kutt ned for korthetens skyld:
 {
-  "sammendrag": "2-3 setninger om hva rapporten viser totalt sett",
-  "positive": ["punkt 1", "punkt 2"],
-  "negative": ["punkt 1", "punkt 2"],
-  "vs_fjoraar": "En setning om utvikling vs samme kvartal i fjor",
-  "nybegynner_tips": "Én setning som forklarer det viktigste for en nybegynner"
+  "sammendrag": "3-5 setninger som oppsummerer rapporten konkret. Bruk de faktiske tallene. Var dette en sterk, svak eller nøytral rapport — og hvorfor?",
+  "vs_fjoraar": "2-3 setninger om hvordan dette kvartalet var sammenlignet med samme kvartal i fjor. Hva forbedret seg? Hva ble svakere?",
+  "eps_forklaring": "Forklar EPS-resultatet konkret — slo de forventningene eller ikke, og hva betyr det i praksis? Kun hvis EPS-data er tilgjengelig.",
+  "marginer": "Kommenter bruttomargin og driftsmargin — er de gode, svake eller typiske for bransjen?",
+  "positive": ["Konkret positivt punkt med tall", "Konkret positivt punkt med tall", "Eventuelt tredje punkt"],
+  "negative": ["Konkret bekymring med tall", "Konkret bekymring med tall"],
+  "nybegynner_tips": "Én konkret setning som hjelper en nybegynner forstå det viktigste fra denne rapporten."
 }`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      max_tokens: 600,
+      max_tokens: 1000,
       messages: [{ role: 'user', content: prompt }]
     });
 
