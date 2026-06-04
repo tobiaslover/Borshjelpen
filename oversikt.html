@@ -145,6 +145,12 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .spinner { width: 20px; height: 20px; border: 2px solid #e8e8e8; border-top-color: #C8A96E; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 1rem auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .section-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+.news-item { display: flex; flex-direction: column; gap: 4px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer; text-decoration: none; color: inherit; }
+.news-item:last-child { border-bottom: none; }
+.news-item:hover .news-title { color: #1B3A5C; }
+.news-title { font-size: 13px; font-weight: 500; line-height: 1.4; color: #1a1a1a; }
+.news-meta { display: flex; gap: 8px; font-size: 11px; color: #aaa; align-items: center; }
+.news-ticker { background: #E6EEF5; color: #1B3A5C; padding: 2px 7px; border-radius: 100px; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -270,11 +276,8 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   <!-- NYHETER + EVENTS -->
   <div class="grid-2" style="margin-bottom:1.5rem;">
     <div class="card">
-      <div class="card-title">📰 Viktigste børsnyheter</div>
-      <div class="news-placeholder">
-        <div class="news-placeholder-icon">🔧</div>
-        <div class="news-placeholder-text">Børsnyheter fra FMP kommer snart</div>
-      </div>
+      <div class="card-title">📰 Børsnyheter <a href="#" onclick="loadNews();return false;">↻</a></div>
+      <div id="newsList"><div class="spinner"></div></div>
     </div>
     <div class="card">
       <div class="card-title">📅 Kommende events</div>
@@ -554,6 +557,7 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
   setGreeting(firstName);
   loadWatchlist();
   loadIndexes();
+  loadNews();
 
   // XP + Streak — oppdater streak ved pageload
   try {
@@ -612,6 +616,42 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
     renderStreak(streak);
   } catch(e) { renderXP(0); }
 })();
+
+async function loadNews() {
+  var list = document.getElementById('newsList');
+  if (!list) return;
+  list.innerHTML = '<div class="spinner"></div>';
+  try {
+    var sess = (await sb.auth.getSession()).data.session;
+    if (!sess) return;
+    var res = await fetch('/api/news', {
+      headers: { 'Authorization': 'Bearer ' + sess.access_token }
+    });
+    var data = await res.json();
+    if (!res.ok || !data.news || !data.news.length) {
+      list.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Ingen nyheter tilgjengelig.</div>';
+      return;
+    }
+    list.innerHTML = data.news.map(function(n) {
+      var ago = '';
+      try {
+        var diff = Math.floor((Date.now() - new Date(n.published)) / 60000);
+        if (diff < 60) ago = diff + ' min siden';
+        else if (diff < 1440) ago = Math.floor(diff/60) + ' t siden';
+        else ago = Math.floor(diff/1440) + ' d siden';
+      } catch(e) {}
+      return '<a class="news-item" href="' + n.url + '" target="_blank" rel="noopener">' +
+        '<div class="news-title">' + n.title + '</div>' +
+        '<div class="news-meta">' +
+        (n.ticker ? '<span class="news-ticker">' + n.ticker + '</span>' : '') +
+        '<span>' + (n.source || '') + '</span>' +
+        '<span>' + ago + '</span>' +
+        '</div></a>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Kunne ikke laste nyheter.</div>';
+  }
+}
 
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
