@@ -15,42 +15,17 @@ export default async function handler(req, res) {
   if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
 
   try {
-    // Prøv først med generelle Oslo Børs-nyheter
-    const queries = [
-      `https://financialmodelingprep.com/api/v3/stock_news?tickers=EQNR.OL,DNB.OL,AKRBP.OL,TEL.OL,MOWI.OL,YAR.OL,NHY.OL&limit=10&apikey=${process.env.FMP_API_KEY}`,
-      `https://financialmodelingprep.com/api/v4/general_news?page=0&apikey=${process.env.FMP_API_KEY}`
-    ];
+    const url = `https://financialmodelingprep.com/api/v3/stock_news?tickers=EQNR.OL&limit=5&apikey=${process.env.FMP_API_KEY}`;
+    const r = await fetch(url);
+    const d = await r.json();
 
-    let news = [];
-
-    // Prøv Oslo Børs tickers først
-    const r1 = await fetch(queries[0]);
-    const d1 = await r1.json();
-    if (Array.isArray(d1) && d1.length > 0) {
-      news = d1;
-    } else {
-      // Fallback til generelle finansnyheter
-      const r2 = await fetch(queries[1]);
-      const d2 = await r2.json();
-      if (Array.isArray(d2) && d2.length > 0) {
-        news = d2.slice(0, 10);
-      }
-    }
-
-    if (!news.length) {
-      return res.status(200).json({ news: [] });
-    }
-
-    const formatted = news.map(item => ({
-      title: item.title,
-      url: item.url,
-      source: item.site || item.publisher || '',
-      ticker: item.symbol || null,
-      published: item.publishedDate || item.date || '',
-      image: item.image || null
-    }));
-
-    return res.status(200).json({ news: formatted });
+    // Returner rådata for debugging
+    return res.status(200).json({ 
+      debug: true,
+      status: r.status,
+      url: url.replace(process.env.FMP_API_KEY, 'HIDDEN'),
+      data: d
+    });
   } catch(e) {
     return res.status(500).json({ error: e.message });
   }
