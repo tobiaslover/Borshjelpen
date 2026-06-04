@@ -199,7 +199,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   <div style="display:flex;flex-direction:column;flex:1;">
     <a href="/borshjelpen.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/oversikt.html" id="mobileOversikt" onclick="closeMobileMenu()" style="display:none;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📊</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Oversikt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
-    <a href="/oversikt.html" id="mobileOversikt" onclick="closeMobileMenu()" style="display:none;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📊</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Oversikt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjeguiden</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
@@ -336,9 +335,9 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
       <div style="font-family:'Playfair Display',serif;font-size:28px;color:#1B3A5C;margin-bottom:4px;">0 kr</div>
       <div style="font-size:12px;color:#5a7a9c;margin-bottom:1.25rem;">For alltid</div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
-        <div style="font-size:13px;color:#1B3A5C;">✓ AI-analyse — 2 per dag</div>
-        <div style="font-size:13px;color:#1B3A5C;">✓ AI-chat — 5 spørsmål per dag</div>
-        <div style="font-size:13px;color:#1B3A5C;">✓ Watchlist — 2 aksjer</div>
+        <div style="font-size:13px;color:#1B3A5C;">✓ AI-analyse — <span id="freeAnalysis">2</span> per dag</div>
+        <div style="font-size:13px;color:#1B3A5C;">✓ AI-chat — <span id="freeChat">5</span> spørsmål per dag</div>
+        <div style="font-size:13px;color:#1B3A5C;">✓ Watchlist — <span id="freeWatchlist">2</span> aksjer</div>
         <div style="font-size:13px;color:#1B3A5C;">✓ Børsbrygg</div>
         <div style="font-size:13px;color:#1B3A5C;">✓ Læring</div>
       </div>
@@ -353,7 +352,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
         <div style="font-size:13px;color:#555;">✓ AI-analyse</div>
         <div style="font-size:13px;color:#555;">✓ AI-chat</div>
-        <div style="font-size:13px;color:#555;">✓ Watchlist — opptil 10 aksjer</div>
+        <div style="font-size:13px;color:#555;">✓ Watchlist — opptil <span id="investorWatchlist">10</span> aksjer</div>
         <div style="font-size:13px;color:#555;">✓ Børsbrygg</div>
         <div style="font-size:13px;color:#555;">✓ Børsmeldinger oppsummert</div>
         <div style="font-size:13px;color:#555;">✓ Læring</div>
@@ -427,11 +426,13 @@ async function loadHeroStock() {
   const ticker = heroTickers[Math.floor(Math.random() * heroTickers.length)];
   try {
     const res = await fetch('/api/stock?ticker=' + ticker);
+    if (!res.ok) return;
     const s = await res.json();
-    if (s.error) return;
+    const price = parseFloat(s.price);
+    if (s.error || isNaN(price)) return;
     document.getElementById('heroTicker').textContent = s.ticker + ' · Oslo Børs';
     document.getElementById('heroName').textContent = s.name;
-    document.getElementById('heroPrice').textContent = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
+    document.getElementById('heroPrice').textContent = price.toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
     const sign = s.up ? '+' : '';
     const badge = document.getElementById('heroBadge');
     badge.textContent = sign + s.change + ' kr (' + sign + s.changePct + '%)';
@@ -455,6 +456,16 @@ if (nlDateEl) {
   nlDateEl.textContent = today.charAt(0).toUpperCase() + today.slice(1);
 }
 
+// Plangrenser — MÅ holdes i synk med PLANS i aksjer.html (Infinity = ubegrenset)
+const PLANS = { free: {aiAnalysis:2, aiChat:5, watchlist:2}, investor: {aiAnalysis:200, aiChat:200, watchlist:10}, proff: {aiAnalysis:200, aiChat:200, watchlist:Infinity} };
+(function renderPlanLimits() {
+  function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+  setText('freeAnalysis', PLANS.free.aiAnalysis);
+  setText('freeChat', PLANS.free.aiChat);
+  setText('freeWatchlist', PLANS.free.watchlist);
+  setText('investorWatchlist', PLANS.investor.watchlist === Infinity ? 'ubegrenset' : PLANS.investor.watchlist);
+})();
+
 (async function checkAuth() {
   try {
     const script = document.createElement('script');
@@ -472,8 +483,6 @@ if (nlDateEl) {
       const initials = name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0,2);
       document.getElementById('navAuth').style.display = 'none';
       document.getElementById('navUser').style.display = 'flex';
-      if(document.getElementById('navOversikt')) document.getElementById('navOversikt').style.display = 'block';
-      if(document.getElementById('mobileOversikt')) document.getElementById('mobileOversikt').style.display = 'flex';
       if(document.getElementById('navOversikt')) document.getElementById('navOversikt').style.display = 'block';
       if(document.getElementById('mobileOversikt')) document.getElementById('mobileOversikt').style.display = 'flex';
       document.getElementById('navAv').textContent = initials;
