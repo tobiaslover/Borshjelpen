@@ -158,12 +158,59 @@ async function doLogin() {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
-      // Kun 1 login-XP per dag
+      // Streak og daglig login-XP
       var loginToday = new Date().toISOString().slice(0, 10);
       var { data: loginCheck } = await sb.from('user_activity').select('id').eq('user_id', session.user.id).eq('type', 'login').gte('created_at', loginToday + 'T00:00:00Z').limit(1);
       if (!loginCheck || loginCheck.length === 0) {
+        // Logg aktivitet
         await sb.from('user_activity').insert({ user_id: session.user.id, type: 'login', ticker: null, name: 'Daglig innlogging', xp: 3 });
-        try { var apd = await sb.from('user_plans').select('total_xp').eq('user_id', session.user.id).maybeSingle(); var axp = (apd.data && apd.data.total_xp) || 0; await sb.from('user_plans').upsert({ user_id: session.user.id, total_xp: axp + 3 }, { onConflict: 'user_id' }); } catch(e) {}
+
+        // Oppdater streak
+        try {
+          var { data: planData } = await sb.from('user_plans').select('streak, last_login, total_xp').eq('user_id', session.user.id).maybeSingle();
+          var streak = (planData && planData.streak) || 0;
+          var lastLogin = planData && planData.last_login;
+          var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+          var yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+          if (lastLogin === yesterdayStr) {
+            streak += 1; // Fortsetter streaken
+          } else if (lastLogin === loginToday) {
+            // Allerede logget inn i dag, gjør ingenting
+          } else {
+            streak = 1; // Nullstill
+          }
+
+          // Bonus-XP ved milepæler
+          var bonusXp = 0;
+          var bonusMsg = '';
+          if (streak === 3)  { bonusXp = 10;  bonusMsg = '3-dagers streak!'; }
+          if (streak === 7)  { bonusXp = 25;  bonusMsg = '7-dagers streak!'; }
+          if (streak === 14) { bonusXp = 50;  bonusMsg = '14-dagers streak!'; }
+          if (streak === 30) { bonusXp = 100; bonusMsg = '30-dagers streak!'; }
+
+          var currentXp = (planData && planData.total_xp) || 0;
+          var newXp = currentXp + 3 + bonusXp;
+
+          await sb.from('user_plans').upsert({
+            user_id: session.user.id,
+            total_xp: newXp,
+            streak: streak,
+            last_login: loginToday
+          }, { onConflict: 'user_id' });
+
+          if (bonusXp > 0) {
+            await sb.from('user_activity').insert({ user_id: session.user.id, type: 'streak', ticker: null, name: bonusMsg, xp: bonusXp });
+            // Vis streak-melding
+            setTimeout(function() {
+              var el = document.createElement('div');
+              el.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1B3A5C;color:white;padding:14px 24px;border-radius:100px;font-size:14px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);display:flex;align-items:center;gap:8px;';
+              el.innerHTML = '🔥 ' + bonusMsg + ' +' + bonusXp + ' bonus XP!';
+              document.body.appendChild(el);
+              setTimeout(function() { el.remove(); }, 4000);
+            }, 1500);
+          }
+        } catch(e) {}
       }
     }
   } catch(e) {}
