@@ -469,6 +469,9 @@ async function confirmCancel() {
     if (res.ok) {
       closeCancelModal();
       alert('Abonnementet er avsluttet. Du beholder tilgang til betalingsperioden er over.');
+    } else if (data.error && data.error.includes('abonnement')) {
+      closeCancelModal();
+      alert('Du er på gratis-plan og har ingen aktivt abonnement å avslutte.');
     } else {
       alert('Feil: ' + (data.error || 'Noe gikk galt'));
     }
