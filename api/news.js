@@ -16,26 +16,41 @@ export default async function handler(req, res) {
   if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
 
   const apiKey = process.env.FMP_API_KEY;
-  
+
   try {
-    // Test 1: generelle nyheter uten ticker-filter
-    const url = `https://financialmodelingprep.com/api/v3/stock_news?limit=10&apikey=${apiKey}`;
-    console.log('Fetching FMP news:', url.replace(apiKey, 'HIDDEN'));
-    
+    // v4 endepunkt
+    const url = `https://financialmodelingprep.com/api/v4/stock_news_sentiments_rss_feed?page=0&apikey=${apiKey}`;
+    console.log('Fetching FMP v4 news');
+
     const r = await fetch(url);
     const text = await r.text();
-    console.log('FMP status:', r.status);
-    console.log('FMP raw:', text.slice(0, 500));
-    
-    let d;
-    try { d = JSON.parse(text); } catch(e) { d = text; }
+    console.log('FMP v4 status:', r.status, text.slice(0, 300));
 
-    return res.status(200).json({ 
-      fmp_status: r.status,
-      fmp_data: d,
-      has_key: !!apiKey,
-      key_prefix: apiKey ? apiKey.slice(0, 8) + '...' : 'MANGLER'
-    });
+    let d;
+    try { d = JSON.parse(text); } catch(e) { d = []; }
+
+    if (!Array.isArray(d) || !d.length) {
+      // Fallback: prøv general_news
+      const r2 = await fetch(`https://financialmodelingprep.com/api/v4/general_news?page=0&apikey=${apiKey}`);
+      const t2 = await r2.text();
+      console.log('FMP general_news status:', r2.status, t2.slice(0, 300));
+      try { d = JSON.parse(t2); } catch(e) { d = []; }
+    }
+
+    if (!Array.isArray(d) || !d.length) {
+      return res.status(200).json({ news: [], debug: 'no data' });
+    }
+
+    const news = d.slice(0, 10).map(item => ({
+      title: item.title,
+      url: item.url,
+      source: item.site || item.publisher || '',
+      ticker: item.symbol || null,
+      published: item.publishedDate || item.date || '',
+      sentiment: item.sentiment || null
+    }));
+
+    return res.status(200).json({ news });
   } catch(e) {
     console.error('News error:', e.message);
     return res.status(500).json({ error: e.message });
