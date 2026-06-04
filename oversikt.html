@@ -368,7 +368,7 @@ function renderStreak(streak) {
     return;
   }
   var flame = streak >= 30 ? '🔥🔥🔥' : streak >= 7 ? '🔥🔥' : '🔥';
-  el.innerHTML = flame + ' <strong>' + streak + '</strong> dager streak';
+  el.innerHTML = flame + ' <strong>' + streak + '</strong> dagers streak';
   var next = streak < 3 ? 3 : streak < 7 ? 7 : streak < 14 ? 14 : streak < 30 ? 30 : null;
   if (next) el.innerHTML += ' <span style="font-size:11px;color:rgba(255,255,255,0.5);margin-left:4px;">(' + (next - streak) + ' til neste bonus)</span>';
   else el.innerHTML += ' <span style="font-size:11px;color:#C8A96E;margin-left:4px;">Maks streak! 🏆</span>';
