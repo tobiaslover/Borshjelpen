@@ -359,6 +359,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   </div>
 </div>
 
+<script src="/plans.js"></script>
 <script>
 function fmt(val) { return (val === null || val === undefined) ? '—' : val; }
 let chatHistory = [];
@@ -696,7 +697,7 @@ function getStockType(s) {
 }
 
 var DEV_MODE = window.location.hostname.includes('vercel.app');
-var PLANS = { free: {aiAnalysis:2, aiChat:5, watchlist:2}, investor: {aiAnalysis:200, aiChat:200, watchlist:10}, proff: {aiAnalysis:200, aiChat:200, watchlist:Infinity} };
+// PLANS hentes fra plans.js (window.PLANS) — én sannhetskilde for hele nettstedet
 var XP_VALUES = { search: 2, chat: 1, borsbrygg: 5, login: 3, watchlist: 5 };
 
 async function getUserPlan(sb) {
