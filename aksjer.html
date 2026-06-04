@@ -422,7 +422,7 @@ async function search(ticker) {
     return;
   }
 
-  showSkeleton();
+  showLoading();
   var s;
   try {
     var res = await fetch('/api/stock?ticker=' + encodeURIComponent(ticker));
@@ -488,6 +488,7 @@ function renderFMPData(fmp, s) {
       descEl.className = 'card';
       descEl.style.marginBottom = '1rem';
       descEl.innerHTML = '<div class="card-title">Om selskapet</div><p style="font-size:13px;line-height:1.7;color:#555;">' + fmp.description.slice(0, 500) + (fmp.description.length > 500 ? '...' : '') + '</p>';
+      aiSection.insertAdjacentElement('beforebegin', descEl);
     }
   }
 
