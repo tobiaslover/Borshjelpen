@@ -419,6 +419,7 @@ async function search(ticker) {
   if (cached) {
     renderStock(cached);
     generateAI(cached);
+    loadFMPData(cached);
     return;
   }
 
@@ -699,7 +700,7 @@ function getStockType(s) {
 }
 
 var DEV_MODE = window.location.hostname.includes('vercel.app');
-var PLANS = { free: {aiAnalysis:2, aiChat:5, watchlist:2}, investor: {aiAnalysis:200, aiChat:200, watchlist:10}, proff: {aiAnalysis:200, aiChat:200, watchlist:-1} };
+var PLANS = { free: {aiAnalysis:2, aiChat:5, watchlist:2}, investor: {aiAnalysis:200, aiChat:200, watchlist:10}, proff: {aiAnalysis:200, aiChat:200, watchlist:Infinity} };
 var XP_VALUES = { search: 2, chat: 1, borsbrygg: 5, login: 3, watchlist: 5 };
 
 async function getUserPlan(sb) {
@@ -852,8 +853,7 @@ document.getElementById('searchInput').addEventListener('keydown', function(e) {
   if (e.key === 'Escape') document.getElementById('acList').style.display = 'none';
 });
 
-var urlTicker = new URLSearchParams(window.location.search).get('ticker');
-if (urlTicker) search(urlTicker);
+// URL-autosøk flyttet til etter at auth er klar (se window._authReady nederst)
 
 function addMsg(role, text) {
   var c = document.getElementById('chatMessages');
@@ -1370,7 +1370,6 @@ document.getElementById('searchInput').addEventListener('input', function() { sh
 document.addEventListener('click', function(e) { if (!e.target.closest('.search-wrap')) document.getElementById('acList').style.display = 'none'; });
 
 var currentStock = null;
-var WATCHLIST_LIMITS = { free: 2, investor: 10, proff: Infinity };
 
 async function getWatchlist() {
   var sb = window._sb; if (!sb) return [];
@@ -1399,7 +1398,8 @@ async function removeWatchlistItem(ticker) {
 
 function getWatchlistLimit() {
   var plan = window._userPlan || 'free';
-  return WATCHLIST_LIMITS[plan] !== undefined ? WATCHLIST_LIMITS[plan] : WATCHLIST_LIMITS['free'];
+  var p = PLANS[plan] || PLANS.free;
+  return p.watchlist !== undefined ? p.watchlist : PLANS.free.watchlist;
 }
 
 async function toggleWatchlist(s) {
@@ -1569,9 +1569,9 @@ async function analyzePortfolioFresh() {
   btn.textContent = 'Analyser portefølje →'; btn.disabled = false;
 }
 
-window.addEventListener('load', function() { setTimeout(initPortfolio, 800); loadPortfolio(); });
+window.addEventListener('load', function() { loadPortfolio(); });
 
-(async function checkAuth() {
+window._authReady = (async function checkAuth() {
   try {
     var script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
@@ -1600,6 +1600,13 @@ window.addEventListener('load', function() { setTimeout(initPortfolio, 800); loa
     }
   } catch(e) {}
 })();
+
+// Kjør auth-avhengige handlinger først når Supabase faktisk er klar (ingen gjetting på timing)
+window._authReady.then(function() {
+  initPortfolio();
+  var urlTicker = new URLSearchParams(window.location.search).get('ticker');
+  if (urlTicker) search(urlTicker);
+});
 
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
