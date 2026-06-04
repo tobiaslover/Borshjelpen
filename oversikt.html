@@ -290,7 +290,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
       <div id="newsList" style="text-align:center;padding:1.5rem 0;color:#aaa;font-size:13px;">🔧 Under utvikling — kommer snart</div>
     </div>
     <div class="card">
-      <div class="card-title">📅 Kommende events</div>
+      <div class="card-title">📅 Kommende events <span style="font-size:10px;background:#E6EEF5;color:#1B3A5C;padding:2px 7px;border-radius:100px;font-weight:500;margin-left:6px;letter-spacing:0.5px;">OBX</span></div>
       <div id="eventsList">
         <div class="event-row">
           <div class="event-date"><div class="event-date-day">10</div><div class="event-date-mon">Jun</div></div>
@@ -700,6 +700,43 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+async function loadEvents() {
+  var el = document.getElementById('eventsList');
+  if (!el) return;
+  try {
+    var res = await fetch('/api/events');
+    if (!res.ok) throw new Error('feil');
+    var data = await res.json();
+    var events = (data.events || []).slice(0, 8);
+    if (!events.length) {
+      el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen kommende events.</div>';
+      return;
+    }
+    el.innerHTML = events.map(function(e) {
+      var d = new Date(e.date + 'T12:00:00');
+      var day = d.getDate();
+      var month = d.toLocaleString('nb-NO', {month:'short'}).toUpperCase();
+      var isRapport = e.type === 'rapport';
+      var badgeColor = isRapport ? '#1B3A5C' : '#2C7A5C';
+      var badgeBg = isRapport ? '#E6EEF5' : '#E1F5EE';
+      var badgeText = isRapport ? 'Rapport' : 'Utbytte';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
+        '<div style="width:40px;background:#1B3A5C;border-radius:8px;padding:6px 4px;text-align:center;flex-shrink:0;">' +
+          '<div style="font-size:14px;font-weight:700;color:white;line-height:1;">' + day + '</div>' +
+          '<div style="font-size:9px;color:#C8A96E;font-weight:500;margin-top:1px;">' + month + '</div>' +
+        '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (e.name || e.ticker) + '</div>' +
+          '<div style="font-size:11px;color:#aaa;">' + e.ticker + (e.amount ? ' · ' + e.amount + ' NOK' : '') + '</div>' +
+        '</div>' +
+        '<span style="font-size:10px;background:' + badgeBg + ';color:' + badgeColor + ';padding:3px 8px;border-radius:100px;font-weight:500;flex-shrink:0;">' + badgeText + '</span>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    var el2 = document.getElementById('eventsList');
+    if (el2) el2.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente events.</div>';
+  }
+}
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
