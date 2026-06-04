@@ -308,7 +308,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   </div>
 </div>
 
-<div id="watchlistSection" style="display:none;max-width:900px;margin:0 auto 2rem;padding:0 2rem;">
+<div id="watchlistSection" style="display:none;max-width:900px;margin:0 auto 2rem;padding:0 2rem;" class="frontpage-only">
   <div class="watchlist-section">
     <div class="watchlist-header">
       <div class="watchlist-label">📌 Min Watchlist</div>
@@ -318,7 +318,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   </div>
 </div>
 
-<div style="max-width:900px;margin:0 auto 3rem;padding:0 2rem;">
+<div id="portfolioSection" style="max-width:900px;margin:0 auto 3rem;padding:0 2rem;">
   <div style="border:1px solid #e8e8e8;border-radius:16px;overflow:hidden;">
     <div style="background:#1B3A5C;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;">
       <div style="display:flex;align-items:center;gap:10px;">
@@ -591,6 +591,9 @@ function renderStock(s) {
     '</div>' +
     '<div class="disclaimer">Data fra Yahoo Finance · Forsinket ca. 15–20 min · Ikke finansiell rådgivning</div>';
   document.getElementById('trending').innerHTML = '';
+  // Skjul watchlist-overskrift og portefølje når aksje er søkt opp
+  var pfSec = document.getElementById('portfolioSection');
+  if (pfSec) pfSec.style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
   loadQuarterlyReport(s);
   renderWatchlistBtn(s);
@@ -612,18 +615,85 @@ function renderStock(s) {
 
 function getStockType(s) {
   var badges = [];
-  var sector = (s.sector || '').toLowerCase();
   var ticker = (s.ticker || '').toUpperCase();
-  if (['EQNR','DNB','TEL','NHY','YAR','ORK','GJF','STB','AKRBP','SUBC'].includes(ticker)) badges.push({label: '💰 Utbytteaksje', cls: 'badge-dividend'});
-  if (['KAHOT','NEL','RECSI','SCATC','HYON','CLOUD'].includes(ticker)) badges.push({label: '🚀 Vekstaksje', cls: 'badge-growth'});
-  if (['MOWI','SALM','LSG','GRIEG','AUSS'].includes(ticker)) badges.push({label: '🐟 Sjømat', cls: 'badge-value'});
-  if (sector.includes('energy') || ['EQNR','AKRBP','VAR','OKEA'].includes(ticker)) badges.push({label: '⛽ Energi', cls: 'badge-cyclical'});
-  if (sector.includes('financial') || ['DNB','STB','GJF','SRBANK'].includes(ticker)) badges.push({label: '🏦 Finans', cls: 'badge-defensive'});
-  if (sector.includes('tech') || ['KAHOT','TOMRA','BOUVET','PEXIP'].includes(ticker)) badges.push({label: '💻 Teknologi', cls: 'badge-growth'});
-  if (['FRONTLINE','GOGL','BWLPG','MPCC','BELCO'].includes(ticker)) badges.push({label: '🚢 Shipping', cls: 'badge-cyclical'});
-  if (['EQNR','DNB','TEL'].includes(ticker)) badges.push({label: '🇳🇴 Statseiet', cls: 'badge-small'});
-  if (badges.length === 0 && s.sector) badges.push({label: s.sector, cls: 'badge-small'});
-  badges.push({label: 'Oslo Børs', cls: 'badge-small'});
+  var sector = (s.sector || '').toLowerCase();
+  var name = (s.name || '').toUpperCase();
+
+  // Finn i osloStocks for sektor
+  var stockInfo = osloStocks.find(function(x) { return x.ticker === ticker; });
+  var dbSector = stockInfo ? stockInfo.sector : null;
+
+  // Bruk FMP-sektor hvis tilgjengelig, ellers vår database
+  var activeSector = sector || (dbSector || '').toLowerCase();
+
+  // Sjømat
+  if (activeSector.includes('sjømat') || activeSector.includes('seafood') ||
+      ['MOWI','LSG','SALM','GRIEG','AUSS','GSF','AFISH','ANDF'].includes(ticker)) {
+    badges.push({label:'🐟 Sjømat', cls:'badge-value'});
+  }
+  // Shipping
+  else if (activeSector.includes('shipping') || activeSector.includes('maritime') ||
+      ['FRONTLINE','GOGL','BWLPG','MPCC','BELCO','FLNG','2020','ALNG','HAFNI','HAVI'].includes(ticker)) {
+    badges.push({label:'🚢 Shipping', cls:'badge-cyclical'});
+  }
+  // Energi
+  else if (activeSector.includes('energi') || activeSector.includes('energy') || activeSector.includes('oil') ||
+      ['EQNR','AKRBP','OKEA','TGS','PGS','AKSO','VAR','BORR','ARCH'].includes(ticker)) {
+    badges.push({label:'⛽ Energi', cls:'badge-cyclical'});
+  }
+  // Fornybar
+  else if (activeSector.includes('fornybar') || activeSector.includes('renewable') || activeSector.includes('hydrogen') ||
+      ['NEL','SCATC','HYON','RECSI','REC'].includes(ticker)) {
+    badges.push({label:'🌱 Fornybar', cls:'badge-growth'});
+  }
+  // Teknologi
+  else if (activeSector.includes('teknologi') || activeSector.includes('tech') || activeSector.includes('software') ||
+      ['KAHOT','BOUVET','PEXIP','ATEA','TOMRA','AUTO'].includes(ticker)) {
+    badges.push({label:'💻 Teknologi', cls:'badge-growth'});
+  }
+  // Finans
+  else if (activeSector.includes('finans') || activeSector.includes('financial') || activeSector.includes('bank') ||
+      ['DNB','STB','GJF','SRBANK','MING','NONG','SVEG'].includes(ticker)) {
+    badges.push({label:'🏦 Finans', cls:'badge-defensive'});
+  }
+  // Bioteknologi
+  else if (activeSector.includes('biotek') || activeSector.includes('pharma') || activeSector.includes('bio') ||
+      activeSector.includes('health') || activeSector.includes('medical')) {
+    badges.push({label:'🔬 Biotek', cls:'badge-growth'});
+  }
+  // Eiendom
+  else if (activeSector.includes('eiendom') || activeSector.includes('real estate') || activeSector.includes('property')) {
+    badges.push({label:'🏢 Eiendom', cls:'badge-defensive'});
+  }
+  // Kjemikalier
+  else if (activeSector.includes('kjemikalier') || activeSector.includes('chemical') || activeSector.includes('fertilizer') ||
+      ['YAR','NHY','BRG'].includes(ticker)) {
+    badges.push({label:'⚗️ Kjemikalier', cls:'badge-value'});
+  }
+  // Forsvar
+  else if (activeSector.includes('forsvar') || activeSector.includes('defence') || activeSector.includes('defense') ||
+      ['KOG'].includes(ticker)) {
+    badges.push({label:'🛡️ Forsvar', cls:'badge-defensive'});
+  }
+  // Industri (default)
+  else {
+    badges.push({label:'🏭 Industri', cls:'badge-small'});
+  }
+
+  // Utbytteaksje
+  if (s.dividendYield && parseFloat(s.dividendYield) > 3) {
+    badges.push({label:'💰 Utbytte', cls:'badge-dividend'});
+  }
+
+  // Statseiet
+  if (['EQNR','DNB','TEL'].includes(ticker)) {
+    badges.push({label:'🇳🇴 Statseiet', cls:'badge-small'});
+  }
+
+  // Børs
+  var stockMkt = stockInfo ? null : null;
+  badges.push({label:'Oslo Børs', cls:'badge-small'});
+
   return badges;
 }
 
@@ -880,6 +950,9 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
 
 // Populære aksjer — .OL fjernet fra visning
 var popular = [{ticker:'EQNR',name:'Equinor'},{ticker:'DNB',name:'DNB Bank'},{ticker:'AKRBP',name:'Aker BP'},{ticker:'TEL',name:'Telenor'},{ticker:'MOWI',name:'Mowi'},{ticker:'YAR',name:'Yara'}];
+// Vis portefølje igjen på forsiden
+var pfSecFront = document.getElementById('portfolioSection');
+if (pfSecFront) pfSecFront.style.display = 'block';
 document.getElementById('trending').innerHTML = '<div class="trending"><div class="trending-label">Populære aksjer på Oslo Børs</div><div class="trending-grid">' +
   popular.map(function(s) { return '<div class="trending-card" onclick="search(\'' + s.ticker + '\')">' +
     '<div class="t-ticker">' + s.ticker + '</div>' +
