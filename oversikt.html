@@ -453,7 +453,7 @@ async function loadIndexes() {
     var res = await fetch('/api/movers');
     var data = await res.json();
     if (!res.ok) throw new Error('movers feil');
-    window._moversData = data;
+    window._moversData = data; // inneholder winners, losers og all (alle 25 OBX)
 
     // Ekte indekser fra Yahoo Finance
     var obx = data.obx;
@@ -694,10 +694,7 @@ function openMoversModal() {
     return;
   }
 
-  var all = [...(window._moversData.winners || []), ...[...( window._moversData.losers || [])].reverse()];
-  var sorted = all.sort(function(a, b) {
-    return (parseFloat(b.changePct) * (b.up ? 1 : -1)) - (parseFloat(a.changePct) * (a.up ? 1 : -1));
-  });
+  var sorted = window._moversData.all || [];
 
   body.innerHTML = sorted.map(function(s) {
     var sign = s.up ? '+' : '-';
