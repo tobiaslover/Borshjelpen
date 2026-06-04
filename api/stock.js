@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 'public, max-age=60');
+  res.setHeader('Cache-Control', 'no-store');
 
   const { ticker } = req.query;
   if (!ticker) return res.status(400).json({ error: 'Ticker mangler' });
@@ -17,7 +17,6 @@ export default async function handler(req, res) {
   };
 
   try {
-    // Hent kurs fra Yahoo Finance (NOK) og fundamentals fra FMP parallelt
     const [yahooRes, fmpProfileRes, fmpRatiosRes] = await Promise.all([
       fetch(`https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`, { headers }),
       fetch(`https://financialmodelingprep.com/api/v3/profile/${upper}?apikey=${apiKey}`),
@@ -25,7 +24,7 @@ export default async function handler(req, res) {
     ]);
 
     if (!yahooRes.ok) {
-      return res.status(404).json({ error: `Aksje "${upper}" ikke funnet. Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI.` });
+      return res.status(404).json({ error: `Aksje "${upper}" ikke funnet.` });
     }
 
     const yahooData = await yahooRes.json();
@@ -38,48 +37,28 @@ export default async function handler(req, res) {
     const changePct = prevClose ? +((change / prevClose) * 100).toFixed(2) : 0;
     const name = meta?.longName || meta?.shortName || upper;
 
-    // FMP fundamentals
-    let sector = null, industry = null, beta = null, marketCap = null;
-    let description = null, pe = null, dividendYield = null;
-    let profitMargin = null, returnOnEquity = null;
+    // Debug FMP
+    const fmpProfileText = await fmpProfileRes.text();
+    const fmpRatiosText = await fmpRatiosRes.text();
+    console.log('FMP profile status:', fmpProfileRes.status, fmpProfileText.slice(0, 200));
+    console.log('FMP ratios status:', fmpRatiosRes.status, fmpRatiosText.slice(0, 200));
 
-    if (fmpProfileRes.ok) {
-      try {
-        const profileData = await fmpProfileRes.json();
-        const profile = Array.isArray(profileData) ? profileData[0] : profileData;
-        if (profile && !profile['Error Message']) {
-          sector = profile.sector || null;
-          industry = profile.industry || null;
-          beta = profile.beta ? profile.beta.toFixed(2) : null;
-          description = profile.description || null;
-          pe = profile.pe ? profile.pe.toFixed(1) : null;
+    let profile = null, ratios = null;
+    try { profile = JSON.parse(fmpProfileText); profile = Array.isArray(profile) ? profile[0] : profile; } catch(e) {}
+    try { ratios = JSON.parse(fmpRatiosText); ratios = Array.isArray(ratios) ? ratios[0] : ratios; } catch(e) {}
 
-          // Markedsverdi i NOK (konverter fra USD via approximasjon)
-          if (profile.mktCap) {
-            const mc = profile.mktCap;
-            marketCap = mc >= 1e12 ? (mc/1e12).toFixed(1) + ' tn USD' :
-                        mc >= 1e9  ? (mc/1e9).toFixed(1) + ' mrd USD' :
-                        mc >= 1e6  ? (mc/1e6).toFixed(0) + ' mill USD' : mc.toString();
-          }
+    const pe = ratios?.peRatioTTM ? parseFloat(ratios.peRatioTTM).toFixed(1) :
+               profile?.pe ? parseFloat(profile.pe).toFixed(1) : null;
 
-          if (profile.lastDiv && profile.price) {
-            dividendYield = ((profile.lastDiv / profile.price) * 100).toFixed(2) + '%';
-          }
-        }
-      } catch(e) { console.log('FMP profile error:', e.message); }
-    }
+    const dividendYield = ratios?.dividendYieldTTM ? (parseFloat(ratios.dividendYieldTTM) * 100).toFixed(2) + '%' :
+                          (profile?.lastDiv && profile?.price) ? ((profile.lastDiv / profile.price) * 100).toFixed(2) + '%' : null;
 
-    if (fmpRatiosRes.ok) {
-      try {
-        const ratiosData = await fmpRatiosRes.json();
-        const ratios = Array.isArray(ratiosData) ? ratiosData[0] : ratiosData;
-        if (ratios && !ratios['Error Message']) {
-          profitMargin = ratios.netProfitMarginTTM ? (ratios.netProfitMarginTTM * 100).toFixed(1) + '%' : null;
-          returnOnEquity = ratios.returnOnEquityTTM ? (ratios.returnOnEquityTTM * 100).toFixed(1) + '%' : null;
-          if (!pe && ratios.peRatioTTM) pe = parseFloat(ratios.peRatioTTM).toFixed(1);
-          if (!dividendYield && ratios.dividendYieldTTM) dividendYield = (ratios.dividendYieldTTM * 100).toFixed(2) + '%';
-        }
-      } catch(e) { console.log('FMP ratios error:', e.message); }
+    let marketCap = null;
+    const mc = profile?.mktCap || profile?.marketCap;
+    if (mc) {
+      marketCap = mc >= 1e12 ? (mc/1e12).toFixed(1) + ' tn USD' :
+                  mc >= 1e9  ? (mc/1e9).toFixed(1) + ' mrd USD' :
+                  mc >= 1e6  ? (mc/1e6).toFixed(0) + ' mill USD' : String(mc);
     }
 
     res.status(200).json({
@@ -94,15 +73,15 @@ export default async function handler(req, res) {
       marketCap,
       pe,
       dividendYield,
-      beta,
+      beta: profile?.beta ? parseFloat(profile.beta).toFixed(2) : null,
       fiftyTwoWeekHigh: meta?.fiftyTwoWeekHigh?.toFixed(2) || null,
       fiftyTwoWeekLow: meta?.fiftyTwoWeekLow?.toFixed(2) || null,
       volume: meta?.regularMarketVolume?.toLocaleString('nb-NO') || null,
-      sector,
-      industry,
-      profitMargin,
-      returnOnEquity,
-      description,
+      sector: profile?.sector || null,
+      industry: profile?.industry || null,
+      profitMargin: ratios?.netProfitMarginTTM ? (parseFloat(ratios.netProfitMarginTTM) * 100).toFixed(1) + '%' : null,
+      returnOnEquity: ratios?.returnOnEquityTTM ? (parseFloat(ratios.returnOnEquityTTM) * 100).toFixed(1) + '%' : null,
+      description: profile?.description || null,
     });
   } catch (err) {
     console.error('stock error:', err.message);
