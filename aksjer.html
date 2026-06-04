@@ -883,28 +883,95 @@ async function loadQuarterlyReport(s) {
   document.getElementById('quarterlyBox').style.display = 'block';
   document.getElementById('qTitle').textContent = s.name + ' — Kvartalsrapport';
   document.getElementById('qSubtitle').textContent = 'Siste tilgjengelige rapport';
-  var nextDates = {'EQNR':'Juli 2026','DNB':'Juli 2026','AKRBP':'Juli 2026','TEL':'Juli 2026','MOWI':'August 2026','YAR':'Juli 2026','NHY':'Juli 2026','KAHOT':'August 2026'};
-  document.getElementById('qNext').textContent = 'Neste rapport: ' + (nextDates[s.ticker] || 'Ikke tilgjengelig');
+  document.getElementById('qNext').textContent = 'Neste rapport: laster...';
+  document.getElementById('qBody').innerHTML = '<div class="quarterly-loading"><div class="quarterly-spinner"></div>Henter kvartalsdata fra FMP...</div>';
+
   var sb = window._sb;
   if (!sb) { showQLockedMsg(); return; }
   var sess = (await sb.auth.getSession()).data.session;
   if (!sess) { showQLockedMsg(); return; }
   var plan = await getUserPlan(sb);
   if (plan !== 'proff') { showQLockedMsg(); return; }
-  document.getElementById('qBody').innerHTML = '<div class="quarterly-loading"><div class="quarterly-spinner"></div>AI analyserer siste kvartalsrapport...</div>';
+
   try {
-    var token = (await sb.auth.getSession()).data.session?.access_token || '';
-    var stockWithLabel = Object.assign({}, s, {marketLabel: getMarketLabel()});
-    var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify(stockWithLabel)});
-    var ai = await res.json();
-    if (!res.ok || ai.error) { document.getElementById('qBody').innerHTML = '<div class="quarterly-loading">Kunne ikke laste kvartalsrapport.</div>'; return; }
-    var bull = (ai.bull||[]).slice(0,2); var bear = (ai.bear||[]).slice(0,2);
+    var token = sess.access_token;
+    var res = await fetch('/api/quarterly', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({ticker: s.ticker, name: s.name})
+    });
+    var data = await res.json();
+
+    if (!res.ok || data.error) {
+      document.getElementById('qBody').innerHTML =
+        '<div class="quarterly-loading">' + (data.error || 'Ingen kvartalsdata tilgjengelig.') + '</div>';
+      return;
+    }
+
+    var qData = data.qData;
+    var ai = data.ai || {};
+
+    document.getElementById('qSubtitle').textContent = qData.period + ' · ' + (qData.date || '');
+
+    function changeColor(val) {
+      if (!val) return '#888';
+      return val.startsWith('-') ? '#A32D2D' : '#2C7A5C';
+    }
+    function changeArrow(val) {
+      if (!val) return '';
+      return val.startsWith('-') ? ' ▼' : ' ▲';
+    }
+
+    var rows = [
+      ['Omsetning', qData.revenue, qData.revenueChange],
+      ['EBIT', qData.ebit, qData.ebitChange],
+      ['Nettoresultat', qData.netIncome, qData.netIncomeChange],
+    ];
+    if (qData.eps) rows.push(['EPS', qData.eps + ' USD', qData.epsSurprise ? 'vs est: ' + qData.epsEstimated + ' (' + qData.epsSurprise + ')' : null]);
+    if (qData.grossMargin) rows.push(['Bruttomargin', qData.grossMargin, null]);
+    if (qData.operatingMargin) rows.push(['Driftsmargin', qData.operatingMargin, null]);
+    if (qData.freeCashFlow) rows.push(['Fri kontantstrøm', qData.freeCashFlow, null]);
+
+    var tableHtml = rows.map(function(r) {
+      return '<div class="stat-row">' +
+        '<span class="stat-label">' + r[0] + '</span>' +
+        '<span class="stat-val" style="display:flex;align-items:center;gap:8px;">' +
+          '<span>' + r[1] + '</span>' +
+          (r[2] ? '<span style="font-size:11px;color:' + changeColor(r[2]) + ';">' + r[2] + changeArrow(r[2]) + '</span>' : '') +
+        '</span></div>';
+    }).join('');
+
+    var positiveHtml = (ai.positive || []).map(function(p) {
+      return '<p style="margin-bottom:6px;font-size:13px;">✓ ' + p + '</p>';
+    }).join('');
+
+    var negativeHtml = (ai.negative || []).map(function(p) {
+      return '<p style="margin-bottom:6px;font-size:13px;">✗ ' + p + '</p>';
+    }).join('');
+
     document.getElementById('qBody').innerHTML =
-      '<div class="quarterly-card"><div class="quarterly-card-title">Sammendrag</div><p>' + (ai.hva||'—') + '</p></div>' +
-      '<div class="quarterly-card"><div class="quarterly-card-title">Risiko</div><p>' + (ai.risiko||'—') + '</p></div>' +
-      '<div class="quarterly-card"><div class="quarterly-card-title">Positive signaler</div>' + bull.map(function(b){return '<p style="margin-bottom:6px">✓ '+b+'</p>';}).join('') + '</div>' +
-      '<div class="quarterly-card"><div class="quarterly-card-title">Negative signaler</div>' + bear.map(function(b){return '<p style="margin-bottom:6px">✗ '+b+'</p>';}).join('') + '</div>';
-  } catch(e) { document.getElementById('qBody').innerHTML = '<div class="quarterly-loading">Kunne ikke laste kvartalsrapport.</div>'; }
+      '<div class="quarterly-card" style="grid-column:1/-1;">' +
+        '<div class="quarterly-card-title">Nøkkeltall</div>' +
+        tableHtml +
+      '</div>' +
+      '<div class="quarterly-card">' +
+        '<div class="quarterly-card-title">Sammendrag</div>' +
+        '<p style="font-size:13px;line-height:1.6;">' + (ai.sammendrag || '—') + '</p>' +
+        (ai.vs_fjoraar ? '<p style="font-size:12px;color:#888;margin-top:8px;">' + ai.vs_fjoraar + '</p>' : '') +
+      '</div>' +
+      '<div class="quarterly-card">' +
+        '<div class="quarterly-card-title">Signaler</div>' +
+        '<div style="color:#2C7A5C;margin-bottom:8px;">' + positiveHtml + '</div>' +
+        '<div style="color:#A32D2D;">' + negativeHtml + '</div>' +
+      '</div>' +
+      (ai.nybegynner_tips ? '<div class="quarterly-card" style="grid-column:1/-1;background:#EEE8DA;">' +
+        '<div class="quarterly-card-title" style="color:#5a4520;">Tips til nybegynnere</div>' +
+        '<p style="font-size:13px;line-height:1.6;color:#5a4520;">' + ai.nybegynner_tips + '</p>' +
+      '</div>' : '');
+
+  } catch(e) {
+    document.getElementById('qBody').innerHTML = '<div class="quarterly-loading">Kunne ikke laste kvartalsrapport.</div>';
+  }
 }
 
 async function sendMessage() {
