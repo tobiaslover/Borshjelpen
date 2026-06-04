@@ -41,10 +41,12 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 .xp-next { font-size: 11px; color: #aaa; margin-top: 4px; }
 
 /* GRID LAYOUT */
+.grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; align-items: stretch; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
 @media (max-width: 700px) {
   .grid-2 { grid-template-columns: 1fr; }
+  .grid-3col { grid-template-columns: 1fr !important; }
   .grid-3 { grid-template-columns: 1fr; }
   .page { padding: 1rem; }
   .xp-bar { flex-direction: column; text-align: center; gap: 1rem; }
@@ -252,7 +254,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   </div>
 
   <!-- INDEKSER + VINNERE/TAPERE -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+  <div class="grid-3col">
     <div class="card">
       <div class="card-title">Indekser</div>
       <div id="indexList"><div class="spinner"></div></div>
