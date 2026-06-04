@@ -252,8 +252,8 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   </div>
 
   <!-- INDEKSER + VINNERE/TAPERE -->
-  <div class="grid-2">
-    <div class="card">
+  <div style="display:grid;grid-template-columns:1fr 2fr;gap:1.5rem;margin-bottom:1.5rem;align-items:stretch;">
+    <div class="card" style="align-self:start;">
       <div class="card-title">Indekser</div>
       <div id="indexList"><div class="spinner"></div></div>
     </div>
@@ -485,9 +485,10 @@ async function loadIndexes() {
     function renderMover(s) {
       var sign = s.up ? '+' : '-';
       var cls = s.up ? 'mover-up' : 'mover-down';
+      var name = s.name.length > 14 ? s.name.slice(0, 13) + '…' : s.name;
       return '<div class="mover-row">' +
-        '<div><div class="mover-name">' + s.name + '</div><div class="mover-ticker">' + s.ticker + '</div></div>' +
-        '<div class="' + cls + '">' + sign + s.changePct + '%</div>' +
+        '<div style="min-width:0;flex:1;overflow:hidden;"><div class="mover-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + name + '</div><div class="mover-ticker">' + s.ticker + '</div></div>' +
+        '<div class="' + cls + '" style="flex-shrink:0;margin-left:8px;">' + sign + s.changePct + '%</div>' +
       '</div>';
     }
 
