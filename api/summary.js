@@ -52,7 +52,17 @@ JSON-struktur:
         },
         {
           role: 'user',
-          content: `Analyser ${stock.name} (${stock.ticker}). Kurs: ${stock.price} NOK, endring: ${stock.changePct}% (${stock.marketLabel || 'siden siste stenging'}), P/E: ${stock.pe}, utbytte: ${stock.dividendYield}, markedsverdi: ${stock.marketCap}, beta: ${stock.beta}, sektor: ${stock.sector}`
+          content: `Analyser ${stock.name} (${stock.ticker}).
+
+Kursdata: ${stock.price} NOK, endring: ${stock.changePct}% (${stock.marketLabel || 'siden siste stenging'}), 52-ukers høy: ${stock.fiftyTwoWeekHigh}, 52-ukers lav: ${stock.fiftyTwoWeekLow}
+
+Nøkkeltall: P/E: ${stock.pe}, P/B: ${stock.pb || '—'}, EV/EBITDA: ${stock.evEbitda || '—'}, Utbytteyield: ${stock.dividendYield}, Markedsverdi: ${stock.marketCap}, Beta: ${stock.beta}
+
+Lønnsomhet: Bruttomargin: ${stock.grossMargin || '—'}, Nettomargin: ${stock.profitMargin || '—'}, ROE: ${stock.returnOnEquity || '—'}, ROA: ${stock.returnOnAssets || '—'}
+
+Finansiell styrke: Gjeld/EK: ${stock.debtEquity || '—'}, Fri kontantstrøm-yield: ${stock.fcfYield || '—'}
+
+Sektor: ${stock.sector}, Bransje: ${stock.industry || '—'}`
         }
       ]
     });
