@@ -1,112 +1,41 @@
 import { createClient } from '@supabase/supabase-js';
 
-const OBX = [
-  {ticker:'EQNR', name:'Equinor'},
-  {ticker:'VAR', name:'Vår Energi'},
-  {ticker:'DNB', name:'DNB'},
-  {ticker:'NHY', name:'Norsk Hydro'},
-  {ticker:'FRO', name:'Frontline'},
-  {ticker:'AKRBP', name:'Aker BP'},
-  {ticker:'NAS', name:'Norwegian'},
-  {ticker:'KOG', name:'Kongsberg Gruppen'},
-  {ticker:'MOWI', name:'Mowi'},
-  {ticker:'ORK', name:'Orkla'},
-  {ticker:'YAR', name:'Yara'},
-  {ticker:'TEL', name:'Telenor'},
-  {ticker:'VEND', name:'Vend'},
-  {ticker:'PROT', name:'Protector'},
-  {ticker:'SUBC', name:'Subsea 7'},
-  {ticker:'SALM', name:'SalMar'},
-  {ticker:'KMAR', name:'Kongsberg Maritime'},
-  {ticker:'STB', name:'Storebrand'},
-  {ticker:'NOD', name:'Nordic Semiconductor'},
-  {ticker:'DOFG', name:'DOF Group'},
-  {ticker:'GJF', name:'Gjensidige'},
-  {ticker:'TOM', name:'Tomra'},
-  {ticker:'WAWI', name:'Wallenius Wilhelmsen'},
-  {ticker:'BWLPG', name:'BW LPG'},
-  {ticker:'HAUTO', name:'Höegh Autoliners'},
-  {ticker:'BAKKA', name:'Bakkafrost'},
+// Hardkodede OBX events — oppdateres manuelt hvert kvartal
+// Kilde: Oslo Børs / selskapenes investor relations
+const HARDCODED_EVENTS = [
+  // Kvartalsrapporter Q2 2026
+  { date: '2026-07-02', ticker: 'EQNR', name: 'Equinor', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-07-09', ticker: 'DNB', name: 'DNB', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-07-09', ticker: 'STB', name: 'Storebrand', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-07-10', ticker: 'AKRBP', name: 'Aker BP', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-07-10', ticker: 'NHY', name: 'Norsk Hydro', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-07-14', ticker: 'GJF', name: 'Gjensidige', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-07-14', ticker: 'TEL', name: 'Telenor', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-07-15', ticker: 'YAR', name: 'Yara', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-07-16', ticker: 'ORK', name: 'Orkla', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-07-16', ticker: 'KOG', name: 'Kongsberg Gruppen', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-08-12', ticker: 'MOWI', name: 'Mowi', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-08-13', ticker: 'SALM', name: 'SalMar', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-08-19', ticker: 'TOM', name: 'Tomra', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-08-20', ticker: 'NOD', name: 'Nordic Semiconductor', type: 'rapport', label: 'Kvartalsrapport' },
+  { date: '2026-08-27', ticker: 'SUBC', name: 'Subsea 7', type: 'rapport', label: 'Kvartalsrapport' },
+  // Utbyttedatoer
+  { date: '2026-06-23', ticker: 'SALM', name: 'SalMar', type: 'utbytte', label: 'Utbyttedato', amount: '10.00' },
+  { date: '2026-08-13', ticker: 'EQNR', name: 'Equinor', type: 'utbytte', label: 'Utbyttedato', amount: '3.61' },
+  { date: '2026-08-14', ticker: 'EQNR', name: 'Equinor', type: 'utbytte', label: 'Utbyttedato', amount: '0.39' },
 ];
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
   if (req.method !== 'GET') return res.status(405).end();
 
-  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
   const today = new Date().toISOString().slice(0, 10);
-  const force = req.query.force === '1';
 
-  if (!force) {
-    try {
-      const { data: cached } = await sb.from('events_cache').select('events, updated_at').eq('id', 'obx').maybeSingle();
-      if (cached?.events?.length > 0) {
-        const age = Date.now() - new Date(cached.updated_at).getTime();
-        if (age < 7 * 24 * 60 * 60 * 1000) {
-          return res.status(200).json({ events: cached.events, cached: true });
-        }
-      }
-    } catch(e) {}
-  }
+  const events = HARDCODED_EVENTS
+    .filter(e => e.date >= today)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const yHeaders = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-    'Accept': '*/*',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Referer': 'https://finance.yahoo.com/',
-    'Origin': 'https://finance.yahoo.com',
-  };
-
-  try {
-    const results = await Promise.all(
-      OBX.map(s =>
-        fetch(`https://query2.finance.yahoo.com/v8/finance/chart/${s.ticker}.OL?modules=calendarEvents&interval=1d&range=1d`, { headers: yHeaders })
-          .then(r => r.ok ? r.json() : null)
-          .catch(() => null)
-      )
-    );
-
-    let events = [];
-
-    results.forEach((data, i) => {
-      const { ticker, name } = OBX[i];
-      if (!data) return;
-      try {
-        const meta = data?.chart?.result?.[0]?.meta;
-        
-        // Earnings date fra meta
-        if (meta?.earningsTimestamp) {
-          const date = new Date(meta.earningsTimestamp * 1000).toISOString().slice(0, 10);
-          if (date >= today) {
-            events.push({ date, ticker, name, type: 'rapport', label: 'Kvartalsrapport' });
-          }
-        }
-
-        // Ex-dividend fra meta
-        if (meta?.exDividendDate) {
-          const date = new Date(meta.exDividendDate * 1000).toISOString().slice(0, 10);
-          if (date >= today) {
-            events.push({ date, ticker, name, type: 'utbytte', label: 'Utbyttedato' });
-          }
-        }
-      } catch(e) {}
-    });
-
-    console.log('rapport:', events.filter(e=>e.type==='rapport').length);
-    console.log('utbytte:', events.filter(e=>e.type==='utbytte').length);
-    console.log('total:', events.length);
-
-    events.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    try {
-      await sb.from('events_cache').upsert({ id: 'obx', events, updated_at: new Date().toISOString() });
-    } catch(e) {}
-
-    return res.status(200).json({ events, cached: false });
-  } catch(e) {
-    console.error('error:', e.message);
-    return res.status(500).json({ error: e.message });
-  }
+  return res.status(200).json({ events, cached: false });
 }
