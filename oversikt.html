@@ -483,10 +483,9 @@ async function loadIndexes() {
     function renderMover(s) {
       var sign = s.up ? '+' : '-';
       var cls = s.up ? 'mover-up' : 'mover-down';
-      var name = s.name.length > 14 ? s.name.slice(0, 13) + '…' : s.name;
       return '<div class="mover-row">' +
-        '<div style="min-width:0;flex:1;overflow:hidden;"><div class="mover-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + name + '</div><div class="mover-ticker">' + s.ticker + '</div></div>' +
-        '<div class="' + cls + '" style="flex-shrink:0;margin-left:8px;">' + sign + s.changePct + '%</div>' +
+        '<div style="min-width:0;flex:1;"><div class="mover-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</div><div class="mover-ticker">' + s.ticker + '</div></div>' +
+        '<div class="' + cls + '" style="flex-shrink:0;white-space:nowrap;">' + sign + s.changePct + '%</div>' +
       '</div>';
     }
 
