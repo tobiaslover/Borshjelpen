@@ -389,10 +389,10 @@ function renderStreak(streak) {
 
 function renderXP(xp) {
   var levels = [
-    {name:'🌱 Nybegynner', label:'Nybegynner', emoji:'🌱', min:0, max:199},
-    {name:'📈 Aksjespirer', label:'Aksjespirer', emoji:'📈', min:200, max:699},
-    {name:'🔍 Analytiker', label:'Analytiker', emoji:'🔍', min:700, max:1799},
-    {name:'🏆 Mester', label:'Mester', emoji:'🏆', min:1800, max:999999}
+    {name:'🌱 Nybegynner', label:'Nybegynner', emoji:'🌱', min:0, max:399},
+    {name:'📈 Aksjespirer', label:'Aksjespirer', emoji:'📈', min:400, max:1499},
+    {name:'🔍 Analytiker', label:'Analytiker', emoji:'🔍', min:1500, max:2999},
+    {name:'🏆 Mester', label:'Mester', emoji:'🏆', min:3000, max:999999}
   ];
   var level = levels.find(function(l) { return xp >= l.min && xp <= l.max; }) || levels[3];
   var pct = Math.min(100, Math.round(((xp - level.min) / (level.max - level.min)) * 100));
