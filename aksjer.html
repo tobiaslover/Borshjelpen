@@ -811,20 +811,38 @@ async function generateAI(s) {
     var sec = document.getElementById('ai-section');
     if (!sec) return;
     if (!res.ok || ai.error) { sec.innerHTML = '<div style="padding:1rem;background:#fff8f0;border-radius:10px;font-size:13px;color:#888;margin-bottom:1rem;">AI-sammendrag ikke tilgjengelig: ' + (ai.error || res.status) + '</div>'; return; }
-    var bullHtml = (ai.bull||[]).map(function(p) { return '<div class="point"><div class="dot-up"></div><span>' + p + '</span></div>'; }).join('');
-    var bearHtml = (ai.bear||[]).map(function(p) { return '<div class="point"><div class="dot-down"></div><span>' + p + '</span></div>'; }).join('');
+    // Sikrer at AI-felt alltid blir lesbar tekst (aldri "[object Object]"),
+    // og vasker vanlige tegnsettingsfeil (".," manglende mellomrom osv.).
+    function cleanPunct(t) {
+      return String(t)
+        .replace(/\.\s*,/g, ', ')
+        .replace(/,\s*\./g, '. ')
+        .replace(/\s+([,.;:!?])/g, '$1')
+        .replace(/([.!?])([A-ZÆØÅ])/g, '$1 $2')
+        .replace(/,([^\s\d])/g, ', $1')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    }
+    function aiText(v) {
+      if (v == null) return '';
+      if (Array.isArray(v)) return v.map(aiText).filter(Boolean).join(' ');
+      if (typeof v === 'object') return Object.values(v).map(aiText).filter(Boolean).join(' ');
+      return cleanPunct(v);
+    }
+    var bullHtml = (ai.bull||[]).map(function(p) { return '<div class="point"><div class="dot-up"></div><span>' + aiText(p) + '</span></div>'; }).join('');
+    var bearHtml = (ai.bear||[]).map(function(p) { return '<div class="point"><div class="dot-down"></div><span>' + aiText(p) + '</span></div>'; }).join('');
     sec.innerHTML =
-      (ai.om_selskapet ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Om selskapet</div><p>' + ai.om_selskapet + '</p></div>' : '') +
-      '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva gjør selskapet?</div><p>' + (ai.hva||'—') + '</p></div>' +
-      (ai.hvorfor_eier_folk ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hvorfor eier folk denne aksjen?</div><p>' + ai.hvorfor_eier_folk + '</p></div>' : '') +
-      (ai.aktuelt ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva skjer akkurat nå?</div><p>' + ai.aktuelt + '</p></div>' : '') +
-      (ai.pris_vurdering ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hvordan er verdsettelsen?</div><p>' + ai.pris_vurdering + '</p></div>' : '') +
-      (ai.paavirkere ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva påvirker kursen?</div><p>' + ai.paavirkere + '</p></div>' : '') +
+      (ai.om_selskapet ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Om selskapet</div><p>' + aiText(ai.om_selskapet) + '</p></div>' : '') +
+      '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva gjør selskapet?</div><p>' + (aiText(ai.hva)||'—') + '</p></div>' +
+      (ai.hvorfor_eier_folk ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hvorfor eier folk denne aksjen?</div><p>' + aiText(ai.hvorfor_eier_folk) + '</p></div>' : '') +
+      (ai.aktuelt ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva skjer akkurat nå?</div><p>' + aiText(ai.aktuelt) + '</p></div>' : '') +
+      (ai.pris_vurdering ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hvordan er verdsettelsen?</div><p>' + aiText(ai.pris_vurdering) + '</p></div>' : '') +
+      (ai.paavirkere ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva påvirker kursen?</div><p>' + aiText(ai.paavirkere) + '</p></div>' : '') +
       '<div id="newsSection"></div>' +
       '<div class="bull-bear"><div class="card bull"><div class="card-title">Bull-case</div>' + bullHtml + '</div><div class="card bear"><div class="card-title">Bear-case</div>' + bearHtml + '</div></div>' +
-      '<div class="card" style="margin-bottom:1rem;border-left:3px solid #A32D2D;border-radius:0 14px 14px 0;"><div class="card-title">Risiko</div><p style="font-size:13px;line-height:1.7">' + (ai.risiko||'—') + '</p></div>' +
-      (ai.historisk ? '<div class="historical-card"><div class="historical-title">📊 Historisk sett</div><div class="historical-text">' + ai.historisk + '</div></div>' : '') +
-      (ai.nybegynner_tips ? '<div class="tip-box"><div class="tip-text"><strong>Tips:</strong> ' + ai.nybegynner_tips + '</div></div>' : '');
+      '<div class="card" style="margin-bottom:1rem;border-left:3px solid #A32D2D;border-radius:0 14px 14px 0;"><div class="card-title">Risiko</div><p style="font-size:13px;line-height:1.7">' + (aiText(ai.risiko)||'—') + '</p></div>' +
+      (ai.historisk ? '<div class="historical-card"><div class="historical-title">📊 Historisk sett</div><div class="historical-text">' + aiText(ai.historisk) + '</div></div>' : '') +
+      (ai.nybegynner_tips ? '<div class="tip-box"><div class="tip-text"><strong>Tips:</strong> ' + aiText(ai.nybegynner_tips) + '</div></div>' : '');
     loadNews(s.ticker, plan);
   } catch(e) {
     var sec = document.getElementById('ai-section');
