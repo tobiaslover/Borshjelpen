@@ -690,6 +690,18 @@ function getStockType(s) {
 // PLANS hentes fra plans.js (window.PLANS) — én sannhetskilde for hele nettstedet
 var XP_VALUES = { search: 2, chat: 1, borsbrygg: 5, login: 3, watchlist: 5 };
 
+// Starten av "i dag" i Oslo-tid som ISO-tidsstempel — for korrekt døgntelling uansett UTC-forskyvning.
+function osloDayStartISO() {
+  var d = new Date();
+  var date = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Oslo' }).format(d);
+  var off = '';
+  try {
+    off = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Oslo', timeZoneName: 'longOffset' })
+      .formatToParts(d).find(function(p) { return p.type === 'timeZoneName'; }).value.replace('GMT', '');
+  } catch(e) {}
+  return date + 'T00:00:00' + (off || '+00:00');
+}
+
 async function getUserPlan(sb) {
   try {
     var sess = (await sb.auth.getSession()).data.session;
@@ -704,7 +716,7 @@ async function getTodayCount(sb, type) {
     var sess = (await sb.auth.getSession()).data.session;
     if (!sess) return 0;
     var today = new Date().toISOString().split('T')[0];
-    var r = await sb.from('user_activity').select('*', {count:'exact',head:true}).eq('user_id', sess.user.id).eq('type', type).gte('created_at', today + 'T00:00:00Z');
+    var r = await sb.from('user_activity').select('*', {count:'exact',head:true}).eq('user_id', sess.user.id).eq('type', type).gte('created_at', osloDayStartISO());
     return r.count || 0;
   } catch(e) { return 0; }
 }
@@ -734,14 +746,13 @@ async function logActivity(type, ticker, name) {
     var sb = window._sb; if (!sb) return;
     var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
     var xp = XP_VALUES[type] || 0;
-    var today = new Date().toISOString().slice(0, 10);
 
     // Begrens XP: search og chat — maks 100 per type per dag, watchlist — maks 1 per aksje totalt
     if (xp > 0) {
       if (type === 'search' || type === 'chat') {
         var { data: todayActs } = await sb.from('user_activity').select('id')
           .eq('user_id', sess.user.id).eq('type', type)
-          .gte('created_at', today + 'T00:00:00Z');
+          .gte('created_at', osloDayStartISO());
         if (todayActs && todayActs.length >= 100) xp = 0;
       } else if (type === 'watchlist' && ticker) {
         var { data: prevWl } = await sb.from('user_activity').select('id')
