@@ -533,6 +533,7 @@ function getMarketLabel() {
   return 'i går';
 }
 
+function escapeHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function renderStock(s) {
   var priceStr = parseFloat(s.price).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
   var sign = s.up ? '+' : '';
@@ -549,7 +550,7 @@ function renderStock(s) {
         '<div class="company-logo">' + s.ticker.slice(0,4) + '</div>' +
         '<div>' +
           '<div style="display:flex;align-items:center;gap:10px;">' +
-            '<div class="company-name">' + s.name + '</div>' +
+            '<div class="company-name">' + escapeHtml(s.name) + '</div>' +
             '<button id="watchlistBtn" onclick="toggleWatchlist(currentStock)" style="font-size:11px;padding:4px 12px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap;">+ Watchlist</button>' +
           '</div>' +
           '<div class="company-meta">' + s.exchange + ' · ' + s.ticker + (visSektor ? ' · ' + visSektor : '') + '</div>' +
@@ -1033,7 +1034,7 @@ if (pfSecFront) pfSecFront.style.display = 'block';
 document.getElementById('trending').innerHTML = '<div class="trending"><div class="trending-label">Populære aksjer på Oslo Børs</div><div class="trending-grid">' +
   popular.map(function(s) { return '<div class="trending-card" onclick="search(\'' + s.ticker + '\')">' +
     '<div class="t-ticker">' + s.ticker + '</div>' +
-    '<div class="t-name">' + s.name + '</div>' +
+    '<div class="t-name">' + escapeHtml(s.name) + '</div>' +
     '<div class="t-price-row"><span style="font-size:12px;color:#aaa">Klikk for data + AI</span><span style="color:#C8A96E">→</span></div></div>'; }).join('') + '</div></div>';
 
 var osloStocks = [
@@ -1339,7 +1340,7 @@ function showAutocomplete(query) {
   var q = query.toUpperCase();
   var matches = osloStocks.filter(function(s) { return s.ticker.startsWith(q) || s.name.toUpperCase().includes(q); }).slice(0, 6);
   if (!matches.length) { list.style.display = 'none'; return; }
-  list.innerHTML = matches.map(function(s) { return '<div class="autocomplete-item" onclick="selectStock(\'' + s.ticker + '\')">' + '<span class="ac-ticker">' + s.ticker + '</span><span class="ac-name">' + s.name + '</span><span class="ac-sector">' + s.sector + '</span></div>'; }).join('');
+  list.innerHTML = matches.map(function(s) { return '<div class="autocomplete-item" onclick="selectStock(\'' + s.ticker + '\')">' + '<span class="ac-ticker">' + escapeHtml(s.ticker) + '</span><span class="ac-name">' + escapeHtml(s.name) + '</span><span class="ac-sector">' + escapeHtml(s.sector) + '</span></div>'; }).join('');
   list.style.display = 'block';
 }
 function selectStock(ticker) { document.getElementById('searchInput').value = ticker; document.getElementById('acList').style.display = 'none'; search(ticker); }
@@ -1428,7 +1429,7 @@ async function renderWatchlist() {
     var card = '<div class="watchlist-card" onclick="search(&quot;' + s.ticker + '&quot;)">';
     card += '<button class="watchlist-remove" onclick="event.stopPropagation();removeFromWatchlist(&quot;' + s.ticker + '&quot;)" title="Fjern">✕</button>';
     card += '<div class="wl-ticker-tag">' + s.ticker + '</div>';
-    card += '<div class="wl-name">' + (s.name||s.ticker).split(' ')[0] + '</div>';
+    card += '<div class="wl-name">' + escapeHtml((s.name||s.ticker).split(' ')[0]) + '</div>';
     card += '<div class="wl-price-row"><span class="wl-price" id="wlprice-' + s.ticker + '">—</span><span class="wl-pct" id="wlpct-' + s.ticker + '" style="font-size:11px;font-weight:500;margin-left:4px;"></span></div></div>';
     return card;
   }).join('');
@@ -1480,7 +1481,7 @@ document.getElementById('pfInput').addEventListener('input', function() {
   if (!q) { list.style.display = 'none'; return; }
   var matches = osloStocks.filter(function(s) { return s.ticker.startsWith(q) || s.name.toUpperCase().includes(q); }).slice(0, 5);
   if (!matches.length) { list.style.display = 'none'; return; }
-  list.innerHTML = matches.map(function(s) { return '<div onclick="selectPfStock(\'' + s.ticker + '\',\'' + s.name.replace(/'/g,'') + '\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-family:\'DM Sans\',sans-serif;"><span style="font-size:11px;font-weight:500;color:#1B3A5C;background:#EEE8DA;padding:2px 8px;border-radius:100px;min-width:52px;text-align:center;">' + s.ticker + '</span><span style="font-size:13px;">' + s.name + '</span></div>'; }).join('');
+  list.innerHTML = matches.map(function(s) { return '<div onclick="selectPfStock(\'' + s.ticker + '\',\'' + s.name.replace(/'/g,'') + '\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-family:\'DM Sans\',sans-serif;"><span style="font-size:11px;font-weight:500;color:#1B3A5C;background:#EEE8DA;padding:2px 8px;border-radius:100px;min-width:52px;text-align:center;">' + escapeHtml(s.ticker) + '</span><span style="font-size:13px;">' + escapeHtml(s.name) + '</span></div>'; }).join('');
   list.style.display = 'block';
 });
 document.addEventListener('click', function(e) { if (!e.target.closest('#pfInput') && !e.target.closest('#pfAcList')) document.getElementById('pfAcList').style.display = 'none'; });
@@ -1504,7 +1505,7 @@ function renderPortfolioList() {
   if (portfolio.length === 0) { list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#aaa;font-size:13px;">Ingen aksjer lagt til ennå — søk opp en aksje og skriv inn prosent</div>'; totalRow.style.display = 'none'; analyzeBtn.style.display = 'none'; document.getElementById('pfResult').innerHTML = ''; return; }
   var total = portfolio.reduce(function(sum, p) { return sum + p.pct; }, 0);
   list.innerHTML = '<div style="border:1px solid #e8e8e8;border-radius:12px;overflow:hidden;margin-bottom:4px;">' +
-    portfolio.map(function(p, i) { return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;' + (i < portfolio.length-1 ? 'border-bottom:1px solid #f0f0f0;' : '') + '"><span style="font-size:11px;font-weight:500;color:#1B3A5C;background:#EEE8DA;padding:2px 8px;border-radius:100px;min-width:50px;text-align:center;">' + p.ticker + '</span><span style="flex:1;font-size:13px;">' + p.name + '</span><span style="font-size:11px;color:#aaa;">' + p.sector + '</span><input type="number" value="' + p.pct + '" min="0" max="100" onchange="updatePct(\'' + p.ticker + '\',this.value)" style="width:52px;padding:4px 8px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;text-align:center;outline:none;font-family:\'DM Sans\',sans-serif;" /><span style="font-size:13px;color:#888;">%</span><button onclick="removeFromPortfolio(\'' + p.ticker + '\')" style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;border:none;cursor:pointer;font-size:11px;color:#aaa;">✕</button></div>'; }).join('') + '</div>';
+    portfolio.map(function(p, i) { return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;' + (i < portfolio.length-1 ? 'border-bottom:1px solid #f0f0f0;' : '') + '"><span style="font-size:11px;font-weight:500;color:#1B3A5C;background:#EEE8DA;padding:2px 8px;border-radius:100px;min-width:50px;text-align:center;">' + p.ticker + '</span><span style="flex:1;font-size:13px;">' + escapeHtml(p.name) + '</span><span style="font-size:11px;color:#aaa;">' + escapeHtml(p.sector) + '</span><input type="number" value="' + p.pct + '" min="0" max="100" onchange="updatePct(\'' + p.ticker + '\',this.value)" style="width:52px;padding:4px 8px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;text-align:center;outline:none;font-family:\'DM Sans\',sans-serif;" /><span style="font-size:13px;color:#888;">%</span><button onclick="removeFromPortfolio(\'' + p.ticker + '\')" style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;border:none;cursor:pointer;font-size:11px;color:#aaa;">✕</button></div>'; }).join('') + '</div>';
   totalRow.style.display = 'block';
   document.getElementById('pfTotalPct').textContent = total.toFixed(0) + '%';
   document.getElementById('pfTotalPct').style.color = total > 100 ? '#A32D2D' : (Math.round(total) === 100 ? '#2C7A5C' : '#666');
