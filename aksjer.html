@@ -1538,7 +1538,12 @@ async function analyzePortfolioFresh() {
   var portfolioText = portfolio.map(function(p) { return p.ticker + ' (' + p.name + ', ' + p.sector + '): ' + p.pct + '% av porteføljen'; }).join('\n');
   try {
     var pfToken = window._sb ? ((await window._sb.auth.getSession()).data.session?.access_token || '') : '';
-    var res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pfToken }, body: JSON.stringify({ messages: [{ role: 'user', content: 'Analyser denne aksjeporteføljen for en norsk nybegynnerinvestor:\n\n' + portfolioText + '\n\nTotal allokering: ' + total.toFixed(0) + '%\n\nGi en grundig analyse på norsk bokmål. Bruk IKKE ### eller markdown-headings. Gi ALDRI kjøps- eller salgsanbefalinger.' }], context: null }) });
+    var res = await fetch('/api/portfolio', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pfToken }, body: JSON.stringify({ portfolio: portfolio, total: total }) });
+    if (res.status === 403) {
+      result.innerHTML = '<div style="text-align:center;padding:1.5rem;"><div style="font-size:28px;margin-bottom:10px;">🔒</div><div style="font-weight:500;font-size:14px;margin-bottom:6px;">Porteføljeanalyse krever Proff</div><button onclick="location.href=\'/priser.html\'" style="margin-top:8px;padding:9px 20px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:13px;font-weight:500;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Oppgrader til Proff →</button></div>';
+      btn.textContent = 'Analyser portefølje →'; btn.disabled = false;
+      return;
+    }
     var data = await res.json();
     var reply = (data.reply || 'Kunne ikke analysere.').replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>').replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>').replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>').replace(/\n/g, '');
     var pfKey = 'pf_analysis_' + portfolio.map(function(p){return p.ticker+p.pct;}).join('_');
