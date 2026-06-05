@@ -59,6 +59,7 @@ export default async function handler(req, res) {
 
 REGLER:
 - Gi ALDRI kjøps- eller salgsanbefalinger, og foreslå ALDRI å kjøpe eller selge spesifikke aksjer. Beskriv egenskaper, risiko og avveininger, og la beslutningen være leserens.
+- FORBUDTE ORD: bruk ALDRI verdiladede ord som feller en dom over en aksje eller kurs. Følgende ord — og alt i samme gate — er strengt forbudt: "undervurdert", "overvurdert", "billig", "dyr", "kjøp", "selg", "kjøpskandidat", "salgskandidat", "sterk kjøp", "bør kjøpe", "bør selge", "verdt å kjøpe", "et godt kjøp", "anbefaler". Konkluder ALDRI med at en aksje er rimelig, dyr, attraktiv eller en god/dårlig investering.
 - Skriv på naturlig norsk bokmål. Forklar faguttrykk kort.
 - Vær KONKRET og innholdsrik — gi reell innsikt, ikke bare gjenta prosentene. Forklar HVA fordelingen betyr for risiko og samvariasjon (f.eks. at flere industri- eller energiaksjer ofte beveger seg i takt). Navngi aksjene og sektorene.
 - IKKE DIKT: du har KUN ticker, navn, sektor og andel — ikke kurser, nøkkeltall eller nyheter. Påstå aldri tall eller hendelser du ikke har fått oppgitt.
