@@ -585,7 +585,7 @@ function renderStock(s) {
       (s.volume ? '<div class="stat-row"><span class="stat-label">Volum</span><span class="stat-val">' + s.volume + '</span></div>' : '') +
       '<div style="font-size:11px;color:#aaa;margin-top:8px;font-style:italic;">Nøkkeltall i ' + (s.reportCurrency || 'USD') + ' · Kurs i NOK</div>' +
     '</div>' +
-    '<div class="disclaimer">Kursdata fra Yahoo Finance · Fundamentals fra Financial Modeling Prep · Ikke finansiell rådgivning</div>';
+    '<div class="disclaimer">Kurs- og nøkkeltall fra Financial Modeling Prep · Ikke finansiell rådgivning</div>';
   document.getElementById('trending').innerHTML = '';
   // Skjul watchlist-overskrift og portefølje når aksje er søkt opp
   var pfSec = document.getElementById('portfolioSection');
@@ -1692,7 +1692,7 @@ function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.sty
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
   <div style="text-align:center;font-size:11px;color:#aaa;font-style:italic;padding:1rem 2rem 2rem;">
-    Kursdata fra Yahoo Finance · Fundamentals fra Financial Modeling Prep · Ikke finansiell rådgivning
+    Kurs- og nøkkeltall fra Financial Modeling Prep · Ikke finansiell rådgivning
   </div>
 </body>
 </html>
