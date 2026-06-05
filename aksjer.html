@@ -1514,14 +1514,56 @@ function renderPortfolioList() {
   analyzeBtn.style.display = portfolio.length >= 2 ? 'block' : 'none';
 }
 
+// Rendrer porteføljeanalysen med samme kort-stil som aksjesøkets AI-analyse:
+// hver **Tittel:**-seksjon blir et eget kort med gull card-title.
+function renderPfBody(text) {
+  var lines = String(text || '').split('\n');
+  var html = '';
+  var para = [];
+  function flush() {
+    if (para.length) { html += '<p style="font-size:13px;line-height:1.7;color:#1a1a1a;margin:0 0 8px;">' + para.join(' ') + '</p>'; para = []; }
+  }
+  lines.forEach(function(line) {
+    var l = line.trim();
+    if (!l) { flush(); return; }
+    if (l.indexOf('- ') === 0) {
+      flush();
+      var item = escapeHtml(l.slice(2)).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html += '<div style="display:flex;gap:8px;padding:3px 0;font-size:13px;line-height:1.6;color:#1a1a1a;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>' + item + '</span></div>';
+    } else {
+      para.push(escapeHtml(l).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+    }
+  });
+  flush();
+  return html;
+}
+function renderPfCards(reply) {
+  var clean = String(reply || '').replace(/\n?\s*Dette er ikke finansiell rådgivning\.?\s*$/i, '').trim();
+  var parts = clean.split(/\*\*\s*([^*]+?)\s*:\s*\*\*/g);
+  var html = '';
+  if (parts[0] && parts[0].trim()) html += renderPfBody(parts[0].trim());
+  for (var i = 1; i < parts.length; i += 2) {
+    var title = (parts[i] || '').trim();
+    var body = (parts[i + 1] || '').trim();
+    html += '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">' + escapeHtml(title) + '</div>' + renderPfBody(body) + '</div>';
+  }
+  if (!html.trim()) html = renderPfBody(clean);
+  return html;
+}
+function pfResultHtml(reply, ts) {
+  var header = '<div style="display:flex;justify-content:space-between;align-items:center;margin:1rem 0 12px;"><div class="card-title" style="margin-bottom:0;">AI Porteføljeanalyse</div><button onclick="analyzePortfolioFresh()" style="font-size:11px;padding:3px 10px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Oppdater</button></div>';
+  var disc = '<div style="margin-top:0.5rem;padding:10px 14px;background:#fff8f0;border-radius:10px;font-size:11px;color:#888;font-style:italic;">⚠️ Dette er ikke finansiell rådgivning. Analysen er generert av AI og skal ikke brukes som grunnlag for investeringsbeslutninger. Snakk alltid med en kvalifisert finansrådgiver.</div>';
+  var stamp = ts ? '<div style="font-size:11px;color:#aaa;margin-top:8px;">Sist oppdatert: ' + new Date(ts).toLocaleString('nb-NO') + '</div>' : '';
+  return header + renderPfCards(reply) + disc + stamp;
+}
+
 async function analyzePortfolio() {
   if (portfolio.length < 2) return;
   var pfKey = 'pf_analysis_' + portfolio.map(function(p){return p.ticker+p.pct;}).join('_');
   try {
     var cached = JSON.parse(localStorage.getItem(pfKey) || 'null');
     if (cached && (Date.now() - cached.ts) < 24 * 60 * 60 * 1000) {
-      var cachedReply = cached.reply.replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>').replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>').replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>').replace(/\n/g, '');
-      document.getElementById('pfResult').innerHTML = '<div class="card" style="margin-top:1rem;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div class="card-title" style="margin-bottom:0;">AI Porteføljeanalyse</div><button onclick="analyzePortfolioFresh()" style="font-size:11px;padding:3px 10px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Oppdater</button></div><p style="font-size:13px;line-height:1.7;">' + cachedReply + '</p><div style="margin-top:1rem;padding:10px 14px;background:#fff8f0;border-radius:10px;font-size:11px;color:#888;font-style:italic;">⚠️ Dette er ikke finansiell rådgivning.</div><div style="font-size:11px;color:#aaa;margin-top:8px;">Sist oppdatert: ' + new Date(cached.ts).toLocaleString('nb-NO') + '</div></div>';
+      document.getElementById('pfResult').innerHTML = pfResultHtml(cached.reply, cached.ts);
       return;
     }
   } catch(e) {}
@@ -1552,10 +1594,10 @@ async function analyzePortfolioFresh() {
       btn.textContent = 'Analyser portefølje →'; btn.disabled = false;
       return;
     }
-    var reply = (data.reply || 'Kunne ikke analysere.').replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>').replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>').replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>').replace(/\n/g, '');
+    var reply = data.reply;
     var pfKey = 'pf_analysis_' + portfolio.map(function(p){return p.ticker+p.pct;}).join('_');
     localStorage.setItem(pfKey, JSON.stringify({ reply: data.reply, ts: Date.now() }));
-    result.innerHTML = '<div class="card" style="margin-top:1rem;"><div class="card-title">AI Porteføljeanalyse</div><p style="font-size:13px;line-height:1.7;">' + reply + '</p><div style="margin-top:1rem;padding:10px 14px;background:#fff8f0;border-radius:10px;font-size:11px;color:#888;font-style:italic;">⚠️ Dette er ikke finansiell rådgivning. Analysen er generert av AI og skal ikke brukes som grunnlag for investeringsbeslutninger. Snakk alltid med en kvalifisert finansrådgiver.</div></div>';
+    result.innerHTML = pfResultHtml(reply, Date.now());
   } catch(e) { result.innerHTML = '<div style="font-size:13px;color:#888;padding:1rem;">Kunne ikke nå serveren: ' + (e && e.message ? e.message : 'ukjent feil') + '</div>'; }
   btn.textContent = 'Analyser portefølje →'; btn.disabled = false;
 }
