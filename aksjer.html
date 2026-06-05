@@ -479,17 +479,8 @@ function renderFMPData(fmp, s) {
       return '<div class="stat-row"><span class="stat-label">' + r[0] + '</span><span class="stat-val">' + r[1] + '</span></div>';
     }).join('');
 
-  // Legg til selskapsbeskrivelse fra FMP
-  if (fmp.description) {
-    var aiSection = document.getElementById('ai-section');
-    if (aiSection) {
-      var descEl = document.createElement('div');
-      descEl.className = 'card';
-      descEl.style.marginBottom = '1rem';
-      descEl.innerHTML = '<div class="card-title">Om selskapet</div><p style="font-size:13px;line-height:1.7;color:#555;">' + fmp.description.slice(0, 500) + (fmp.description.length > 500 ? '...' : '') + '</p>';
-      aiSection.insertAdjacentElement('beforebegin', descEl);
-    }
-  }
+  // Selskapsbeskrivelsen vises nå AI-oversatt til norsk (ai.om_selskapet) i generateAI,
+  // i sin helhet — ikke lenger den engelske FMP-teksten her.
 
   // Legg til kvartalsresultater
   if (fmp.earnings && fmp.earnings.length) {
@@ -821,6 +812,7 @@ async function generateAI(s) {
     var bullHtml = (ai.bull||[]).map(function(p) { return '<div class="point"><div class="dot-up"></div><span>' + p + '</span></div>'; }).join('');
     var bearHtml = (ai.bear||[]).map(function(p) { return '<div class="point"><div class="dot-down"></div><span>' + p + '</span></div>'; }).join('');
     sec.innerHTML =
+      (ai.om_selskapet ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Om selskapet</div><p>' + ai.om_selskapet + '</p></div>' : '') +
       '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva gjør selskapet?</div><p>' + (ai.hva||'—') + '</p></div>' +
       (ai.hvorfor_eier_folk ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hvorfor eier folk denne aksjen?</div><p>' + ai.hvorfor_eier_folk + '</p></div>' : '') +
       (ai.aktuelt ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva skjer akkurat nå?</div><p>' + ai.aktuelt + '</p></div>' : '') +
@@ -881,7 +873,9 @@ async function loadNews(ticker, plan) {
   }
   sec.innerHTML = '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Børsmeldinger</div><div style="font-size:13px;color:#aaa;padding:8px 0;">Henter nyheter...</div></div>';
   try {
-    const res = await fetch('/api/news?ticker=' + encodeURIComponent(ticker));
+    var sbNews = window._sb;
+    var newsToken = sbNews ? ((await sbNews.auth.getSession()).data.session?.access_token || '') : '';
+    const res = await fetch('/api/news?ticker=' + encodeURIComponent(ticker), { headers: { 'Authorization': 'Bearer ' + newsToken } });
     const data = await res.json();
     const articles = data.articles || [];
     if (articles.length === 0) {
