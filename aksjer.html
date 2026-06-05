@@ -1544,12 +1544,19 @@ async function analyzePortfolioFresh() {
       btn.textContent = 'Analyser portefølje →'; btn.disabled = false;
       return;
     }
-    var data = await res.json();
+    var data = null;
+    try { data = await res.json(); } catch (je) { data = null; }
+    if (!res.ok || !data || !data.reply) {
+      var msg = (data && data.error) ? data.error : ('Serverfeil ' + res.status + (res.status === 404 ? ' — endepunktet /api/portfolio finnes ikke (er portfolio.js deployet til api/?)' : ''));
+      result.innerHTML = '<div style="font-size:13px;color:#888;padding:1rem;">Kunne ikke analysere porteføljen: ' + msg + '</div>';
+      btn.textContent = 'Analyser portefølje →'; btn.disabled = false;
+      return;
+    }
     var reply = (data.reply || 'Kunne ikke analysere.').replace(/### (\d+)\. (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$2</div>').replace(/### (.*?)(\n|$)/g, '<div style="font-size:14px;font-weight:600;margin:1.25rem 0 4px;">$1</div>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/^- (.*?)$/gm, '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.5;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>$1</span></div>').replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>').replace(/\n/g, '');
     var pfKey = 'pf_analysis_' + portfolio.map(function(p){return p.ticker+p.pct;}).join('_');
     localStorage.setItem(pfKey, JSON.stringify({ reply: data.reply, ts: Date.now() }));
     result.innerHTML = '<div class="card" style="margin-top:1rem;"><div class="card-title">AI Porteføljeanalyse</div><p style="font-size:13px;line-height:1.7;">' + reply + '</p><div style="margin-top:1rem;padding:10px 14px;background:#fff8f0;border-radius:10px;font-size:11px;color:#888;font-style:italic;">⚠️ Dette er ikke finansiell rådgivning. Analysen er generert av AI og skal ikke brukes som grunnlag for investeringsbeslutninger. Snakk alltid med en kvalifisert finansrådgiver.</div></div>';
-  } catch(e) { result.innerHTML = '<div style="font-size:13px;color:#888;padding:1rem;">Kunne ikke analysere porteføljen akkurat nå.</div>'; }
+  } catch(e) { result.innerHTML = '<div style="font-size:13px;color:#888;padding:1rem;">Kunne ikke nå serveren: ' + (e && e.message ? e.message : 'ukjent feil') + '</div>'; }
   btn.textContent = 'Analyser portefølje →'; btn.disabled = false;
 }
 
