@@ -1,15 +1,12 @@
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
-
 const LIMITS = { free: 5, investor: 200, proff: 200 };
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
-
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Ikke autentisert' });
@@ -18,15 +15,12 @@ export default async function handler(req, res) {
   const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
   const { data: { user }, error: authError } = await sb.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
-
   const { messages, context } = req.body || {};
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'messages mangler' });
   }
-
   // --- RATE LIMIT SJEKK ---
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
-
   // Hent plan
   const { data: planData } = await sb
     .from('user_plans')
@@ -35,15 +29,13 @@ export default async function handler(req, res) {
     .maybeSingle();
   const plan = planData?.plan || 'free';
   const limit = LIMITS[plan] ?? LIMITS.free;
-
-  // Tell chat-kall i dag
+  // Tell chat-kall i dag. NB: kolonnen heter "type" (samme som resten av appen).
   const { count } = await sb
     .from('user_activity')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .eq('activity', 'chat')
+    .eq('type', 'chat')
     .gte('created_at', today + 'T00:00:00+02:00');
-
   if ((count || 0) >= limit) {
     return res.status(429).json({
       error: `Du har nådd dagens grense på ${limit} chat-meldinger.`,
@@ -51,17 +43,16 @@ export default async function handler(req, res) {
       plan
     });
   }
-
-  // Logg aktivitet
+  // Logg aktivitet (samme skjema som resten av appen: type/ticker/name/xp)
   await sb.from('user_activity').insert({
     user_id: user.id,
-    activity: 'chat',
+    type: 'chat',
+    ticker: (context && context.ticker) || null,
+    name: 'Chat',
     xp: 1
   });
-
   // --- OPENAI KALL ---
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
   const contextInfo = context ? `
 Du snakker nå om ${context.name} (${context.ticker}).
 Kurs: ${context.price} NOK, endring: ${context.changePct}%
@@ -70,9 +61,7 @@ ${context.dividendYield ? 'Direkteavkastning: ' + context.dividendYield : ''}
 ${context.marketCap ? 'Markedsverdi: ' + context.marketCap : ''}
 ${context.sector ? 'Sektor: ' + context.sector : ''}
 Bruk disse tallene aktivt i svarene dine når det er relevant.` : '';
-
   const systemPrompt = `Du er Børshjelpen sin AI-assistent — du snakker som en klok, ærlig venn som kan finans godt. Tonen er varm, direkte og engasjerende. Du forklarer ting enkelt uten å være nedlatende, og du er konkret fremfor vag.
-
 REGLER:
 - Gi ALDRI kjøps- eller salgsanbefalinger — si heller "det er faktorer som taler for og imot"
 - Presenter alltid begge sider når noen spør om en aksje er bra eller dårlig
@@ -81,7 +70,6 @@ REGLER:
 - Svar gjerne utfyllende når spørsmålet fortjener det, men vær konsis på enkle spørsmål
 - Avslutt alltid med: "Dette er ikke finansiell rådgivning."
 ${contextInfo}`;
-
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
