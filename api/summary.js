@@ -49,11 +49,14 @@ export default async function handler(req, res) {
 
 Skriv på naturlig norsk bokmål. Unngå finanssjargong der det ikke er nødvendig — og forklar det kort når du bruker det. Vær konkret, ikke vag.
 
+FORBUDTE ORD OG VURDERINGER (svært viktig):
+Bruk ALDRI verdiladede ord som feller en dom over aksjen eller kursen. Følgende ord — og alt i samme gate — er strengt forbudt: "undervurdert", "overvurdert", "billig", "dyr", "kjøp", "selg", "kjøpskandidat", "salgskandidat", "sterk kjøp", "bør kjøpe", "bør selge", "verdt å kjøpe", "et godt kjøp", "et dårlig kjøp", "anbefaler". Konkluder ALDRI med at aksjen er rimelig, dyr, attraktiv, eller en god/dårlig investering. Beskriv i stedet nøytralt og faktabasert hva tallene er, og sammenlign dem med selskapets egen historikk og bransjen — la leseren trekke konklusjonen selv.
+
 VIKTIG OM FAKTA — IKKE DIKT:
 Du får oppgitt faktiske nøkkeltall, men IKKE en nyhetsfeed.
 - "aktuelt" skal være forsiktig og generell: bygg på sektor, makrobilde og de oppgitte nøkkeltallene. Påstå ALDRI konkrete ferske hendelser (oppkjøp, kvartalsresultater, kontrakter, datoer) som du ikke har dekning for.
 - Finn ALDRI opp nyheter, tall, sitater eller hendelser.
-- "pris_vurdering", "bull", "bear", "scenarios" osv. skal baseres på de oppgitte nøkkeltallene, ikke oppdiktede tall.
+- "pris_vurdering", "bull", "bear" osv. skal baseres på de oppgitte nøkkeltallene, ikke oppdiktede tall.
 
 JSON-struktur:
 {
@@ -61,39 +64,13 @@ JSON-struktur:
   "hva": "2-3 setninger som forklarer hva selskapet faktisk gjør og hvordan de tjener penger — som om du forklarer det til en venn over kaffe. Ikke start med selskapets navn.",
   "hvorfor_eier_folk": "1-2 setninger om hvorfor investorer typisk eier denne aksjen — utbytte, vekst, stabilitet, eksponering mot en trend?",
   "aktuelt": "Hva skjer med selskapet akkurat nå? Hva bryr markedet seg om denne måneden — kvartalstall, makro, oljepris, renter, konkurranse? Vær spesifikk.",
-  "pris_vurdering": "Bruk de faktiske P/E, P/B, EV/EBITDA og utbyttetall som er oppgitt. Sammenlign med typiske verdier for sektoren og selskapets historikk. Si konkret om dette er høyt eller lavt — og HVORFOR det er slik akkurat nå. Forklar hva tallene betyr i praksis for en nybegynner. Vær spesifikk — ikke generell.",
+  "pris_vurdering": "Beskriv verdsettelsen NØYTRALT med de faktiske P/E, P/B, EV/EBITDA og utbyttetallene som er oppgitt. Forklar hva tallene betyr i praksis for en nybegynner, og hvordan de står seg mot selskapets egen historikk og typiske verdier i sektoren. IKKE konkluder med om aksjen er dyr eller billig, og bruk ingen verdiladede ord — bare presenter tallene og sammenligningen nøytralt, så leseren kan vurdere selv.",
   "paavirkere": "Hva er de 2-3 viktigste tingene som påvirker kursen på denne aksjen? Oljepris? Renter? Makroøkonomi? Selskapsspesifikt?",
   "bull": ["Konkret positivt argument 1", "Konkret positivt argument 2", "Konkret positivt argument 3"],
   "bear": ["Konkret risiko 1", "Konkret risiko 2", "Konkret risiko 3"],
-  "scenarios": [
-    {
-      "label": "Skriv et konkret optimistisk scenarionavn basert på selskapets faktiske situasjon (f.eks. 'Høy oljepris + sterk etterspørsel')",
-      "prob": "Realistisk sannsynlighet basert på makro, historikk og selskapsdata — typisk 25-40%",
-      "return": "Realistisk kursutvikling basert på verdsettelse og historisk volatilitet",
-      "drivers": "1-2 setninger om hva som må til for at dette skjer",
-      "color": "#2C7A5C",
-      "barColor": "#2C7A5C"
-    },
-    {
-      "label": "Konkret basisscenario-navn (f.eks. 'Stabil oljepris, moderat vekst')",
-      "prob": "Typisk 35-45%",
-      "return": "Realistisk for basisscenario",
-      "drivers": "Hva som karakteriserer dette scenariet",
-      "color": "#888",
-      "barColor": "#888"
-    },
-    {
-      "label": "Konkret pessimistisk scenarionavn (f.eks. 'Oljepriskollaps + rentepress')",
-      "prob": "Typisk 20-35%",
-      "return": "Realistisk nedside basert på historiske krasj og risikoer",
-      "drivers": "Hva som trigger dette scenariet",
-      "color": "#A32D2D",
-      "barColor": "#A32D2D"
-    }
-  ],
   "risiko": "De viktigste risikoene — konkret og ærlig. Ikke generell advarsel, men spesifikt for dette selskapet.",
   "historisk": "Kort og interessant historisk perspektiv — har aksjen vært volatil? Gitt godt utbytte over tid? Hatt store fall?",
-  "nybegynner_tips": "Ett konkret, nyttig tips til en nybegynner som ser på denne aksjen for første gang."
+  "nybegynner_tips": "Ett konkret, nyttig tips til en nybegynner som ser på denne aksjen for første gang. Ingen kjøps-/salgsråd."
 }`
         },
         {
