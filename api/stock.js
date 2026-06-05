@@ -59,13 +59,18 @@ export default async function handler(req, res) {
     if (ratios?.peRatioTTM) pe = parseFloat(ratios.peRatioTTM).toFixed(1);
     else if (metrics?.earningsYieldTTM && metrics.earningsYieldTTM > 0) pe = (1 / metrics.earningsYieldTTM).toFixed(1);
 
-    // Siste utbytte: bruk dedikert dividends-endepunkt (nyeste først), fall tilbake på profil.
-    let lastDiv = null, lastDivDate = null;
+    // Utbytte: skill mellom siste UTBETALTE (dato <= i dag) og neste ANNONSERTE (dato > i dag).
+    let lastDiv = null, lastDivDate = null, upcomingDiv = null, upcomingDivDate = null;
     if (dividends && dividends.length) {
-      const sorted = dividends.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
-      const latest = sorted[0];
-      const amt = latest.adjDividend != null ? latest.adjDividend : latest.dividend;
-      if (amt != null) { lastDiv = parseFloat(amt); lastDivDate = latest.date || null; }
+      const todayMs = Date.now();
+      const rows = dividends
+        .filter(d => d && d.date)
+        .map(d => ({ date: d.date, amt: d.adjDividend != null ? d.adjDividend : d.dividend, t: new Date(d.date).getTime() }))
+        .filter(d => d.amt != null && !isNaN(d.t));
+      const past = rows.filter(d => d.t <= todayMs).sort((a, b) => b.t - a.t);
+      const future = rows.filter(d => d.t > todayMs).sort((a, b) => a.t - b.t);
+      if (past.length) { lastDiv = parseFloat(past[0].amt); lastDivDate = past[0].date; }
+      if (future.length) { upcomingDiv = parseFloat(future[0].amt); upcomingDivDate = future[0].date; }
     }
     if (lastDiv == null && profile?.lastDividend != null) lastDiv = parseFloat(profile.lastDividend);
     if (lastDiv == null && profile?.lastDiv != null) lastDiv = parseFloat(profile.lastDiv);
@@ -96,9 +101,12 @@ export default async function handler(req, res) {
     let ebit = null;
     if (income?.operatingIncome) ebit = fmtMoney(income.operatingIncome, reportCurrency);
 
-    // Siste utbytte per aksje (utbetales i kursvaluta)
+    // Siste utbetalte utbytte per aksje (i kursvaluta)
     let dividendPerShare = null;
     if (lastDiv != null) dividendPerShare = lastDiv.toFixed(2) + ' ' + priceCurrency;
+    // Neste annonserte utbytte per aksje (i kursvaluta)
+    let upcomingDividend = null;
+    if (upcomingDiv != null) upcomingDividend = upcomingDiv.toFixed(2) + ' ' + priceCurrency;
 
     res.status(200).json({
       ticker: upper,
@@ -116,6 +124,8 @@ export default async function handler(req, res) {
       eps,
       dividendPerShare,
       lastDividendDate: lastDivDate,
+      upcomingDividend,
+      upcomingDividendDate: upcomingDivDate,
       dividendYield,
       pe,
       pb,
