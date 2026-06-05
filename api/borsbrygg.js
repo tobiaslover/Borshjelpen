@@ -75,14 +75,20 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).end();
 
-  // Auth-sjekk på POST
+  // Auth-sjekk på POST.
+  // Internt cron-kall (samme server-miljø) autentiseres med CRON_SECRET og slipper
+  // forbi brukertoken-kravet. En brukertoken kan aldri være lik CRON_SECRET.
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Ikke autentisert' });
+  const cronSecret = process.env.CRON_SECRET;
+  const isCron = cronSecret && authHeader === `Bearer ${cronSecret}`;
+  if (!isCron) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Ikke autentisert' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await sb.auth.getUser(token);
+    if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
   }
-  const token = authHeader.replace('Bearer ', '');
-  const { data: { user }, error: authError } = await sb.auth.getUser(token);
-  if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
 
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
 
