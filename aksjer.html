@@ -687,12 +687,10 @@ function getStockType(s) {
   return badges;
 }
 
-var DEV_MODE = window.location.hostname.includes('vercel.app');
 // PLANS hentes fra plans.js (window.PLANS) — én sannhetskilde for hele nettstedet
 var XP_VALUES = { search: 2, chat: 1, borsbrygg: 5, login: 3, watchlist: 5 };
 
 async function getUserPlan(sb) {
-  if (DEV_MODE) return 'proff';
   try {
     var sess = (await sb.auth.getSession()).data.session;
     if (!sess) return 'free';
