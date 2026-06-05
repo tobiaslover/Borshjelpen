@@ -13,20 +13,22 @@ export default async function handler(req, res) {
   try {
     // Kurs OG nøkkeltall hentes nå fra FMP (lisensiert kilde). Oslo Børs-aksjer
     // med .OL-suffiks prises nativt i NOK — ingen valutakonvertering nødvendig.
-    const [quoteRes, profileRes, metricsRes, ratiosRes, incomeRes] = await Promise.all([
+    const [quoteRes, profileRes, metricsRes, ratiosRes, incomeRes, dividendsRes] = await Promise.all([
       fetch(`https://financialmodelingprep.com/stable/quote?symbol=${olSymbol}&apikey=${apiKey}`),
       fetch(`https://financialmodelingprep.com/stable/profile?symbol=${olSymbol}&apikey=${apiKey}`),
       fetch(`https://financialmodelingprep.com/stable/key-metrics-ttm?symbol=${olSymbol}&apikey=${apiKey}`),
       fetch(`https://financialmodelingprep.com/stable/ratios-ttm?symbol=${olSymbol}&apikey=${apiKey}`),
       fetch(`https://financialmodelingprep.com/stable/income-statement?symbol=${olSymbol}&limit=1&apikey=${apiKey}`),
+      fetch(`https://financialmodelingprep.com/stable/dividends?symbol=${olSymbol}&limit=8&apikey=${apiKey}`),
     ]);
 
-    let quote = null, profile = null, metrics = null, ratios = null, income = null;
+    let quote = null, profile = null, metrics = null, ratios = null, income = null, dividends = null;
     if (quoteRes.ok) { try { const d = await quoteRes.json(); quote = Array.isArray(d) ? d[0] : d; } catch(e) {} }
     if (profileRes.ok) { try { const d = await profileRes.json(); profile = Array.isArray(d) ? d[0] : d; } catch(e) {} }
     if (metricsRes.ok) { try { const d = await metricsRes.json(); metrics = Array.isArray(d) ? d[0] : d; } catch(e) {} }
     if (ratiosRes.ok) { try { const d = await ratiosRes.json(); ratios = Array.isArray(d) ? d[0] : d; } catch(e) {} }
     if (incomeRes.ok) { try { const d = await incomeRes.json(); income = Array.isArray(d) ? d[0] : d; } catch(e) {} }
+    if (dividendsRes.ok) { try { const d = await dividendsRes.json(); dividends = Array.isArray(d) ? d : null; } catch(e) {} }
 
     if (!quote || quote.price == null) {
       return res.status(404).json({ error: `Aksje "${upper}" ikke funnet. Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI.` });
@@ -57,10 +59,21 @@ export default async function handler(req, res) {
     if (ratios?.peRatioTTM) pe = parseFloat(ratios.peRatioTTM).toFixed(1);
     else if (metrics?.earningsYieldTTM && metrics.earningsYieldTTM > 0) pe = (1 / metrics.earningsYieldTTM).toFixed(1);
 
+    // Siste utbytte: bruk dedikert dividends-endepunkt (nyeste først), fall tilbake på profil.
+    let lastDiv = null, lastDivDate = null;
+    if (dividends && dividends.length) {
+      const sorted = dividends.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+      const latest = sorted[0];
+      const amt = latest.adjDividend != null ? latest.adjDividend : latest.dividend;
+      if (amt != null) { lastDiv = parseFloat(amt); lastDivDate = latest.date || null; }
+    }
+    if (lastDiv == null && profile?.lastDividend != null) lastDiv = parseFloat(profile.lastDividend);
+    if (lastDiv == null && profile?.lastDiv != null) lastDiv = parseFloat(profile.lastDiv);
+
     // Utbytteyield (prosent — valutauavhengig)
     let dividendYield = null;
     if (ratios?.dividendYieldTTM) dividendYield = (parseFloat(ratios.dividendYieldTTM) * 100).toFixed(2) + '%';
-    else if (profile?.lastDiv && price) dividendYield = ((profile.lastDiv / price) * 100).toFixed(2) + '%';
+    else if (lastDiv && price) dividendYield = ((lastDiv / price) * 100).toFixed(2) + '%';
 
     // Markedsverdi (prisbasert → kursvaluta)
     let marketCap = null;
@@ -83,9 +96,9 @@ export default async function handler(req, res) {
     let ebit = null;
     if (income?.operatingIncome) ebit = fmtMoney(income.operatingIncome, reportCurrency);
 
-    // Utbytte per aksje (utbetales i kursvaluta)
+    // Siste utbytte per aksje (utbetales i kursvaluta)
     let dividendPerShare = null;
-    if (profile?.lastDiv) dividendPerShare = parseFloat(profile.lastDiv).toFixed(2) + ' ' + priceCurrency;
+    if (lastDiv != null) dividendPerShare = lastDiv.toFixed(2) + ' ' + priceCurrency;
 
     res.status(200).json({
       ticker: upper,
@@ -102,6 +115,7 @@ export default async function handler(req, res) {
       ebit,
       eps,
       dividendPerShare,
+      lastDividendDate: lastDivDate,
       dividendYield,
       pe,
       pb,
