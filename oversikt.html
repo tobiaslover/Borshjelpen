@@ -223,17 +223,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
     <div class="greeting-date" id="greetingDate"></div>
   </div>
 
-  <!-- VELKOMSTTILBUD (kun gratisbrukere) -->
-  <div id="promoBanner" style="display:none;background:linear-gradient(135deg,#FFF8E7,#FFF0C0);border:1px solid #C8A96E;border-radius:14px;padding:1rem 1.25rem;margin-bottom:1rem;">
-    <div style="font-size:13px;color:#8B6E3A;font-weight:500;margin-bottom:6px;">🎁 Velkomsttilbud</div>
-    <div style="font-size:14px;color:#3a2800;margin-bottom:10px;">Få <strong>50&nbsp;% rabatt på din første måned</strong> med din personlige kode:</div>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <code id="promoCode" style="font-family:monospace;font-size:16px;font-weight:700;letter-spacing:1px;background:#fff;border:1px dashed #C8A96E;border-radius:8px;padding:8px 14px;color:#1B3A5C;">—</code>
-      <button onclick="copyPromo()" id="promoCopyBtn" style="font-size:13px;padding:8px 16px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kopier</button>
-      <button onclick="location.href='/priser.html'" style="font-size:13px;padding:8px 16px;border-radius:100px;border:1px solid #C8A96E;background:none;color:#8B6E3A;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Se planer →</button>
-    </div>
-  </div>
-
   <!-- XP -->
   <div class="xp-bar">
     <div class="xp-level" id="xpEmoji">🌱</div>
@@ -400,10 +389,10 @@ function renderStreak(streak) {
 
 function renderXP(xp) {
   var levels = [
-    {name:'🌱 Nybegynner', label:'Nybegynner', emoji:'🌱', min:0, max:99},
-    {name:'📈 Investor', label:'Investor', emoji:'📈', min:100, max:499},
-    {name:'🔍 Analytiker', label:'Analytiker', emoji:'🔍', min:500, max:999},
-    {name:'🏆 Proff', label:'Proff', emoji:'🏆', min:1000, max:9999}
+    {name:'🌱 Nybegynner', label:'Nybegynner', emoji:'🌱', min:0, max:199},
+    {name:'📈 Aksjespirer', label:'Aksjespirer', emoji:'📈', min:200, max:699},
+    {name:'🔍 Analytiker', label:'Analytiker', emoji:'🔍', min:700, max:1799},
+    {name:'🏆 Mester', label:'Mester', emoji:'🏆', min:1800, max:999999}
   ];
   var level = levels.find(function(l) { return xp >= l.min && xp <= l.max; }) || levels[3];
   var pct = Math.min(100, Math.round(((xp - level.min) / (level.max - level.min)) * 100));
@@ -674,39 +663,9 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
     renderXP(totalXp);
     renderStreak(streak);
   } catch(e) { renderXP(0); }
-  loadPromo();
 })();
 
 async function loadNews() {}
-
-async function loadPromo() {
-  try {
-    var bannerEl = document.getElementById('promoBanner');
-    if (!bannerEl) return;
-    var plan = await getUserPlan();
-    if (plan !== 'free') return; // velkomsttilbud kun for gratisbrukere
-    var sess = (await sb.auth.getSession()).data.session;
-    if (!sess) return;
-    var res = await fetch('/api/promo', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sess.access_token }
-    });
-    if (!res.ok) return;
-    var data = await res.json();
-    if (!data.code) return;
-    document.getElementById('promoCode').textContent = data.code;
-    bannerEl.style.display = 'block';
-  } catch(e) {}
-}
-function copyPromo() {
-  var code = document.getElementById('promoCode').textContent;
-  if (!code || code === '—') return;
-  navigator.clipboard.writeText(code).then(function() {
-    var btn = document.getElementById('promoCopyBtn');
-    var t = btn.textContent; btn.textContent = 'Kopiert ✓';
-    setTimeout(function() { btn.textContent = t; }, 1500);
-  }).catch(function() {});
-}
 
 function openMoversModal() {
   var modal = document.getElementById('moversModal');
