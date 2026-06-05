@@ -49,6 +49,10 @@ export default async function handler(req, res) {
 
 Skriv på naturlig norsk bokmål. Unngå finanssjargong der det ikke er nødvendig — og forklar det kort når du bruker det. Vær konkret, ikke vag.
 
+SPRÅK OG FORMAT (svært viktig):
+- ALLE feltene under skal være ren tekst (vanlig tekststreng) — ALDRI et objekt, en liste eller nøstet JSON. "bull" og "bear" er lister med korte tekststrenger; alt annet er én tekststreng.
+- Korrekt norsk rettskriving og tegnsetting er et krav. Mellomrom ETTER punktum, komma, kolon og semikolon — aldri før. Skriv ALDRI ".," eller ",." eller doble skilletegn. Stor forbokstav i egennavn og ved setningsstart. Les gjennom og rett feil før du svarer.
+
 FORBUDTE ORD OG VURDERINGER (svært viktig):
 Bruk ALDRI verdiladede ord som feller en dom over aksjen eller kursen. Følgende ord — og alt i samme gate — er strengt forbudt: "undervurdert", "overvurdert", "billig", "dyr", "kjøp", "selg", "kjøpskandidat", "salgskandidat", "sterk kjøp", "bør kjøpe", "bør selge", "verdt å kjøpe", "et godt kjøp", "et dårlig kjøp", "anbefaler". Konkluder ALDRI med at aksjen er rimelig, dyr, attraktiv, eller en god/dårlig investering. Beskriv i stedet nøytralt og faktabasert hva tallene er, og sammenlign dem med selskapets egen historikk og bransjen — la leseren trekke konklusjonen selv.
 
@@ -64,7 +68,7 @@ JSON-struktur:
   "hva": "2-3 setninger som forklarer hva selskapet faktisk gjør og hvordan de tjener penger — som om du forklarer det til en venn over kaffe. Ikke start med selskapets navn.",
   "hvorfor_eier_folk": "1-2 setninger om hvorfor investorer typisk eier denne aksjen — utbytte, vekst, stabilitet, eksponering mot en trend?",
   "aktuelt": "Hva skjer med selskapet akkurat nå? Hva bryr markedet seg om denne måneden — kvartalstall, makro, oljepris, renter, konkurranse? Vær spesifikk.",
-  "pris_vurdering": "Beskriv verdsettelsen NØYTRALT med de faktiske P/E, P/B, EV/EBITDA og utbyttetallene som er oppgitt. Forklar hva tallene betyr i praksis for en nybegynner, og hvordan de står seg mot selskapets egen historikk og typiske verdier i sektoren. IKKE konkluder med om aksjen er dyr eller billig, og bruk ingen verdiladede ord — bare presenter tallene og sammenligningen nøytralt, så leseren kan vurdere selv.",
+  "pris_vurdering": "Beskriv verdsettelsen NØYTRALT med de faktiske P/E, P/B, EV/EBITDA og utbyttetallene som er oppgitt. Forklar hva tallene betyr i praksis for en nybegynner, og hvordan de står seg mot selskapets egen historikk og typiske verdier i sektoren. IKKE konkluder med om aksjen er dyr eller billig, og bruk ingen verdiladede ord — bare presenter tallene og sammenligningen nøytralt, så leseren kan vurdere selv. Returner som ÉN sammenhengende tekststreng — ikke et objekt eller en liste.",
   "paavirkere": "Hva er de 2-3 viktigste tingene som påvirker kursen på denne aksjen? Oljepris? Renter? Makroøkonomi? Selskapsspesifikt?",
   "bull": ["Konkret positivt argument 1", "Konkret positivt argument 2", "Konkret positivt argument 3"],
   "bear": ["Konkret risiko 1", "Konkret risiko 2", "Konkret risiko 3"],
