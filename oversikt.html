@@ -320,6 +320,18 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 var chatHistory = [];
 
+// Starten av "i dag" i Oslo-tid som ISO-tidsstempel — for korrekt døgntelling uansett UTC-forskyvning.
+function osloDayStartISO() {
+  var d = new Date();
+  var date = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Oslo' }).format(d);
+  var off = '';
+  try {
+    off = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Oslo', timeZoneName: 'longOffset' })
+      .formatToParts(d).find(function(p) { return p.type === 'timeZoneName'; }).value.replace('GMT', '');
+  } catch(e) {}
+  return date + 'T00:00:00' + (off || '+00:00');
+}
+
 async function getUserPlan() {
   try {
     var sess = (await sb.auth.getSession()).data.session;
@@ -333,8 +345,7 @@ async function getTodayChatCount() {
   try {
     var sess = (await sb.auth.getSession()).data.session;
     if (!sess) return 0;
-    var today = new Date().toISOString().slice(0, 10);
-    var r = await sb.from('user_activity').select('*', {count:'exact',head:true}).eq('user_id', sess.user.id).eq('type', 'chat').gte('created_at', today + 'T00:00:00Z');
+    var r = await sb.from('user_activity').select('*', {count:'exact',head:true}).eq('user_id', sess.user.id).eq('type', 'chat').gte('created_at', osloDayStartISO());
     return r.count || 0;
   } catch(e) { return 0; }
 }
@@ -342,9 +353,8 @@ async function getTodayChatCount() {
 async function logChatActivity() {
   try {
     var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
-    var today = new Date().toISOString().slice(0, 10);
     var xp = 1;
-    var { data: todayActs } = await sb.from('user_activity').select('id').eq('user_id', sess.user.id).eq('type', 'chat').gte('created_at', today + 'T00:00:00Z');
+    var { data: todayActs } = await sb.from('user_activity').select('id').eq('user_id', sess.user.id).eq('type', 'chat').gte('created_at', osloDayStartISO());
     if (todayActs && todayActs.length >= 100) xp = 0; // maks 100 XP-givende chat per dag
     await sb.from('user_activity').insert({ user_id: sess.user.id, type: 'chat', ticker: null, name: 'Chat (oversikt)', xp: xp });
     if (xp > 0) {
