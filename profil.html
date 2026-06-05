@@ -358,9 +358,9 @@ function renderStats(all) {
     const xp = all.reduce((sum, d) => sum + (d.xp || 0), 0);
     document.getElementById('statXP').textContent = xp;
     let level = '🌱 Nybegynner';
-    if (xp >= 1800) level = '🏆 Mester';
-    else if (xp >= 700) level = '🔍 Analytiker';
-    else if (xp >= 200) level = '📈 Aksjespirer';
+    if (xp >= 3000) level = '🏆 Mester';
+    else if (xp >= 1500) level = '🔍 Analytiker';
+    else if (xp >= 400) level = '📈 Aksjespirer';
     const planEl = document.getElementById('profilePlan');
     if (planEl) planEl.textContent = level;
   } catch(e) {}
