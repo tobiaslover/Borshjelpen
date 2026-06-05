@@ -462,6 +462,8 @@ function renderFMPData(fmp, s) {
   if (fmp.pbRatio) rows.push(['P/B (TTM)', fmp.pbRatio]);
   if (fmp.psRatio) rows.push(['P/S (TTM)', fmp.psRatio]);
   if (fmp.evEbitda) rows.push(['EV/EBITDA', fmp.evEbitda]);
+  if (s.dividendPerShare) rows.push(['Siste utbytte', s.dividendPerShare + (s.lastDividendDate ? ' (' + new Date(s.lastDividendDate).toLocaleDateString('nb-NO') + ')' : '')]);
+  if (s.upcomingDividend) rows.push(['Neste utbytte (annonsert)', s.upcomingDividend + (s.upcomingDividendDate ? ' (' + new Date(s.upcomingDividendDate).toLocaleDateString('nb-NO') + ')' : '')]);
   if (fmp.dividendYield) rows.push(['Utbytteyield', fmp.dividendYield]);
   if (fmp.roe) rows.push(['Egenkapitalavkastning (ROE)', fmp.roe]);
   if (fmp.roa) rows.push(['Totalkapitalavkastning (ROA)', fmp.roa]);
@@ -574,7 +576,8 @@ function renderStock(s) {
       (s.revenue ? '<div class="stat-row"><span class="stat-label">Omsetning (TTM)</span><span class="stat-val">' + s.revenue + '</span></div>' : '') +
       (s.ebit ? '<div class="stat-row"><span class="stat-label">EBIT</span><span class="stat-val">' + s.ebit + '</span></div>' : '') +
       (s.eps ? '<div class="stat-row"><span class="stat-label">EPS</span><span class="stat-val">' + s.eps + '</span></div>' : '') +
-      (s.dividendPerShare ? '<div class="stat-row"><span class="stat-label">Utbytte per aksje</span><span class="stat-val">' + s.dividendPerShare + '</span></div>' : '') +
+      (s.dividendPerShare ? '<div class="stat-row"><span class="stat-label">Siste utbytte</span><span class="stat-val">' + s.dividendPerShare + (s.lastDividendDate ? ' <span style="color:#aaa;font-weight:400;">(' + new Date(s.lastDividendDate).toLocaleDateString('nb-NO') + ')</span>' : '') + '</span></div>' : '') +
+      (s.upcomingDividend ? '<div class="stat-row"><span class="stat-label">Neste utbytte (annonsert)</span><span class="stat-val">' + s.upcomingDividend + (s.upcomingDividendDate ? ' <span style="color:#aaa;font-weight:400;">(' + new Date(s.upcomingDividendDate).toLocaleDateString('nb-NO') + ')</span>' : '') + '</span></div>' : '') +
       (s.dividendYield ? '<div class="stat-row"><span class="stat-label">Direkteavkastning</span><span class="stat-val">' + s.dividendYield + '</span></div>' : '') +
       (s.pe ? '<div class="stat-row"><span class="stat-label">P/E</span><span class="stat-val">' + s.pe + '</span></div>' : '') +
       (s.pb ? '<div class="stat-row"><span class="stat-label">P/B</span><span class="stat-val">' + s.pb + '</span></div>' : '') +
@@ -586,7 +589,7 @@ function renderStock(s) {
       (s.volume ? '<div class="stat-row"><span class="stat-label">Volum</span><span class="stat-val">' + s.volume + '</span></div>' : '') +
       '<div style="font-size:11px;color:#aaa;margin-top:8px;font-style:italic;">Nøkkeltall i ' + (s.reportCurrency || 'USD') + ' · Kurs i NOK</div>' +
     '</div>' +
-    '<div class="disclaimer">Kursdata fra Yahoo Finance · Fundamentals fra Financial Modeling Prep · Ikke finansiell rådgivning</div>';
+    '<div class="disclaimer">Kurs- og nøkkeltall fra Financial Modeling Prep · Ikke finansiell rådgivning</div>';
   document.getElementById('trending').innerHTML = '';
   // Skjul watchlist-overskrift og portefølje når aksje er søkt opp
   var pfSec = document.getElementById('portfolioSection');
@@ -1693,7 +1696,7 @@ function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.sty
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 </script>
   <div style="text-align:center;font-size:11px;color:#aaa;font-style:italic;padding:1rem 2rem 2rem;">
-    Kursdata fra Yahoo Finance · Fundamentals fra Financial Modeling Prep · Ikke finansiell rådgivning
+    Kurs- og nøkkeltall fra Financial Modeling Prep · Ikke finansiell rådgivning
   </div>
 </body>
 </html>
