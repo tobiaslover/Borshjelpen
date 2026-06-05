@@ -603,10 +603,13 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) { i
   }
 
   setGreeting(firstName);
-  loadWatchlist();
   loadIndexes();
   loadNews();
   loadEvents();
+  // user_watchlist hentes før streak-spørringen (user_plans) under, så de to
+  // Supabase-kallene ikke fyres samtidig (Safari dropper forbindelser ved mange
+  // parallelle kall mot samme vert).
+  await loadWatchlist();
 
   try {
     var { data: planInfo } = await sb.from('user_plans').select('total_xp, streak, last_login').eq('user_id', user.id).maybeSingle();
