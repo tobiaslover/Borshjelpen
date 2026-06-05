@@ -50,7 +50,7 @@ export default async function handler(req, res) {
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      max_tokens: 700,
+      max_tokens: 900,
       temperature: 0.4,
       messages: [
         {
@@ -60,22 +60,21 @@ export default async function handler(req, res) {
 REGLER:
 - Gi ALDRI kjøps- eller salgsanbefalinger, og foreslå ALDRI å kjøpe eller selge spesifikke aksjer. Beskriv egenskaper, risiko og avveininger, og la beslutningen være leserens.
 - Skriv på naturlig norsk bokmål. Forklar faguttrykk kort.
-- Vær KONKRET og PRESIS — hver setning skal si noe spesifikt om nettopp denne porteføljen (navngi aksjene/sektorene og bruk de faktiske prosentandelene). Ingen vage, generelle fraser.
+- Vær KONKRET og innholdsrik — gi reell innsikt, ikke bare gjenta prosentene. Forklar HVA fordelingen betyr for risiko og samvariasjon (f.eks. at flere industri- eller energiaksjer ofte beveger seg i takt). Navngi aksjene og sektorene.
 - IKKE DIKT: du har KUN ticker, navn, sektor og andel — ikke kurser, nøkkeltall eller nyheter. Påstå aldri tall eller hendelser du ikke har fått oppgitt.
 - Avslutt alltid med setningen: "Dette er ikke finansiell rådgivning."
 
-LENGDE OG FORMAT — VIKTIG:
-- Hold analysen KORT. Den skal kunne leses på under ett minutt. Unngå fyll og gjentakelser.
-- Skriv i sammenhengende prosa, IKKE som lange punktlister. Hver seksjon skal være 1-3 fullstendige, innholdsrike setninger.
-- Den ENESTE seksjonen som kan bruke en kort punktliste er Sektorfordeling (for å vise fordelingen). Alle andre seksjoner skal være prosa.
-- Bruk korte fete deloverskrifter på formen **Tittel:**.
+FORMAT:
+- Bruk korte fete deloverskrifter på formen **Tittel:** (hver overskrift på EGEN linje).
+- Skriv seksjonene som sammenhengende prosa med 2-3 innholdsrike setninger — ALDRI bare én tynn setning, og ALDRI lange punktlister.
+- Den ENESTE seksjonen med punktliste er Sektorfordeling. Skriv punktene på formen "- Sektor: X% (selskaper)" UTEN fet skrift inne i punktet.
 
 Bruk nøyaktig disse seksjonene:
-- **Sektorfordeling:** Én setning om hvordan porteføljen fordeler seg, eventuelt fulgt av en kort punktliste på formen "- Sektor: X% (selskaper)".
-- **Konsentrasjonsrisiko:** 1-2 setninger om hvilken enkeltaksje eller sektor som dominerer, og hva det konkret betyr for risikoen.
-- **Diversifisering:** 1-2 setninger om hvor godt risikoen er spredt, og om noen posisjoner trolig beveger seg likt.
-- **Allokering:** Én setning om total allokering (under/lik/over 100%) og hva det innebærer.
-- **Verdt å tenke på:** MAKS 3 punkter. Hvert punkt skal være ÉN fullstendig, konkret og presis setning (ikke et kort stikkord). Ingen kjøps-/salgsråd.`
+- **Sektorfordeling:** Én innledende setning, så en kort punktliste over sektorene med andel og selskaper.
+- **Konsentrasjonsrisiko:** 2-3 setninger om hvilken aksje eller sektor som dominerer, hvor stor andelen er, og hva det konkret betyr for hvor sårbar porteføljen er.
+- **Diversifisering:** 2-3 setninger om hvor godt risikoen er spredt, og spesielt om noen posisjoner trolig samvarierer (beveger seg likt) fordi de er i samme sektor eller påvirkes av samme faktorer.
+- **Allokering:** 1-2 setninger om total allokering (under/lik/over 100%) og hva det innebærer for kontantandel eller belåning.
+- **Verdt å tenke på:** Nøyaktig 3 punkter. Hvert punkt skal være ÉN fullstendig, konkret setning med reelt innhold (ikke et stikkord). Ingen kjøps-/salgsråd.`
         },
         {
           role: 'user',
