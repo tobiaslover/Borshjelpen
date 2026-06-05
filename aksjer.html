@@ -811,22 +811,6 @@ async function generateAI(s) {
     var sec = document.getElementById('ai-section');
     if (!sec) return;
     if (!res.ok || ai.error) { sec.innerHTML = '<div style="padding:1rem;background:#fff8f0;border-radius:10px;font-size:13px;color:#888;margin-bottom:1rem;">AI-sammendrag ikke tilgjengelig: ' + (ai.error || res.status) + '</div>'; return; }
-    var scenariosHtml = (ai.scenarios||[]).map(function(sc) {
-      var prob = parseInt(sc.prob) || 33;
-      return '<div style="padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid #f0f0f0;">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;">' +
-          '<span style="font-size:13px;font-weight:500;color:' + sc.color + ';">' + sc.label + '</span>' +
-          '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">' +
-            '<span style="font-size:11px;color:#aaa;">' + prob + '%</span>' +
-            '<span style="font-size:13px;font-weight:500;color:' + sc.color + ';">' + sc.return + '</span>' +
-          '</div>' +
-        '</div>' +
-        '<div style="height:6px;background:#e8e8e8;border-radius:3px;margin-bottom:6px;">' +
-          '<div style="height:100%;border-radius:3px;background:' + sc.barColor + ';width:' + prob + '%;transition:width 0.6s ease;"></div>' +
-        '</div>' +
-        (sc.drivers ? '<div style="font-size:12px;color:#888;line-height:1.5;">' + sc.drivers + '</div>' : '') +
-      '</div>';
-    }).join('');
     var bullHtml = (ai.bull||[]).map(function(p) { return '<div class="point"><div class="dot-up"></div><span>' + p + '</span></div>'; }).join('');
     var bearHtml = (ai.bear||[]).map(function(p) { return '<div class="point"><div class="dot-down"></div><span>' + p + '</span></div>'; }).join('');
     sec.innerHTML =
@@ -834,11 +818,10 @@ async function generateAI(s) {
       '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva gjør selskapet?</div><p>' + (ai.hva||'—') + '</p></div>' +
       (ai.hvorfor_eier_folk ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hvorfor eier folk denne aksjen?</div><p>' + ai.hvorfor_eier_folk + '</p></div>' : '') +
       (ai.aktuelt ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva skjer akkurat nå?</div><p>' + ai.aktuelt + '</p></div>' : '') +
-      (ai.pris_vurdering ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Er aksjen dyr eller billig?</div><p>' + ai.pris_vurdering + '</p></div>' : '') +
+      (ai.pris_vurdering ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hvordan er verdsettelsen?</div><p>' + ai.pris_vurdering + '</p></div>' : '') +
       (ai.paavirkere ? '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Hva påvirker kursen?</div><p>' + ai.paavirkere + '</p></div>' : '') +
       '<div id="newsSection"></div>' +
       '<div class="bull-bear"><div class="card bull"><div class="card-title">Bull-case</div>' + bullHtml + '</div><div class="card bear"><div class="card-title">Bear-case</div>' + bearHtml + '</div></div>' +
-      '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">Scenarioer neste 12 måneder</div>' + scenariosHtml + '</div>' +
       '<div class="card" style="margin-bottom:1rem;border-left:3px solid #A32D2D;border-radius:0 14px 14px 0;"><div class="card-title">Risiko</div><p style="font-size:13px;line-height:1.7">' + (ai.risiko||'—') + '</p></div>' +
       (ai.historisk ? '<div class="historical-card"><div class="historical-title">📊 Historisk sett</div><div class="historical-text">' + ai.historisk + '</div></div>' : '') +
       (ai.nybegynner_tips ? '<div class="tip-box"><div class="tip-text"><strong>Tips:</strong> ' + ai.nybegynner_tips + '</div></div>' : '');
