@@ -319,10 +319,8 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 var chatHistory = [];
-var DEV_MODE = window.location.hostname.includes('vercel.app');
 
 async function getUserPlan() {
-  if (DEV_MODE) return 'proff';
   try {
     var sess = (await sb.auth.getSession()).data.session;
     if (!sess) return 'free';
