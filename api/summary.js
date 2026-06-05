@@ -57,7 +57,7 @@ Du får oppgitt faktiske nøkkeltall, men IKKE en nyhetsfeed.
 
 JSON-struktur:
 {
-  "om_selskapet": "Oversett selskapsbeskrivelsen (gitt nederst i brukermeldingen) til naturlig, flytende norsk bokmål. Ta med HELE innholdet — ikke forkort eller utelat noe. Behold fakta presist. Får du ingen beskrivelse oppgitt, returner tom streng.",
+  "om_selskapet": "Kort, presis beskrivelse av selskapet på naturlig norsk bokmål — KUN det aller viktigste (hva selskapet gjør, hovedvirksomhet, marked). MAKS 6 linjer / ca. 60 ord. Ikke en full oversettelse av kildeteksten, men en fortettet versjon. Dobbeltsjekk rettskriving, store forbokstaver (egennavn, selskapsnavn) og tegnsetting før du svarer. Får du ingen beskrivelse oppgitt, returner tom streng.",
   "hva": "2-3 setninger som forklarer hva selskapet faktisk gjør og hvordan de tjener penger — som om du forklarer det til en venn over kaffe. Ikke start med selskapets navn.",
   "hvorfor_eier_folk": "1-2 setninger om hvorfor investorer typisk eier denne aksjen — utbytte, vekst, stabilitet, eksponering mot en trend?",
   "aktuelt": "Hva skjer med selskapet akkurat nå? Hva bryr markedet seg om denne måneden — kvartalstall, makro, oljepris, renter, konkurranse? Vær spesifikk.",
@@ -110,7 +110,7 @@ Finansiell styrke: Gjeld/EK: ${stock.debtEquity || '—'}, Fri kontantstrøm-yie
 
 Sektor: ${stock.sector}, Bransje: ${stock.industry || '—'}` +
             (stock.description
-              ? `\n\nSelskapsbeskrivelse å oversette til norsk (gjengi HELE i feltet "om_selskapet"):\n${stock.description}`
+              ? `\n\nSelskapsbeskrivelse (kilde, på engelsk). Lag en KORT norsk versjon i feltet "om_selskapet" — maks 6 linjer, kun det viktigste:\n${stock.description}`
               : `\n\nIngen selskapsbeskrivelse oppgitt — sett "om_selskapet" til tom streng.`)
         }
       ]
