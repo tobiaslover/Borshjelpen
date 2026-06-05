@@ -279,6 +279,7 @@ let currentUser = null;
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
 
+function escapeHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function getInitials(name) { if (!name) return '?'; return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2); }
 
 async function loadUser() {
@@ -380,7 +381,7 @@ async function loadWatchlist() {
     grid.innerHTML = list.map(function(s) {
       var card = '<div class="wcard" onclick="location.href=\'/aksjer.html?ticker=' + s.ticker + '\'">' ;
       card += '<div class="wt">' + s.ticker + '</div>';
-      card += '<div class="wn">' + (s.name||s.ticker).split(' ')[0] + '</div>';
+      card += '<div class="wn">' + escapeHtml((s.name||s.ticker).split(' ')[0]) + '</div>';
       card += '<div class="wrow"><span class="wp" id="profwlp-' + s.ticker + '">—</span></div></div>';
       return card;
     }).join('') + addBtn;
@@ -431,18 +432,18 @@ function renderActivity(data) {
       if (item.type === 'chat' || item.type === 'ai_analyse') {
         return '<div class="act-row" onclick="location.href=\'aksjer.html\'" style="cursor:pointer">' +
           '<div class="act-icon" style="background:#E6EEF5">💬</div>' +
-          '<div class="act-text">Stilte AI-spørsmål' + (item.ticker ? ' om <strong>' + item.ticker + '</strong>' : '') + '</div>' +
+          '<div class="act-text">Stilte AI-spørsmål' + (item.ticker ? ' om <strong>' + escapeHtml(item.ticker) + '</strong>' : '') + '</div>' +
           '<div class="act-time">' + timeStr + '</div></div>';
       }
       if (item.type === 'watchlist') {
         return '<div class="act-row" onclick="location.href=\'aksjer.html?ticker=' + (item.ticker||'') + '\'" style="cursor:pointer">' +
           '<div class="act-icon" style="background:#EEE8DA">📌</div>' +
-          '<div class="act-text">La til <strong>' + (item.name||item.ticker||'aksje') + '</strong> i watchlist</div>' +
+          '<div class="act-text">La til <strong>' + escapeHtml(item.name||item.ticker||'aksje') + '</strong> i watchlist</div>' +
           '<div class="act-time">' + timeStr + '</div></div>';
       }
       return '<div class="act-row" onclick="location.href=\'aksjer.html?ticker=' + (item.ticker||'') + '\'" style="cursor:pointer">' +
         '<div class="act-icon" style="background:#E1F5EE">📊</div>' +
-        '<div class="act-text">Søkte opp <strong>' + (item.name||item.ticker||'aksje') + (item.ticker ? ' (' + item.ticker + ')' : '') + '</strong></div>' +
+        '<div class="act-text">Søkte opp <strong>' + escapeHtml(item.name||item.ticker||'aksje') + (item.ticker ? ' (' + escapeHtml(item.ticker) + ')' : '') + '</strong></div>' +
         '<div class="act-time">' + timeStr + '</div></div>';
     }
     const first5 = data.slice(0, 5);
