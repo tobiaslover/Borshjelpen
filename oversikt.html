@@ -3,176 +3,164 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Børshjelpen — Forstå aksjer på vanlig norsk</title>
+<title>Oversikt — Børshjelpen</title>
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/favicon.png">
-<meta name="description" content="Forstå aksjer på Oslo Børs — uten finanssjargong. AI-drevet aksjeanalyse, daglige børsoppdateringer og kvartalsrapporter forklart på vanlig norsk. Gratis å komme i gang.">
-<meta name="keywords" content="aksjer, Oslo Børs, aksjeanalyse, nybegynner, Equinor, DNB, børs, investering, norsk">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://borshjelpen.no/">
-
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://borshjelpen.no/">
-<meta property="og:title" content="Børshjelpen — Forstå aksjer på vanlig norsk">
-<meta property="og:description" content="AI-drevet aksjeanalyse for nybegynnere. Forstå Equinor, DNB og Oslo Børs uten finanssjargong. Gratis å komme i gang.">
-<meta property="og:image" content="https://borshjelpen.no/og-image.png">
-<meta property="og:locale" content="nb_NO">
-<meta property="og:site_name" content="Børshjelpen">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Børshjelpen — Forstå aksjer på vanlig norsk">
-<meta name="twitter:description" content="AI-drevet aksjeanalyse for nybegynnere. Forstå Oslo Børs uten finanssjargong.">
-<meta name="twitter:image" content="https://borshjelpen.no/og-image.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="robots" content="noindex">
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/plans.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
-.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; }
-.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; min-height: 100vh; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; background: white; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
 .logo span { color: #C8A96E; }
 .nav-links { display: flex; gap: 1.5rem; align-items: center; }
 .nav-links a { font-size: 14px; color: #666; text-decoration: none; }
 .nav-links a:hover { color: #1B3A5C; }
 .nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-.hero { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; padding: 4rem 2rem 3rem; max-width: 1000px; margin: 0 auto; }
-.hero-left { display: flex; flex-direction: column; justify-content: center; gap: 1.5rem; }
-.hero-badge { display: inline-flex; align-items: center; gap: 6px; background: #EEE8DA; color: #8B6E3A; font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 100px; width: fit-content; }
-.hero-title { font-family: 'Playfair Display', serif; font-size: 42px; line-height: 1.15; font-weight: 700; letter-spacing: -1px; }
-.hero-title em { font-style: normal; color: #C8A96E; }
-.hero-sub { font-size: 16px; color: #555; line-height: 1.7; font-weight: 300; }
-.hero-actions { display: flex; gap: 12px; align-items: center; margin-top: 0.5rem; }
-.btn-primary { background: #1B3A5C; color: white; padding: 12px 24px; border-radius: 100px; font-size: 15px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-.hero-right { display: flex; align-items: center; justify-content: center; }
-.phone-mock { width: 240px; background: #fff; border: 1px solid #e8e8e8; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
-.phone-top { background: #1B3A5C; padding: 1.2rem 1rem 1rem; color: white; }
-.phone-ticker { font-size: 11px; opacity: 0.6; margin-bottom: 2px; }
-.phone-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
-.phone-price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-.phone-price { font-size: 22px; font-weight: 500; }
-.badge-up { font-size: 12px; background: #1A5C3A; color: #6ECFA0; padding: 3px 8px; border-radius: 100px; font-weight: 500; }
-.badge-down { font-size: 12px; background: #5C1B1B; color: #F09595; padding: 3px 8px; border-radius: 100px; font-weight: 500; }
-.phone-body { padding: 1rem; }
-.phone-section { margin-bottom: 1rem; }
-.phone-section-title { font-size: 10px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.phone-explain { font-size: 12px; line-height: 1.6; color: #1a1a1a; }
-.risk-bars { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
-.risk-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
-.risk-bar-bg { flex: 1; height: 4px; background: #e8e8e8; border-radius: 2px; }
-.risk-bar-fill { height: 100%; border-radius: 2px; }
-.pill-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
-.pill { font-size: 10px; padding: 3px 8px; border-radius: 100px; border: 1px solid #e8e8e8; color: #888; }
-.risk-note { font-size: 10px; color: #999; font-style: italic; margin-top: 8px; line-height: 1.5; border-top: 1px solid #e8e8e8; padding-top: 8px; }
-.stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #e8e8e8; border-bottom: 1px solid #e8e8e8; max-width: 1000px; margin: 0 auto; }
-.stat-item { padding: 1.5rem 2rem; text-align: center; }
-.stat-item:not(:last-child) { border-right: 1px solid #e8e8e8; }
-.stat-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #C8A96E; }
-.stat-label { font-size: 13px; color: #888; margin-top: 2px; }
-.features { padding: 3rem 2rem; max-width: 1000px; margin: 0 auto; }
-.section-label { font-size: 11px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
-.section-title { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; margin-bottom: 2rem; letter-spacing: -0.5px; }
-.feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-.feature-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 16px; padding: 1.5rem; }
-.feature-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; font-size: 20px; }
-.feature-card h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
-.feature-card p { font-size: 13px; color: #666; line-height: 1.6; }
-.coach-section { background: #f8f7f4; border-top: 1px solid #e8e8e8; border-bottom: 1px solid #e8e8e8; padding: 3rem 2rem; }
-.coach-inner { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
-.coach-chat { background: #fff; border: 1px solid #e8e8e8; border-radius: 16px; overflow: hidden; }
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 200; }
+.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; }
+@media (max-width: 768px) { .nav-links { display: none !important; } .hamburger-btn { display: block; } }
+
+.page { max-width: 1000px; margin: 0 auto; padding: 2rem; overflow-x: hidden; box-sizing: border-box; }
+
+/* GREETING */
+.greeting { margin-bottom: 2rem; }
+.greeting-hello { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #1B3A5C; }
+.greeting-date { font-size: 13px; color: #888; margin-top: 4px; }
+
+/* XP BAR */
+.xp-bar { background: white; border-radius: 14px; border: 1px solid #e8e8e8; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+.xp-level { font-size: 28px; }
+.xp-info { flex: 1; }
+.xp-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.xp-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.xp-name { font-size: 14px; font-weight: 500; color: #1B3A5C; }
+.xp-num { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #C8A96E; }
+.xp-track { height: 6px; background: #e8e8e8; border-radius: 3px; }
+.xp-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #C8A96E, #e8c87a); transition: width 0.5s; }
+.xp-next { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+/* GRID LAYOUT */
+.grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; align-items: stretch; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+@media (max-width: 700px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3col { grid-template-columns: 1fr !important; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .page { padding: 1rem; }
+  .xp-bar { flex-direction: column; text-align: center; gap: 1rem; }
+  .xp-row { flex-direction: column; gap: 4px; }
+  .greeting-hello { font-size: 24px; }
+  .wl-grid { grid-template-columns: repeat(2, 1fr); }
+  .bb-shortcut { padding: 1.25rem; }
+  .bb-title { font-size: 16px; }
+  .chat-messages { height: 220px; }
+}
+
+/* CARDS */
+.card { background: white; border-radius: 14px; border: 1px solid #e8e8e8; padding: 1.25rem; }
+.card-title { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+.card-title a { font-size: 11px; color: #C8A96E; text-decoration: none; font-weight: 400; }
+
+/* INDEKS — font matched to watchlist */
+.index-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+.index-row:last-child { border-bottom: none; }
+.index-name { font-size: 13px; font-weight: 500; }
+.index-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+.index-price { font-size: 14px; font-weight: 500; }
+.index-pct { font-size: 12px; font-weight: 500; padding: 3px 8px; border-radius: 100px; }
+.up { background: #E1F5EE; color: #085041; }
+.down { background: #FCEBEB; color: #A32D2D; }
+
+/* VINNERE/TAPERE — font matched to watchlist */
+.mover-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+.mover-row:last-child { border-bottom: none; }
+.mover-name { font-size: 13px; font-weight: 500; }
+.mover-ticker { font-size: 11px; color: #aaa; margin-top: 2px; }
+.mover-up { font-size: 12px; font-weight: 500; color: #2C7A5C; }
+.mover-down { font-size: 12px; font-weight: 500; color: #A32D2D; }
+
+/* WATCHLIST */
+.wl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 700px) { .wl-grid { grid-template-columns: repeat(2, 1fr); } }
+.wl-card { background: #f8f7f4; border-radius: 10px; padding: 1rem; cursor: pointer; border: 1px solid #e8e8e8; }
+.wl-card:hover { border-color: #1B3A5C; }
+.wl-ticker { font-size: 11px; color: #888; margin-bottom: 2px; }
+.wl-name { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+.wl-bottom { display: flex; justify-content: space-between; align-items: center; }
+.wl-price { font-size: 14px; font-weight: 500; }
+
+/* NYHETER */
+.news-placeholder { text-align: center; padding: 2rem; color: #aaa; }
+
+/* EVENTS */
+.event-row { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+.event-row:last-child { border-bottom: none; }
+.event-date { background: #1B3A5C; color: #C8A96E; border-radius: 8px; padding: 6px 10px; text-align: center; flex-shrink: 0; min-width: 48px; }
+.event-date-day { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; line-height: 1; }
+.event-date-mon { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.event-info { flex: 1; }
+.event-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+.event-sub { font-size: 12px; color: #888; }
+.event-tag { font-size: 10px; padding: 2px 8px; border-radius: 100px; font-weight: 500; margin-left: auto; flex-shrink: 0; }
+.tag-rapport { background: #E6EEF5; color: #1B3A5C; }
+.tag-makro { background: #EEE8DA; color: #5a4520; }
+.tag-utbytte { background: #E1F5EE; color: #085041; }
+
+/* BØRSBRYGG SNARVEI */
+.bb-shortcut { background: #1B3A5C; border-radius: 14px; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; text-decoration: none; margin-bottom: 1.5rem; transition: opacity 0.15s; }
+.bb-shortcut:hover { opacity: 0.9; }
+.bb-icon { font-size: 32px; }
+.bb-text { flex: 1; }
+.bb-title { font-family: 'Playfair Display', serif; font-size: 18px; color: white; font-weight: 700; margin-bottom: 4px; }
+.bb-sub { font-size: 13px; color: rgba(255,255,255,0.55); }
+.bb-arrow { color: #C8A96E; font-size: 20px; }
+
+/* CHAT */
+.chat-container { border: 1px solid #e8e8e8; border-radius: 14px; overflow: hidden; background: white; width: 100%; box-sizing: border-box; }
 .chat-header { background: #1B3A5C; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 10px; }
 .chat-avatar { width: 32px; height: 32px; border-radius: 50%; background: #C8A96E; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #1B3A5C; font-weight: 500; }
-.chat-name { font-size: 14px; color: white; font-weight: 500; }
-.chat-status { font-size: 11px; color: rgba(255,255,255,0.5); }
-.chat-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 12px; }
-.msg { font-size: 12px; line-height: 1.6; max-width: 85%; }
-.msg-user { align-self: flex-end; background: #1B3A5C; color: white; padding: 8px 12px; border-radius: 12px 12px 2px 12px; }
-.msg-ai { align-self: flex-start; background: #f8f7f4; color: #1a1a1a; padding: 8px 12px; border-radius: 12px 12px 12px 2px; }
-.msg-disclaimer { font-size: 10px; color: #999; font-style: italic; border-top: 1px solid #e8e8e8; padding-top: 8px; margin-top: 4px; }
-.guidelines { display: flex; flex-direction: column; gap: 12px; }
-.guideline-item { display: flex; gap: 12px; align-items: flex-start; padding: 1rem; background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; }
-.guideline-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
-.guideline-text h4 { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
-.guideline-text p { font-size: 12px; color: #666; line-height: 1.5; }
-.newsletter { padding: 3rem 2rem; max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
-.newsletter-preview { background: #fff; border: 1px solid #e8e8e8; border-radius: 16px; overflow: hidden; }
-.nl-header { background: #1B3A5C; padding: 1rem 1.25rem; }
-.nl-header-top { display: flex; justify-content: space-between; align-items: center; }
-.nl-logo { font-family: 'Tenor Sans', sans-serif; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: #C8A96E; }
-.nl-date { font-size: 11px; color: rgba(255,255,255,0.5); }
-.nl-title-main { font-family: 'Playfair Display', serif; font-size: 16px; color: white; margin-top: 6px; }
-.nl-body { padding: 1.25rem; }
-.nl-story { padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #e8e8e8; }
-.nl-story:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
-.nl-story-tag { font-size: 10px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.nl-story-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
-.nl-story-text { font-size: 12px; color: #666; line-height: 1.6; }
-.cta-section { background: #1B3A5C; padding: 3rem 2rem; text-align: center; }
-.cta-title { font-family: 'Playfair Display', serif; font-size: 32px; color: white; margin-bottom: 1rem; }
-.cta-sub { color: rgba(255,255,255,0.65); font-size: 15px; margin-bottom: 2rem; }
-.footer-note { color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 1rem; }
-.pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; max-width:800px; margin:2rem auto; }
-.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; position: relative; }
-.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
-@media (max-width: 768px) {
-  .nav { padding: .75rem 1rem; }
-  .logo { font-size: 14px; letter-spacing: 1.5px; }
-  .nav-cta { font-size: 11px; padding: 6px 10px; }
-  .hero { grid-template-columns: 1fr !important; padding: 1.5rem 1rem; gap: 1.5rem; }
-  .hero-right { display: none !important; }
-  .hero-title { font-size: 28px; }
-  .hero-sub { font-size: 14px; }
-  .hero-actions { flex-direction: column; align-items: flex-start; }
-  .stats-bar { grid-template-columns: 1fr !important; }
-  .stat-item:not(:last-child) { border-right: none !important; border-bottom: 1px solid #e8e8e8; }
-  .features { padding: 2rem 1rem; }
-  .section-title { font-size: 22px; }
-  .feature-grid { grid-template-columns: 1fr !important; }
-  .coach-section { padding: 2rem 1rem; }
-  .coach-inner { grid-template-columns: 1fr !important; gap: 1.5rem; }
-  .newsletter { grid-template-columns: 1fr !important; padding: 2rem 1rem; gap: 1.5rem; }
-  .newsletter-preview { display: none; }
-  .cta-section { padding: 2rem 1rem; }
-  .cta-title { font-size: 22px; }
-  .pricing-grid { grid-template-columns: 1fr !important; }
-  .hamburger-btn { display: block; }
-  .nav-links { display: none !important; }
-}
+.chat-header-name { font-size: 14px; color: white; font-weight: 500; }
+.chat-header-sub { font-size: 11px; color: rgba(255,255,255,0.5); }
+.chat-badge { font-size: 10px; background: rgba(200,169,110,.2); color: #C8A96E; padding: 3px 10px; border-radius: 100px; border: 1px solid rgba(200,169,110,.3); margin-left: auto; }
+.chat-messages { height: 280px; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 12px; }
+.msg-wrap { display: flex; flex-direction: column; }
+.msg-wrap.user { align-items: flex-end; }
+.msg-wrap.ai { align-items: flex-start; }
+.msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.65; }
+.msg-bubble.user { background: #1B3A5C; color: white; border-radius: 16px 16px 4px 16px; }
+.msg-bubble.ai { background: #f8f7f4; color: #1a1a1a; border-radius: 16px 16px 16px 4px; }
+.chat-disclaimer { font-size: 11px; color: #bbb; font-style: italic; padding: 8px 1.25rem; border-top: 1px solid #f0f0f0; text-align: center; }
+.chat-suggestions { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 1rem; }
+.csug { font-size: 11px; padding: 4px 10px; border-radius: 100px; border: 1px solid #e8e8e8; color: #666; cursor: pointer; background: none; font-family: 'DM Sans', sans-serif; }
+.csug:hover { border-color: #1B3A5C; color: #1B3A5C; }
+.chat-input-row { display: flex; gap: 8px; padding: .9rem 1rem; border-top: 1px solid #e8e8e8; }
+.chat-input { flex: 1; padding: 9px 14px; border-radius: 100px; border: 1px solid #e8e8e8; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; }
+.chat-input:focus { border-color: #1B3A5C; }
+.chat-send { background: #1B3A5C; color: white; border: none; border-radius: 100px; padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.chat-send:disabled { background: #ccc; }
+
+.spinner { width: 20px; height: 20px; border: 2px solid #e8e8e8; border-top-color: #C8A96E; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 1rem auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.news-item { display: flex; flex-direction: column; gap: 4px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer; text-decoration: none; color: inherit; }
+.news-item:last-child { border-bottom: none; }
+.news-item:hover .news-title { color: #1B3A5C; }
+.news-title { font-size: 13px; font-weight: 500; line-height: 1.4; color: #1a1a1a; }
+.news-meta { display: flex; gap: 8px; font-size: 11px; color: #aaa; align-items: center; }
+.news-ticker { background: #E6EEF5; color: #1B3A5C; padding: 2px 7px; border-radius: 100px; font-weight: 500; }
 </style>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Børshjelpen",
-  "url": "https://borshjelpen.no",
-  "description": "Børsen forklart på vanlig norsk. AI-analyse av aksjer, daglig børsoppsummering og gratis guider for nybegynnere.",
-  "logo": "https://borshjelpen.no/og-image.png",
-  "inLanguage": "nb-NO",
-  "sameAs": []
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Børshjelpen",
-  "url": "https://borshjelpen.no",
-  "description": "Børsen forklart på vanlig norsk.",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://borshjelpen.no/aksjer.html?ticker={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
 </head>
 <body>
 
 <nav class="nav">
-  <a href="/oversikt.html" class="logo" style="text-decoration:none;color:inherit;">Børs<span>hjelpen</span></a>
+  <a href="/oversikt.html" class="logo">Børs<span>hjelpen</span></a>
   <div class="nav-links">
-    <a href="/oversikt.html" id="navOversikt" style="display:none;">Oversikt</a>
+    <a href="/borshjelpen.html" id="navHjem">Hjem</a>
+    <a href="/oversikt.html" style="color:#1B3A5C;font-weight:500;">Oversikt</a>
     <a href="/aksjer.html">Aksjer</a>
     <a href="/laer.html">Aksjeguiden</a>
     <a href="/borsbrygg.html">Børsbrygg</a>
@@ -194,12 +182,12 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 
 <div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
-    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
+    <a href="/oversikt.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
     <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
   </div>
   <div style="display:flex;flex-direction:column;flex:1;">
-    <a href="/borshjelpen.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
-    <a href="/oversikt.html" id="mobileOversikt" onclick="closeMobileMenu()" style="display:none;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📊</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Oversikt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/borshjelpen.html" id="mobileHjem" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/oversikt.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📊</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Oversikt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjeguiden</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
@@ -219,292 +207,598 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   </div>
 </div>
 
-<section class="hero">
-  <div class="hero-left">
-    <div class="hero-badge">📈 Børsen — endelig forståelig</div>
-    <h1 class="hero-title">Forstå aksjer.<br><em>Uten å være</em><br>analytiker.</h1>
-    <p class="hero-sub">Kvartalsrapport på 30 sekunder — helt uten finanssjargong! Daglige børsoppdateringer du faktisk forstår. En AI-coach som alltid viser begge sider — og aldri gir deg enkle kjøpstips.</p>
-    <div class="hero-actions">
-      <button class="btn-primary" onclick="location.href='/priser.html'">Kom i gang →</button>
-    </div>
-  </div>
-  <div class="hero-right">
-    <div class="phone-mock" id="heroMock">
-      <div class="phone-top">
-        <div class="phone-ticker" id="heroTicker">Laster...</div>
-        <div class="phone-name" id="heroName">—</div>
-        <div class="phone-price-row">
-          <span class="phone-price" id="heroPrice">—</span>
-          <span id="heroBadge" class="badge-up">—</span>
-        </div>
-      </div>
-      <div class="phone-body">
-        <div class="phone-section">
-          <div class="phone-section-title">Hva gjør de?</div>
-          <div class="phone-explain" id="heroDesc">Henter live data...</div>
-        </div>
-        <div class="phone-section">
-          <div class="phone-section-title">Risiko</div>
-          <div class="risk-bars" id="heroRiskBars">
-            <div class="risk-row"><span style="min-width:70px;font-size:10px">Oljepris</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:85%;background:#E24B4A"></div></div><span style="font-size:10px">Høy</span></div>
-            <div class="risk-row"><span style="min-width:70px;font-size:10px">Valuta</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:55%;background:#EF9F27"></div></div><span style="font-size:10px">Middels</span></div>
-            <div class="risk-row"><span style="min-width:70px;font-size:10px">Politisk</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:35%;background:#C8A96E"></div></div><span style="font-size:10px">Lav</span></div>
-          </div>
-        </div>
-        <div class="pill-row" id="heroPills"></div>
-        <div class="risk-note">Data fra Financial Modeling Prep · Ikke finansiell rådgivning.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="stats-bar">
-  <div class="stat-item"><div class="stat-num">200+</div><div class="stat-label">Aksjer på Oslo Børs</div></div>
-  <div class="stat-item"><div class="stat-num">Alltid</div><div class="stat-label">Begge sider presentert</div></div>
-  <div class="stat-item"><div class="stat-num">Gratis</div><div class="stat-label">Å komme i gang</div></div>
+<!-- IKKE INNLOGGET -->
+<div id="lockedView" style="display:none;text-align:center;padding:5rem 2rem;">
+  <div style="font-size:48px;margin-bottom:1rem;">🔒</div>
+  <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:8px;color:#1B3A5C;">Logg inn for å se oversikten</div>
+  <p style="font-size:14px;color:#888;margin-bottom:1.5rem;">Oversikten er kun tilgjengelig for innloggede brukere.</p>
+  <button onclick="location.href='/auth.html'" style="padding:12px 28px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn / Registrer deg →</button>
 </div>
 
-<section class="features">
-  <div class="section-label">Hva du får</div>
-  <div class="section-title">Alt du trenger. Ingenting du ikke forstår.</div>
-  <div class="feature-grid">
-    <div class="feature-card"><div class="feature-icon" style="background:#EEE8DA;">📄</div><h3>Kvartalsrapport på 30 sekunder</h3><p>AI leser de lange rapportene og gir deg det viktigste — hva gikk bra, hva gikk dårlig, og hvilke risikoer ledelsen selv advarer om.</p></div>
-    <div class="feature-card"><div class="feature-icon" style="background:#E6EEF5;">⚖️</div><h3>Alltid begge sider</h3><p>For hvert selskap ser du bull-caset og bear-caset side om side. Du bestemmer selv — «Forstå mulighetene. Se risikoen»</p></div>
-    <div class="feature-card"><div class="feature-icon" style="background:#EEE8DA;">📊</div><h3>Scenarioer og sannsynlighet</h3><p>Ingen spår fremtiden — men vi viser deg realistiske utfall med sannsynligheter, slik at du forstår risikoen før du handler.</p></div>
-    <div class="feature-card"><div class="feature-icon" style="background:#E6EEF5;">💬</div><h3>AI-coach — still alt</h3><p>Stiller du spørsmål om en aksje, får du alltid en balansert analyse — med risiko, usikkerhet og alternative perspektiver inkludert.</p></div>
-  </div>
-</section>
+<!-- INNLOGGET -->
+<div id="mainView" style="display:none;">
+<div class="page">
 
-<section class="coach-section">
-  <div class="coach-inner">
-    <div>
-      <div class="section-label">AI-coach</div>
-      <h2 class="section-title" style="font-family:'Playfair Display',serif;font-size:28px;margin-bottom:1rem;">Ærlig. Balansert. Aldri overfladisk.</h2>
-      <p style="font-size:14px;color:#666;line-height:1.7;margin-bottom:1.5rem;">Vår AI følger strenge retningslinjer for å gi deg informasjon — ikke falsk trygghet.</p>
-      <div class="guidelines">
-        <div class="guideline-item"><div class="guideline-icon" style="background:#EEE8DA;">🚫</div><div class="guideline-text"><h4>Ingen kjøpsanbefalinger</h4><p>AI-en sier aldri "kjøp" eller "selg". Den hjelper deg forstå — du bestemmer.</p></div></div>
-        <div class="guideline-item"><div class="guideline-icon" style="background:#E6EEF5;">🛡️</div><div class="guideline-text"><h4>Risiko alltid inkludert</h4><p>Hver analyse inneholder konkrete risikoer — ikke bare oppsiden.</p></div></div>
-        <div class="guideline-item"><div class="guideline-icon" style="background:#EEE8DA;">⚖️</div><div class="guideline-text"><h4>Begge sider presentert</h4><p>Bull-case og bear-case side om side. Alltid.</p></div></div>
-        <div class="guideline-item"><div class="guideline-icon" style="background:#E6EEF5;">📊</div><div class="guideline-text"><h4>Scenarioer med sannsynlighet</h4><p>Fremtiden er usikker — vi viser deg flere utfall, ikke ett.</p></div></div>
-      </div>
-    </div>
-    <div class="coach-chat">
-      <div class="chat-header"><div class="chat-avatar">B</div><div><div class="chat-name">Børshjelpen AI</div><div class="chat-status">Alltid balansert</div></div></div>
-      <div class="chat-body">
-        <div class="msg msg-user">Er Equinor verdt å kjøpe nå?</div>
-        <div class="msg msg-ai">Det avhenger av din tidshorisont og risikotoleranse.<br><br><strong>Argumenter for:</strong> Høyt utbytte (~8%), sterk balanse, oljepris på høye nivåer.<br><br><strong>Argumenter mot:</strong> Eksponert mot oljeprisfall, energiomstilling på lang sikt, politisk risiko.<br><br>Realistiske scenarioer: 40% sjanse oppgang, 35% flat, 25% nedgang — avhengig av oljeprisen.<div class="msg-disclaimer">Dette er ikke finansiell rådgivning. Vurder din egen situasjon eller snakk med en rådgiver.</div></div>
-      </div>
+  <!-- GREETING -->
+  <div class="greeting">
+    <div class="greeting-hello" id="greetingText">God morgen!</div>
+    <div class="greeting-date" id="greetingDate"></div>
+  </div>
+
+  <!-- VELKOMSTTILBUD (kun gratisbrukere) -->
+  <div id="promoBanner" style="display:none;background:linear-gradient(135deg,#FFF8E7,#FFF0C0);border:1px solid #C8A96E;border-radius:14px;padding:1rem 1.25rem;margin-bottom:1rem;">
+    <div style="font-size:13px;color:#8B6E3A;font-weight:500;margin-bottom:6px;">🎁 Velkomsttilbud</div>
+    <div style="font-size:14px;color:#3a2800;margin-bottom:10px;">Få <strong>50&nbsp;% rabatt på din første måned</strong> med din personlige kode:</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <code id="promoCode" style="font-family:monospace;font-size:16px;font-weight:700;letter-spacing:1px;background:#fff;border:1px dashed #C8A96E;border-radius:8px;padding:8px 14px;color:#1B3A5C;">—</code>
+      <button onclick="copyPromo()" id="promoCopyBtn" style="font-size:13px;padding:8px 16px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kopier</button>
+      <button onclick="location.href='/priser.html'" style="font-size:13px;padding:8px 16px;border-radius:100px;border:1px solid #C8A96E;background:none;color:#8B6E3A;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Se planer →</button>
     </div>
   </div>
-</section>
 
-<section class="newsletter">
-  <div>
-    <div class="section-label">Daglig nyhetsbrev</div>
-    <h2 class="section-title" style="font-family:'Playfair Display',serif;font-size:28px;margin-bottom:1rem;">Børsen forklart. Hver morgen.</h2>
-    <p style="font-size:14px;color:#666;line-height:1.7;margin-bottom:1.5rem;">Dagens viktigste børsnyheter forklart på 2 minutter — med risiko, kontekst og begge sider av saken.</p>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <div style="font-size:14px;color:#666;">✓ Hvorfor Oslo Børs gikk opp eller ned</div>
-      <div style="font-size:14px;color:#666;">✓ Kvartalsrapport med bull- og bear-case</div>
-      <div style="font-size:14px;color:#666;">✓ Risikoene du bør kjenne til i dag</div>
-    </div>
-    <div style="margin-top:1.5rem;padding:1rem 1.25rem;background:#f8f7f4;border-radius:12px;border:1px solid #e8e8e8;">
-      <p style="font-size:13px;color:#888;margin-bottom:10px;">Savner du noe? Har du tilbakemelding?</p>
-      <a href="/kontakt.html" style="display:inline-block;padding:8px 20px;border-radius:100px;border:1px solid #1B3A5C;background:none;color:#1B3A5C;font-size:13px;font-weight:500;text-decoration:none;font-family:'DM Sans',sans-serif;">Send oss tilbakemelding →</a>
+  <!-- XP -->
+  <div class="xp-bar">
+    <div class="xp-level" id="xpEmoji">🌱</div>
+    <div class="xp-info">
+      <div class="xp-label">Din fremgang</div>
+      <div class="xp-row">
+        <div class="xp-name" id="xpLevel">Nybegynner</div>
+        <div class="xp-num"><span id="xpTotal">0</span> XP</div>
+      </div>
+      <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+      <div class="xp-next" id="xpNext"></div>
+      <div id="streakDisplay" style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;color:#C8A96E;font-weight:500;"></div>
     </div>
   </div>
-  <div class="newsletter-preview">
-    <div class="nl-header">
-      <div class="nl-header-top"><span class="nl-logo">Børshjelpen</span><span class="nl-date" id="nlDate"></span></div>
-      <div class="nl-title-main">Equinor slo forventningene — men er det hele bildet?</div>
+
+  <!-- INDEKSER + VINNERE/TAPERE -->
+  <div class="grid-3col">
+    <div class="card">
+      <div class="card-title">Indekser</div>
+      <div id="indexList"><div class="spinner"></div></div>
     </div>
-    <div class="nl-body">
-      <div class="nl-story"><div class="nl-story-tag">Oslo Børs i dag</div><div class="nl-story-title">Børsen opp 0,8% — men vær obs på dette</div><div class="nl-story-text">Olje dro opp. Men rentefrykten er ikke borte — og det kan snu raskt hvis inflasjonsdataene skuffer fredag.</div></div>
-      <div class="nl-story"><div class="nl-story-tag">Bull vs. Bear</div><div class="nl-story-title">Equinor: To scenarioer</div><div class="nl-story-text">Bull: høy oljepris + utbytte = god avkastning. Bear: energiomstilling + prisfall kan halvere inntjeningen innen 2030.</div></div>
-      <div class="nl-story"><div class="nl-story-tag">Risiko i dag</div><div class="nl-story-title">Tre ting som kan snu markedet</div><div class="nl-story-text">1) Fed-tale kl. 16. 2) Kinesiske importtall. 3) OPEC-møte neste uke. Hold øye med disse.</div></div>
-      <div style="margin-top:1rem;padding-top:10px;border-top:1px solid #e8e8e8;font-size:10px;color:#999;font-style:italic;line-height:1.5;">Kun et illustrasjonseksempel — ikke faktiske markedsdata eller en reell utgave av nyhetsbrevet.</div>
+    <div class="card">
+      <div class="card-title">🏆 OBX Vinnere <button onclick="openMoversModal()" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;">Se alle →</button></div>
+      <div id="winnersList"><div class="spinner"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📉 OBX Tapere <button onclick="openMoversModal()" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;">Se alle →</button></div>
+      <div id="losersList"><div class="spinner"></div></div>
     </div>
   </div>
-</section>
 
-<section class="cta-section">
-  <div class="cta-title">Klar til å forstå børsen?</div>
-  <p class="cta-sub">Velg planen som passer deg — start gratis, oppgrader når du vil.</p>
-  <div class="pricing-grid">
-
-    <div style="background:#E6EEF5;border:2px solid #b0cce0;border-radius:16px;padding:1.5rem;text-align:left;">
-      <div style="font-size:11px;color:#1B3A5C;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Gratis</div>
-      <div style="font-family:'Playfair Display',serif;font-size:28px;color:#1B3A5C;margin-bottom:4px;">0 kr</div>
-      <div style="font-size:12px;color:#5a7a9c;margin-bottom:1.25rem;">For alltid</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
-        <div style="font-size:13px;color:#1B3A5C;">✓ AI-analyse — <span id="freeAnalysis">2</span> per dag</div>
-        <div style="font-size:13px;color:#1B3A5C;">✓ AI-chat — <span id="freeChat">5</span> spørsmål per dag</div>
-        <div style="font-size:13px;color:#1B3A5C;">✓ Watchlist — <span id="freeWatchlist">2</span> aksjer</div>
-        <div style="font-size:13px;color:#1B3A5C;">✓ Børsbrygg</div>
-        <div style="font-size:13px;color:#1B3A5C;">✓ Læring</div>
-      </div>
-      <button onclick="location.href='/auth.html'" style="width:100%;padding:10px;border-radius:100px;border:1px solid #1B3A5C;background:none;color:#1B3A5C;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Start gratis →</button>
-    </div>
-
-    <div style="background:linear-gradient(135deg,#e8e8e8,#f5f5f5);border:2px solid #bbb;border-radius:16px;padding:1.5rem;text-align:left;position:relative;">
-      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#C8A96E;color:#1B3A5C;font-size:11px;font-weight:500;padding:3px 12px;border-radius:100px;white-space:nowrap;">Mest populær</div>
-      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Investor</div>
-      <div style="font-family:'Playfair Display',serif;font-size:28px;color:#1B3A5C;margin-bottom:4px;">79 kr</div>
-      <div style="font-size:12px;color:#777;margin-bottom:1.25rem;">per måned</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
-        <div style="font-size:13px;color:#555;">✓ AI-analyse</div>
-        <div style="font-size:13px;color:#555;">✓ AI-chat</div>
-        <div style="font-size:13px;color:#555;">✓ Watchlist — opptil <span id="investorWatchlist">10</span> aksjer</div>
-        <div style="font-size:13px;color:#555;">✓ Børsbrygg</div>
-        <div style="font-size:13px;color:#555;">✓ Børsmeldinger oppsummert</div>
-        <div style="font-size:13px;color:#555;">✓ Læring</div>
-      </div>
-      <button onclick="location.href='/priser.html'" style="width:100%;padding:10px;border-radius:100px;border:none;background:#888;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Abonner →</button>
-    </div>
-
-    <div style="background:linear-gradient(135deg,#FFF8E7,#FFF0C0);border:2px solid #C8A96E;border-radius:16px;padding:1.5rem;text-align:left;">
-      <div style="font-size:11px;color:#1a1a1a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Proff</div>
-      <div style="font-family:'Playfair Display',serif;font-size:28px;color:#1a1a1a;margin-bottom:4px;">149 kr</div>
-      <div style="font-size:12px;color:#555;margin-bottom:1.25rem;">per måned</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
-        <div style="font-size:13px;color:#1a1a1a;">✓ AI-analyse</div>
-        <div style="font-size:13px;color:#1a1a1a;">✓ AI-chat</div>
-        <div style="font-size:13px;color:#1a1a1a;">✓ Watchlist — ubegrenset</div>
-        <div style="font-size:13px;color:#1a1a1a;">✓ Børsbrygg</div>
-        <div style="font-size:13px;color:#1a1a1a;">✓ Børsmeldinger oppsummert</div>
-        <div style="font-size:13px;color:#1a1a1a;">✓ Læring</div>
-        <div style="font-size:13px;color:#1a1a1a;">✓ Kvartalsrapporter oppsummert</div>
-        <div style="font-size:13px;color:#1a1a1a;">✓ Porteføljeanalyse</div>
-      </div>
-      <button onclick="location.href='/priser.html'" style="width:100%;padding:10px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
-    </div>
-
+  <!-- WATCHLIST -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <div class="card-title">📌 Min Watchlist <a href="/aksjer.html">+ Legg til</a></div>
+    <div id="watchlistGrid" class="wl-grid"></div>
   </div>
-  <p class="footer-note">Ingen bindingstid. Avslutt når som helst.</p>
-</section>
 
-<footer style="border-top:1px solid #e8e8e8;padding:1.5rem 2rem;text-align:center;font-size:11px;color:#aaa;">
-  © 2026 Børshjelpen &nbsp;·&nbsp;
-  <a href="/personvern.html" style="color:#aaa;text-decoration:none;">Personvernerklæring</a>
-  &nbsp;·&nbsp;
-  <a href="/vilkar.html" style="color:#aaa;text-decoration:none;">Vilkår for bruk</a>
-  &nbsp;·&nbsp;
-  Kursdata levert av Financial Modeling Prep · Ikke finansiell rådgivning
-</footer>
+  <!-- BØRSBRYGG SNARVEI -->
+  <a href="/borsbrygg.html" class="bb-shortcut">
+    <div class="bb-icon">☕</div>
+    <div class="bb-text">
+      <div class="bb-title">Børsbrygg</div>
+      <div class="bb-sub">Det viktigste fra børsen — forklart enkelt</div>
+    </div>
+    <div class="bb-arrow">→</div>
+  </a>
 
-<script src="/plans.js"></script>
+  <!-- NYHETER + EVENTS -->
+  <div class="grid-2" style="margin-bottom:1rem;">
+    <div class="card">
+      <div class="card-title">📰 Børsnyheter</div>
+      <div id="newsList" style="text-align:center;padding:1.5rem 0;color:#aaa;font-size:13px;">🔧 Under utvikling — kommer snart</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 Kommende events <span style="font-size:10px;background:#FFF3E0;color:#7a4000;padding:2px 7px;border-radius:100px;font-weight:500;margin-left:6px;letter-spacing:0.5px;">🔧 Under utvikling</span> <span style="font-size:10px;background:#E6EEF5;color:#1B3A5C;padding:2px 7px;border-radius:100px;font-weight:500;margin-left:4px;letter-spacing:0.5px;">OBX</span></div>
+      <div id="eventsList"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-container" style="margin-bottom:2rem;">
+    <div class="chat-header">
+      <div class="chat-avatar">BH</div>
+      <div>
+        <div class="chat-header-name">Børshjelpen AI</div>
+        <div class="chat-header-sub">Spør om børs, aksjer og økonomi</div>
+      </div>
+      <div class="chat-badge">Ingen finansiell rådgivning</div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg-wrap ai">
+        <div class="msg-bubble ai">Hei! Jeg kan svare på spørsmål om børsen, aksjer, økonomi og investering. Hva lurer du på?</div>
+      </div>
+    </div>
+    <div class="chat-disclaimer">Ikke finansiell rådgivning · Snakk med en rådgiver for investeringsbeslutninger</div>
+    <div class="chat-suggestions" id="chatSugs">
+      <button class="csug" onclick="askSug(this)">Hva er OBX-indeksen?</button>
+      <button class="csug" onclick="askSug(this)">Hva påvirker renten?</button>
+      <button class="csug" onclick="askSug(this)">Hva er en kvartalsrapport?</button>
+      <button class="csug" onclick="askSug(this)">Hvordan diversifiserer jeg?</button>
+    </div>
+    <div class="chat-input-row">
+      <input id="chatInput" class="chat-input" type="text" placeholder="Still et spørsmål om børsen..." />
+      <button id="chatSendBtn" class="chat-send" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+</div>
+
 <script>
+const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+var chatHistory = [];
+
+// Starten av "i dag" i Oslo-tid som ISO-tidsstempel — for korrekt døgntelling uansett UTC-forskyvning.
+function osloDayStartISO() {
+  var d = new Date();
+  var date = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Oslo' }).format(d);
+  var off = '';
+  try {
+    off = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Oslo', timeZoneName: 'longOffset' })
+      .formatToParts(d).find(function(p) { return p.type === 'timeZoneName'; }).value.replace('GMT', '');
+  } catch(e) {}
+  return date + 'T00:00:00' + (off || '+00:00');
+}
+
+async function getUserPlan() {
+  try {
+    var sess = (await sb.auth.getSession()).data.session;
+    if (!sess) return 'free';
+    var r = await sb.from('user_plans').select('plan').eq('user_id', sess.user.id).maybeSingle();
+    return (r.data && r.data.plan) || 'free';
+  } catch(e) { return 'free'; }
+}
+
+async function getTodayChatCount() {
+  try {
+    var sess = (await sb.auth.getSession()).data.session;
+    if (!sess) return 0;
+    var r = await sb.from('user_activity').select('*', {count:'exact',head:true}).eq('user_id', sess.user.id).eq('type', 'chat').gte('created_at', osloDayStartISO());
+    return r.count || 0;
+  } catch(e) { return 0; }
+}
+
+async function logChatActivity() {
+  try {
+    var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
+    var xp = 1;
+    var { data: todayActs } = await sb.from('user_activity').select('id').eq('user_id', sess.user.id).eq('type', 'chat').gte('created_at', osloDayStartISO());
+    if (todayActs && todayActs.length >= 100) xp = 0; // maks 100 XP-givende chat per dag
+    await sb.from('user_activity').insert({ user_id: sess.user.id, type: 'chat', ticker: null, name: 'Chat (oversikt)', xp: xp });
+    if (xp > 0) {
+      var { data: plan } = await sb.from('user_plans').select('total_xp').eq('user_id', sess.user.id).maybeSingle();
+      var cur = (plan && plan.total_xp) || 0;
+      await sb.from('user_plans').upsert({ user_id: sess.user.id, total_xp: cur + xp }, { onConflict: 'user_id' });
+    }
+  } catch(e) {}
+}
+
+function setGreeting(name) {
+  var oslo = new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/Oslo'}));
+  var h = oslo.getHours();
+  var greeting = h < 10 ? 'God morgen' : h < 12 ? 'God formiddag' : h < 17 ? 'God ettermiddag' : 'God kveld';
+  document.getElementById('greetingText').textContent = greeting + ', ' + name + '!';
+  var date = oslo.toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('greetingDate').textContent = date.charAt(0).toUpperCase() + date.slice(1);
+}
+
+function escapeHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function renderStreak(streak) {
+  var el = document.getElementById('streakDisplay');
+  if (!el) return;
+  el.style.display = 'flex';
+  if (streak < 1) streak = 1; // innlogget = du har logget inn i dag, altså minst 1 dag
+  var flame = streak >= 30 ? '🔥🔥🔥' : streak >= 7 ? '🔥🔥' : '🔥';
+  el.innerHTML = flame + ' <strong>' + streak + '</strong> dagers streak';
+  var next = streak < 3 ? 3 : streak < 7 ? 7 : streak < 14 ? 14 : streak < 30 ? 30 : null;
+  if (next) el.innerHTML += ' <span style="font-size:11px;color:rgba(255,255,255,0.5);margin-left:4px;">(' + (next - streak) + ' til neste bonus)</span>';
+  else el.innerHTML += ' <span style="font-size:11px;color:#C8A96E;margin-left:4px;">Maks streak! 🏆</span>';
+}
+
+function renderXP(xp) {
+  var levels = [
+    {name:'🌱 Nybegynner', label:'Nybegynner', emoji:'🌱', min:0, max:399},
+    {name:'📈 Aksjespirer', label:'Aksjespirer', emoji:'📈', min:400, max:1499},
+    {name:'🔍 Analytiker', label:'Analytiker', emoji:'🔍', min:1500, max:2999},
+    {name:'🏆 Mester', label:'Mester', emoji:'🏆', min:3000, max:999999}
+  ];
+  var level = levels.find(function(l) { return xp >= l.min && xp <= l.max; }) || levels[3];
+  var pct = Math.min(100, Math.round(((xp - level.min) / (level.max - level.min)) * 100));
+  document.getElementById('xpEmoji').textContent = level.emoji;
+  document.getElementById('xpLevel').textContent = level.label;
+  document.getElementById('xpTotal').textContent = xp;
+  document.getElementById('xpFill').style.width = pct + '%';
+  var next = levels[levels.indexOf(level) + 1];
+  document.getElementById('xpNext').textContent = next ? (level.max - xp + 1) + ' XP til ' + next.name : 'Maks nivå nådd 🎉';
+}
+
+async function loadWatchlist() {
+  var grid = document.getElementById('watchlistGrid');
+  try {
+    var sess = (await sb.auth.getSession()).data.session;
+    if (!sess) { grid.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Ingen aksjer ennå. <a href="/aksjer.html" style="color:#1B3A5C;">Legg til →</a></div>'; return; }
+    var { data } = await sb.from('user_watchlist').select('*').eq('user_id', sess.user.id).order('created_at', {ascending:true});
+    var list = data || [];
+    if (!list.length) {
+      grid.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Ingen aksjer ennå. <a href="/aksjer.html" style="color:#1B3A5C;">Legg til →</a></div>';
+      return;
+    }
+    grid.innerHTML = list.map(function(s) {
+      var card = '<div class="wl-card" onclick="location.href=\'/aksjer.html?ticker=' + s.ticker + '\'" id="wlcard-' + s.ticker + '">';
+      card += '<div class="wl-ticker">' + s.ticker + '</div>';
+      card += '<div class="wl-name">' + escapeHtml((s.name||s.ticker).split(' ')[0]) + '</div>';
+      card += '<div class="wl-bottom"><span class="wl-price" id="wlprice-' + s.ticker + '">—</span><span class="wl-pct" id="wlpct-' + s.ticker + '"></span></div></div>';
+      return card;
+    }).join('');
+    list.forEach(function(s) {
+      fetch('/api/stock?ticker=' + s.ticker)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data && !data.error) {
+            var priceEl = document.getElementById('wlprice-' + s.ticker);
+            var pctEl = document.getElementById('wlpct-' + s.ticker);
+            var p = parseFloat(data.price);
+            if (priceEl && !isNaN(p)) priceEl.textContent = p.toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
+            if (pctEl) {
+              var sign = data.up ? '+' : '-';
+              pctEl.textContent = sign + data.changePct + '%';
+              pctEl.style.color = data.up ? '#2C7A5C' : '#A32D2D';
+              pctEl.style.fontSize = '12px';
+              pctEl.style.fontWeight = '500';
+            }
+          }
+        }).catch(function() {});
+    });
+  } catch(e) {
+    grid.innerHTML = '<div style="font-size:13px;color:#aaa;padding:1rem 0;">Kunne ikke laste watchlist.</div>';
+  }
+}
+
+async function loadIndexes() {
+  try {
+    var res = await fetch('/api/movers');
+    var data = await res.json();
+    if (!res.ok) throw new Error('movers feil');
+    window._moversData = data;
+
+    var obx = data.obx;
+    var osebx = data.osebx;
+
+    function renderIndex(name, sub, idx) {
+      if (!idx) return '<div class="index-row"><div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div><div style="color:#aaa;font-size:13px;">—</div></div>';
+      var sign = idx.up ? '+' : '-';
+      var cls = idx.up ? 'up' : 'down';
+      return '<div class="index-row">' +
+        '<div><div class="index-name">' + name + '</div><div class="index-sub">' + sub + '</div></div>' +
+        '<div style="text-align:right;">' +
+          (idx.price ? '<div class="index-price">' + idx.price + '</div>' : '') +
+          '<span class="index-pct ' + cls + '">' + sign + idx.changePct + '%</span>' +
+        '</div>' +
+      '</div>';
+    }
+
+    document.getElementById('indexList').innerHTML =
+      renderIndex('OBX', 'Oslo Børs 25 største', obx) +
+      renderIndex('OSEBX', 'Oslo Børs Benchmark', osebx);
+
+    var winners = data.winners || [];
+    var losers = data.losers || [];
+
+    function renderMover(s) {
+      var sign = s.up ? '+' : '-';
+      var cls = s.up ? 'mover-up' : 'mover-down';
+      return '<div class="mover-row" onclick="location.href=\'/aksjer.html?ticker=' + s.ticker + '\'" style="cursor:pointer;">' +
+        '<div style="min-width:0;flex:1;">' +
+          '<div class="mover-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(s.name) + '</div>' +
+          '<div class="mover-ticker">' + s.ticker + '</div>' +
+        '</div>' +
+        '<div class="' + cls + '" style="flex-shrink:0;white-space:nowrap;">' + sign + s.changePct + '%</div>' +
+      '</div>';
+    }
+
+    var wHtml = winners.slice(0,3).map(renderMover).join('');
+    var winnersMore = winners.slice(3);
+    if (winnersMore.length) {
+      wHtml += '<div id="winnersMore" style="display:none;">' + winnersMore.map(renderMover).join('') + '</div>';
+      wHtml += '<div style="text-align:center;padding:8px 0;"><button onclick="toggleMovers(this.dataset.t)" data-t="winners" id="winnersBtn" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;">Se alle →</button></div>';
+    }
+    document.getElementById('winnersList').innerHTML = wHtml;
+
+    var lHtml = losers.slice(0,3).map(renderMover).join('');
+    var losersMore = losers.slice(3);
+    if (losersMore.length) {
+      lHtml += '<div id="losersMore" style="display:none;">' + losersMore.map(renderMover).join('') + '</div>';
+      lHtml += '<div style="text-align:center;padding:8px 0;"><button onclick="toggleMovers(this.dataset.t)" data-t="losers" id="losersBtn" style="font-size:12px;color:#1B3A5C;background:none;border:none;cursor:pointer;">Se alle →</button></div>';
+    }
+    document.getElementById('losersList').innerHTML = lHtml;
+
+  } catch(e) {
+    document.getElementById('indexList').innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente indeksdata.</div>';
+    var wl = document.getElementById('winnersList'); if (wl) wl.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente data.</div>';
+    var ll = document.getElementById('losersList'); if (ll) ll.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente data.</div>';
+  }
+}
+
+function toggleMovers(type) {
+  var el = document.getElementById(type + 'More');
+  var btn = document.getElementById(type + 'Btn');
+  if (!el) return;
+  if (el.style.display === 'none') { el.style.display = 'block'; btn.textContent = 'Skjul ↑'; }
+  else { el.style.display = 'none'; btn.textContent = 'Se alle →'; }
+}
+
+function addMsg(role, text) {
+  var c = document.getElementById('chatMessages');
+  var d = document.createElement('div');
+  d.className = 'msg-wrap ' + role;
+  d.innerHTML = '<div class="msg-bubble ' + role + '">' + text + '</div>';
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function addTyping() {
+  var c = document.getElementById('chatMessages');
+  var d = document.createElement('div');
+  d.id = 'typing'; d.className = 'msg-wrap ai';
+  d.innerHTML = '<div class="msg-bubble ai">Skriver...</div>';
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function removeTyping() { var e = document.getElementById('typing'); if (e) e.remove(); }
+function askSug(btn) { document.getElementById('chatInput').value = btn.textContent; sendMessage(); }
+
+async function sendMessage() {
+  var input = document.getElementById('chatInput');
+  var btn = document.getElementById('chatSendBtn');
+  var text = input.value.trim(); if (!text) return;
+  var sess = (await sb.auth.getSession()).data.session;
+  if (!sess) { location.href = '/auth.html'; return; }
+  // Daglig chat-grense per plan (samme som aksjer.html)
+  var plan = await getUserPlan();
+  var limits = (window.PLANS && (window.PLANS[plan] || window.PLANS.free)) || { aiChat: 5 };
+  if (limits.aiChat > 0) {
+    var used = await getTodayChatCount();
+    if (used >= limits.aiChat) {
+      addMsg('ai', 'Du har nådd dagens grense på ' + limits.aiChat + ' spørsmål. <a href="/priser.html" style="color:#1B3A5C;font-weight:500;">Oppgrader</a> for flere.');
+      return;
+    }
+  }
+  input.value = ''; btn.disabled = true;
+  document.getElementById('chatSugs').style.display = 'none';
+  addMsg('user', text);
+  chatHistory.push({role:'user', content:text});
+  addTyping();
+  try {
+    var token = sess.access_token;
+    var res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
+      body: JSON.stringify({
+        messages: chatHistory,
+        context: null,
+        systemOverride: 'Du er Børshjelpen sin AI-assistent for norske nybegynnere. Svar på spørsmål om børs, aksjer, økonomi og investering på norsk. Gi ALDRI kjøps- eller salgsanbefalinger. Inkluder alltid risikoer. Avslutt alltid med: "Dette er ikke finansiell rådgivning."'
+      })
+    });
+    removeTyping();
+    var data = await res.json();
+    if (!res.ok || data.error) { addMsg('ai', 'Beklager, prøv igjen.'); }
+    else { addMsg('ai', data.reply); chatHistory.push({role:'assistant', content:data.reply}); if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20); logChatActivity(); }
+  } catch(e) { removeTyping(); addMsg('ai', 'Noe gikk galt.'); }
+  btn.disabled = false; input.focus();
+}
+
+document.getElementById('chatInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') sendMessage(); });
+
+(async function init() {
+  var sess = (await sb.auth.getSession()).data.session;
+  if (!sess) {
+    document.getElementById('lockedView').style.display = 'block';
+    return;
+  }
+  document.getElementById('mainView').style.display = 'block';
+  var user = sess.user;
+  var name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
+  var firstName = name.split(' ')[0];
+  var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+
+  document.getElementById('navAuth').style.display = 'none';
+  document.getElementById('navUser').style.display = 'flex';
+  if (document.getElementById('navHjem')) document.getElementById('navHjem').style.display = 'none';
+  if (document.getElementById('mobileHjem')) document.getElementById('mobileHjem').style.display = 'none';
+  document.getElementById('navAv').textContent = initials;
+  document.getElementById('navName').textContent = firstName;
+  if (document.getElementById('mobileMenuAv')) {
+    document.getElementById('mobileMenuAv').textContent = initials;
+    document.getElementById('mobileMenuName').textContent = firstName;
+    document.getElementById('mobileMenuUser').style.display = 'flex';
+    document.getElementById('mobileMenuAuth').style.display = 'none';
+  }
+
+  setGreeting(firstName);
+  loadIndexes();
+  loadNews();
+  loadEvents();
+  // user_watchlist hentes før streak-spørringen (user_plans) under, så de to
+  // Supabase-kallene ikke fyres samtidig (Safari dropper forbindelser ved mange
+  // parallelle kall mot samme vert).
+  await loadWatchlist();
+
+  try {
+    var { data: planInfo } = await sb.from('user_plans').select('total_xp, streak, last_login').eq('user_id', user.id).maybeSingle();
+    var totalXp = (planInfo && planInfo.total_xp) || 0;
+    var streak = (planInfo && planInfo.streak) || 0;
+    var lastLogin = planInfo && planInfo.last_login;
+    // Oslo-dato (YYYY-MM-DD) — sv-SE gir ISO-format. Unngår at streaken ruller ved UTC-midnatt.
+    function osloDate(d) { return new Date(d).toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' }); }
+    var todayStr = osloDate(new Date());
+    var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+    var yesterdayStr = osloDate(yesterday);
+
+    if (lastLogin !== todayStr) {
+      var newStreak;
+      if (lastLogin === yesterdayStr) { newStreak = streak + 1; }
+      else { newStreak = 1; }
+
+      var bonusXp = 0;
+      var bonusMsg = '';
+      if (newStreak === 3)  { bonusXp = 10;  bonusMsg = '3-dagers streak!'; }
+      if (newStreak === 7)  { bonusXp = 25;  bonusMsg = '7-dagers streak!'; }
+      if (newStreak === 14) { bonusXp = 50;  bonusMsg = '14-dagers streak!'; }
+      if (newStreak === 30) { bonusXp = 100; bonusMsg = '30-dagers streak!'; }
+
+      var newXp = totalXp + 3 + bonusXp;
+
+      await sb.from('user_plans').upsert({
+        user_id: user.id,
+        total_xp: newXp,
+        streak: newStreak,
+        last_login: todayStr
+      }, { onConflict: 'user_id' });
+
+      await sb.from('user_activity').insert({ user_id: user.id, type: 'login', ticker: null, name: 'Daglig innlogging', xp: 3 });
+      if (bonusXp > 0) {
+        await sb.from('user_activity').insert({ user_id: user.id, type: 'streak', ticker: null, name: bonusMsg, xp: bonusXp });
+        setTimeout(function() {
+          var el = document.createElement('div');
+          el.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1B3A5C;color:white;padding:14px 24px;border-radius:100px;font-size:14px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);';
+          el.innerHTML = '🔥 ' + bonusMsg + ' +' + bonusXp + ' bonus XP!';
+          document.body.appendChild(el);
+          setTimeout(function() { el.remove(); }, 4000);
+        }, 1000);
+      }
+
+      totalXp = newXp;
+      streak = newStreak;
+    }
+
+    renderXP(totalXp);
+    renderStreak(streak);
+  } catch(e) { renderXP(0); }
+  loadPromo();
+})();
+
+async function loadNews() {}
+
+async function loadPromo() {
+  try {
+    var bannerEl = document.getElementById('promoBanner');
+    if (!bannerEl) return;
+    var plan = await getUserPlan();
+    if (plan !== 'free') return; // velkomsttilbud kun for gratisbrukere
+    var sess = (await sb.auth.getSession()).data.session;
+    if (!sess) return;
+    var res = await fetch('/api/promo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sess.access_token }
+    });
+    if (!res.ok) return;
+    var data = await res.json();
+    if (!data.code) return;
+    document.getElementById('promoCode').textContent = data.code;
+    bannerEl.style.display = 'block';
+  } catch(e) {}
+}
+function copyPromo() {
+  var code = document.getElementById('promoCode').textContent;
+  if (!code || code === '—') return;
+  navigator.clipboard.writeText(code).then(function() {
+    var btn = document.getElementById('promoCopyBtn');
+    var t = btn.textContent; btn.textContent = 'Kopiert ✓';
+    setTimeout(function() { btn.textContent = t; }, 1500);
+  }).catch(function() {});
+}
+
+function openMoversModal() {
+  var modal = document.getElementById('moversModal');
+  var body = document.getElementById('moversModalBody');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  if (!window._moversData) {
+    body.innerHTML = '<div style="text-align:center;padding:2rem;color:#aaa;">Laster...</div>';
+    return;
+  }
+
+  var d = window._moversData;
+  var sorted = (d.all && d.all.length) ? d.all : [].concat(d.winners || [], d.losers || []);
+  body.innerHTML = sorted.map(function(s) {
+    var sign = s.up ? '+' : '-';
+    var color = s.up ? '#2C7A5C' : '#A32D2D';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
+      '<div><div style="font-size:13px;font-weight:500;">' + escapeHtml(s.name) + '</div>' +
+      '<div style="font-size:11px;color:#aaa;">' + s.ticker + '</div></div>' +
+      '<div style="font-size:12px;font-weight:500;color:' + color + ';">' + sign + s.changePct + '%</div>' +
+    '</div>';
+  }).join('');
+}
+
+function closeMoversModal() {
+  document.getElementById('moversModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+window.addEventListener('DOMContentLoaded', function() {
+  var mm = document.getElementById('moversModal');
+  if (mm) mm.addEventListener('click', function(e) { if (e.target === this) closeMoversModal(); });
+});
+
+async function loadEvents() {
+  var el = document.getElementById('eventsList');
+  if (!el) return;
+  try {
+    var res = await fetch('/api/events');
+    if (!res.ok) throw new Error('feil');
+    var data = await res.json();
+    var events = (data.events || []).slice(0, 5);
+    if (!events.length) {
+      el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen kommende events.</div>';
+      return;
+    }
+    el.innerHTML = events.map(function(e) {
+      var d = new Date(e.date + 'T12:00:00');
+      var day = d.getDate();
+      var month = d.toLocaleString('nb-NO', {month:'short'}).toUpperCase();
+      var isRapport = e.type === 'rapport';
+      var badgeColor = isRapport ? '#1B3A5C' : '#2C7A5C';
+      var badgeBg = isRapport ? '#E6EEF5' : '#E1F5EE';
+      var badgeText = isRapport ? 'Rapport' : 'Utbytte';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
+        '<div style="width:40px;background:#1B3A5C;border-radius:8px;padding:6px 4px;text-align:center;flex-shrink:0;">' +
+          '<div style="font-size:14px;font-weight:700;color:white;line-height:1;">' + day + '</div>' +
+          '<div style="font-size:9px;color:#C8A96E;font-weight:500;margin-top:1px;">' + month + '</div>' +
+        '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (e.name || e.ticker) + '</div>' +
+          '<div style="font-size:11px;color:#aaa;">' +
+          (e.type === 'utbytte' ? 'Utbytte' + (e.amount ? ': ' + e.amount + ' NOK' : '') : 'Kvartalsrapport') +
+        '</div>' +
+        '</div>' +
+        '<span style="font-size:10px;background:' + badgeBg + ';color:' + badgeColor + ';padding:3px 8px;border-radius:100px;font-weight:500;flex-shrink:0;">' + badgeText + '</span>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    var el2 = document.getElementById('eventsList');
+    if (el2) el2.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente events.</div>';
+  }
+}
+
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
-
-const heroTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
-const descriptions = {
-  'EQNR': 'Norges største oljeselskap. Henter opp olje og gass fra Nordsjøen og selger globalt.',
-  'DNB': 'Norges største bank. Tjener penger på renter fra lån og finansielle tjenester.',
-  'AKRBP': 'Et av Norges største uavhengige oljeselskaper. Fokuserer på Nordsjøen.',
-  'TEL': 'Nordens største telekomselskap. Selger mobil og bredbånd i Norge og Asia.',
-  'MOWI': 'Verdens største lakseoppdrettselskap. Produserer atlantisk laks globalt.',
-  'YAR': 'Verdens største produsent av kunstgjødsel. Gjør naturgass om til nitrogengjødsel.',
-  'NHY': 'Globalt aluminium- og energiselskap. Produserer aluminium fra råvare til ferdigprodukt.',
-  'KAHOT': 'Norsk ed-tech selskap. Driver quiz-plattformen Kahoot med 350+ millioner brukere.',
-};
-const sectors = {
-  'EQNR': ['Energi','Olje & gass','Oslo Børs'], 'DNB': ['Finans','Bank','Oslo Børs'],
-  'AKRBP': ['Energi','Olje','Oslo Børs'], 'TEL': ['Telekom','Mobil','Oslo Børs'],
-  'MOWI': ['Sjømat','Laks','Oslo Børs'], 'YAR': ['Kjemikalier','Gjødsel','Oslo Børs'],
-  'NHY': ['Industri','Aluminium','Oslo Børs'], 'KAHOT': ['Teknologi','Ed-tech','Oslo Børs'],
-};
-const riskProfiles = {
-  'EQNR': [{label:'Oljepris',pct:85,color:'#E24B4A',level:'Høy'},{label:'Valuta',pct:55,color:'#EF9F27',level:'Middels'},{label:'Politisk',pct:35,color:'#C8A96E',level:'Lav'}],
-  'DNB':  [{label:'Rente',pct:70,color:'#E24B4A',level:'Høy'},{label:'Kreditt',pct:55,color:'#EF9F27',level:'Middels'},{label:'Regulering',pct:40,color:'#C8A96E',level:'Lav'}],
-  'AKRBP':[{label:'Oljepris',pct:90,color:'#E24B4A',level:'Høy'},{label:'Produksjon',pct:60,color:'#EF9F27',level:'Middels'},{label:'Politisk',pct:30,color:'#C8A96E',level:'Lav'}],
-  'TEL':  [{label:'Konkurranse',pct:65,color:'#E24B4A',level:'Høy'},{label:'Regulering',pct:50,color:'#EF9F27',level:'Middels'},{label:'Valuta',pct:40,color:'#C8A96E',level:'Lav'}],
-  'MOWI': [{label:'Lakspris',pct:80,color:'#E24B4A',level:'Høy'},{label:'Sykdom',pct:65,color:'#EF9F27',level:'Middels'},{label:'Regulering',pct:45,color:'#C8A96E',level:'Lav'}],
-  'YAR':  [{label:'Gasspris',pct:85,color:'#E24B4A',level:'Høy'},{label:'Gjødselpris',pct:60,color:'#EF9F27',level:'Middels'},{label:'Valuta',pct:40,color:'#C8A96E',level:'Lav'}],
-  'NHY':  [{label:'Aluminiumspris',pct:75,color:'#E24B4A',level:'Høy'},{label:'Energikost',pct:65,color:'#EF9F27',level:'Middels'},{label:'Politisk',pct:35,color:'#C8A96E',level:'Lav'}],
-  'KAHOT':[{label:'Brukervekst',pct:70,color:'#E24B4A',level:'Høy'},{label:'Konkurranse',pct:60,color:'#EF9F27',level:'Middels'},{label:'Regulering',pct:25,color:'#C8A96E',level:'Lav'}],
-};
-
-async function loadHeroStock() {
-  const ticker = heroTickers[Math.floor(Math.random() * heroTickers.length)];
-  try {
-    const res = await fetch('/api/stock?ticker=' + ticker);
-    if (!res.ok) return;
-    const s = await res.json();
-    const price = parseFloat(s.price);
-    if (s.error || isNaN(price)) return;
-    document.getElementById('heroTicker').textContent = s.ticker + ' · Oslo Børs';
-    document.getElementById('heroName').textContent = s.name;
-    document.getElementById('heroPrice').textContent = price.toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr';
-    const sign = s.up ? '+' : '';
-    const change = parseFloat(s.change);
-    const changePct = parseFloat(s.changePct);
-    const badge = document.getElementById('heroBadge');
-    if (!isNaN(change) && !isNaN(changePct)) {
-      badge.textContent = sign + change.toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' kr (' + sign + changePct.toFixed(2) + '%)';
-    }
-    badge.className = s.up ? 'badge-up' : 'badge-down';
-    document.getElementById('heroDesc').textContent = descriptions[s.ticker] || 'Notert på Oslo Børs.';
-    const mock = document.getElementById('heroMock');
-    mock.style.cursor = 'pointer';
-    mock.setAttribute('role', 'link');
-    mock.setAttribute('tabindex', '0');
-    mock.setAttribute('aria-label', 'Se full analyse av ' + s.name);
-    function goToStock() { location.href = '/aksjer.html?ticker=' + s.ticker; }
-    mock.onclick = goToStock;
-    mock.onkeydown = function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToStock(); } };
-    const risks = riskProfiles[s.ticker] || riskProfiles['EQNR'];
-    document.getElementById('heroRiskBars').innerHTML = risks.map(function(r) {
-      return '<div class="risk-row"><span style="min-width:70px;font-size:10px">' + r.label + '</span><div class="risk-bar-bg"><div class="risk-bar-fill" style="width:' + r.pct + '%;background:' + r.color + '"></div></div><span style="font-size:10px">' + r.level + '</span></div>';
-    }).join('');
-    document.getElementById('heroPills').innerHTML = (sectors[s.ticker] || []).map(function(p) { return '<span class="pill">' + p + '</span>'; }).join('');
-  } catch(e) {}
-}
-loadHeroStock();
-
-const nlDateEl = document.getElementById('nlDate');
-if (nlDateEl) {
-  const today = new Date().toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'Europe/Oslo'});
-  nlDateEl.textContent = today.charAt(0).toUpperCase() + today.slice(1);
-}
-
-// Plangrenser hentes fra plans.js (window.PLANS) — én sannhetskilde for hele nettstedet.
-// Hvis plans.js mangler, beholdes tallene som står i HTML-en (fallback).
-(function renderPlanLimits() {
-  var P = window.PLANS;
-  if (!P) return;
-  function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
-  setText('freeAnalysis', P.free.aiAnalysis);
-  setText('freeChat', P.free.aiChat);
-  setText('freeWatchlist', P.free.watchlist);
-  setText('investorWatchlist', P.investor.watchlist === Infinity ? 'ubegrenset' : P.investor.watchlist);
-})();
-
-(async function checkAuth() {
-  try {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    document.head.appendChild(script);
-    await new Promise(function(r) { script.onload = r; });
-    const sb = supabase.createClient(
-      'https://twckvtwzyadevqbyehnu.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
-    );
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      const user = session.user;
-      const name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
-      const initials = name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0,2);
-      document.getElementById('navAuth').style.display = 'none';
-      document.getElementById('navUser').style.display = 'flex';
-      if(document.getElementById('navOversikt')) document.getElementById('navOversikt').style.display = 'block';
-      if(document.getElementById('mobileOversikt')) document.getElementById('mobileOversikt').style.display = 'flex';
-      document.getElementById('navAv').textContent = initials;
-      document.getElementById('navName').textContent = name.split(' ')[0];
-      if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
-    }
-  } catch(e) {}
-})();
 </script>
+  <div style="text-align:center;font-size:11px;color:#aaa;font-style:italic;padding:1rem 2rem 2rem;">
+    Kurs- og nøkkeltall fra Financial Modeling Prep · Ikke finansiell rådgivning
+  </div>
+
+<!-- Movers Modal -->
+<div id="moversModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;">
+  <div style="background:white;border-radius:16px;max-width:500px;width:100%;margin:auto;overflow:hidden;">
+    <div style="background:#1B3A5C;padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;color:white;font-weight:700;">OBX Vinnere & Tapere</div>
+      <button onclick="closeMoversModal()" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div id="moversModalBody" style="padding:1.25rem;max-height:70vh;overflow-y:auto;"></div>
+  </div>
+</div>
 </body>
 </html>
