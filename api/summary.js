@@ -27,12 +27,13 @@ export default async function handler(req, res) {
   const { data: planData } = await sb.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle();
   const plan = planData?.plan || 'free';
   const limit = LIMITS[plan] ?? 2;
+  // NB: kolonnen heter "type" (samme som resten av appen), ikke "activity".
   const { count } = await sb.from('user_activity').select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id).eq('activity', 'ai_analyse').gte('created_at', today + 'T00:00:00+02:00');
+    .eq('user_id', user.id).eq('type', 'ai_analyse').gte('created_at', today + 'T00:00:00+02:00');
   if ((count || 0) >= limit) {
     return res.status(429).json({ error: `Du har nådd dagens grense på ${limit} AI-analyser.`, limit, plan });
   }
-  await sb.from('user_activity').insert({ user_id: user.id, activity: 'ai_analyse', xp: 2 });
+  await sb.from('user_activity').insert({ user_id: user.id, type: 'ai_analyse', ticker: stock.ticker, name: stock.name || null, xp: 2 });
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
