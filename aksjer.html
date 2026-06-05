@@ -573,7 +573,7 @@ function renderStock(s) {
       (s.revenue ? '<div class="stat-row"><span class="stat-label">Omsetning (TTM)</span><span class="stat-val">' + s.revenue + '</span></div>' : '') +
       (s.ebit ? '<div class="stat-row"><span class="stat-label">EBIT</span><span class="stat-val">' + s.ebit + '</span></div>' : '') +
       (s.eps ? '<div class="stat-row"><span class="stat-label">EPS</span><span class="stat-val">' + s.eps + '</span></div>' : '') +
-      (s.dividendPerShare ? '<div class="stat-row"><span class="stat-label">Utbytte per aksje</span><span class="stat-val">' + s.dividendPerShare + '</span></div>' : '') +
+      (s.dividendPerShare ? '<div class="stat-row"><span class="stat-label">Siste utbytte</span><span class="stat-val">' + s.dividendPerShare + (s.lastDividendDate ? ' <span style="color:#aaa;font-weight:400;">(' + new Date(s.lastDividendDate).toLocaleDateString('nb-NO') + ')</span>' : '') + '</span></div>' : '') +
       (s.dividendYield ? '<div class="stat-row"><span class="stat-label">Direkteavkastning</span><span class="stat-val">' + s.dividendYield + '</span></div>' : '') +
       (s.pe ? '<div class="stat-row"><span class="stat-label">P/E</span><span class="stat-val">' + s.pe + '</span></div>' : '') +
       (s.pb ? '<div class="stat-row"><span class="stat-label">P/B</span><span class="stat-val">' + s.pb + '</span></div>' : '') +
