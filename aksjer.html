@@ -1462,18 +1462,47 @@ async function renderWatchlist() {
 // renderWatchlist() kalles etter auth er satt opp
 
 var portfolio = [];
-function savePortfolio() { try { localStorage.setItem('bh_portfolio', JSON.stringify(portfolio)); } catch(e) {} }
-function loadPortfolio() {
+
+// Porteføljen lagres i Supabase (user_portfolio) slik at den følger brukeren
+// på tvers av web og mobil — samme mønster som watchlist (user_watchlist).
+async function getPortfolioRows() {
+  var sb = window._sb; if (!sb) return [];
+  var sess = (await sb.auth.getSession()).data.session; if (!sess) return [];
   try {
-    var saved = JSON.parse(localStorage.getItem('bh_portfolio') || '[]');
-    if (Array.isArray(saved) && saved.length > 0) { portfolio = saved; renderPortfolioList(); }
+    var { data } = await sb.from('user_portfolio').select('*').eq('user_id', sess.user.id).order('created_at', {ascending:true});
+    return data || [];
+  } catch(e) { return []; }
+}
+async function savePortfolioItem(item) {
+  var sb = window._sb; if (!sb) return;
+  var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
+  try {
+    await sb.from('user_portfolio').upsert({ user_id: sess.user.id, ticker: item.ticker, name: item.name, sector: item.sector, pct: item.pct }, { onConflict: 'user_id,ticker' });
   } catch(e) {}
+}
+async function removePortfolioItem(ticker) {
+  var sb = window._sb; if (!sb) return;
+  var sess = (await sb.auth.getSession()).data.session; if (!sess) return;
+  try {
+    await sb.from('user_portfolio').delete().eq('user_id', sess.user.id).eq('ticker', ticker);
+  } catch(e) {}
+}
+async function loadPortfolio() {
+  var rows = await getPortfolioRows();
+  portfolio = rows.map(function(r) { return { ticker: r.ticker, name: r.name || r.ticker, sector: r.sector || 'Ukjent', pct: parseFloat(r.pct) || 0 }; });
+  renderPortfolioList();
 }
 async function initPortfolio() {
   var sb = window._sb; if (!sb) return;
   var plan = await getUserPlan(sb);
-  if (plan !== 'proff') { document.getElementById('portfolioLocked').style.display = 'block'; document.getElementById('portfolioActive').style.display = 'none'; }
-  else { document.getElementById('portfolioLocked').style.display = 'none'; document.getElementById('portfolioActive').style.display = 'block'; }
+  if (plan !== 'proff') {
+    document.getElementById('portfolioLocked').style.display = 'block';
+    document.getElementById('portfolioActive').style.display = 'none';
+    return;
+  }
+  document.getElementById('portfolioLocked').style.display = 'none';
+  document.getElementById('portfolioActive').style.display = 'block';
+  await loadPortfolio();
 }
 document.getElementById('pfInput').addEventListener('input', function() {
   var q = this.value.trim().toUpperCase();
@@ -1486,19 +1515,21 @@ document.getElementById('pfInput').addEventListener('input', function() {
 });
 document.addEventListener('click', function(e) { if (!e.target.closest('#pfInput') && !e.target.closest('#pfAcList')) document.getElementById('pfAcList').style.display = 'none'; });
 function selectPfStock(ticker, name) { var input = document.getElementById('pfInput'); input.value = ticker + ' — ' + name; input.dataset.ticker = ticker; input.dataset.name = name; document.getElementById('pfAcList').style.display = 'none'; document.getElementById('pfPct').focus(); }
-function addToPortfolio() {
+async function addToPortfolio() {
   var input = document.getElementById('pfInput'); var pctInput = document.getElementById('pfPct');
   var ticker = input.dataset.ticker || input.value.trim().toUpperCase().split(' ')[0];
   var name = input.dataset.name || ticker; var pct = parseFloat(pctInput.value);
   if (!ticker || isNaN(pct) || pct <= 0 || pct > 100) { pctInput.style.borderColor = '#A32D2D'; setTimeout(function() { pctInput.style.borderColor = '#e8e8e8'; }, 1500); return; }
   var existing = portfolio.findIndex(function(p) { return p.ticker === ticker; });
-  if (existing >= 0) { portfolio[existing].pct = pct; }
-  else { var stockInfo = osloStocks.find(function(s) { return s.ticker === ticker; }); portfolio.push({ ticker: ticker, name: name, pct: pct, sector: stockInfo ? stockInfo.sector : 'Ukjent' }); }
+  var item;
+  if (existing >= 0) { portfolio[existing].pct = pct; item = portfolio[existing]; }
+  else { var stockInfo = osloStocks.find(function(s) { return s.ticker === ticker; }); item = { ticker: ticker, name: name, pct: pct, sector: stockInfo ? stockInfo.sector : 'Ukjent' }; portfolio.push(item); }
   input.value = ''; input.dataset.ticker = ''; input.dataset.name = ''; pctInput.value = '';
-  savePortfolio(); renderPortfolioList();
+  renderPortfolioList();
+  await savePortfolioItem(item);
 }
-function removeFromPortfolio(ticker) { portfolio = portfolio.filter(function(p) { return p.ticker !== ticker; }); savePortfolio(); renderPortfolioList(); }
-function updatePct(ticker, val) { var pct = parseFloat(val); if (isNaN(pct) || pct < 0 || pct > 100) return; var item = portfolio.find(function(p) { return p.ticker === ticker; }); if (item) { item.pct = pct; savePortfolio(); renderPortfolioList(); } }
+async function removeFromPortfolio(ticker) { portfolio = portfolio.filter(function(p) { return p.ticker !== ticker; }); renderPortfolioList(); await removePortfolioItem(ticker); }
+async function updatePct(ticker, val) { var pct = parseFloat(val); if (isNaN(pct) || pct < 0 || pct > 100) return; var item = portfolio.find(function(p) { return p.ticker === ticker; }); if (item) { item.pct = pct; renderPortfolioList(); await savePortfolioItem(item); } }
 function renderPortfolioList() {
   var list = document.getElementById('pfList'); var totalRow = document.getElementById('pfTotalRow'); var analyzeBtn = document.getElementById('pfAnalyzeBtn');
   if (!list) return;
@@ -1619,7 +1650,7 @@ async function analyzePortfolioFresh() {
   btn.textContent = 'Analyser portefølje →'; btn.disabled = false;
 }
 
-window.addEventListener('load', function() { loadPortfolio(); });
+// loadPortfolio() kalles fra initPortfolio() etter at auth + plan er bekreftet
 
 window._authReady = (async function checkAuth() {
   try {
