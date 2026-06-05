@@ -305,6 +305,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 <script>
 const SUPABASE_URL = 'https://twckvtwzyadevqbyehnu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); // én delt klient for hele siden
 
 const today = new Date().toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'Europe/Oslo'});
 const todayCap = today.charAt(0).toUpperCase() + today.slice(1);
@@ -375,9 +376,10 @@ async function loadBorsbrygg() {
     const winner = sorted[0]; const loser = sorted[sorted.length-1];
     const stockSummary = valid.map(function(s) { const sign = parseFloat(s.changePct) >= 0 ? '+' : ''; return s.name + ' (' + s.ticker + '): ' + s.price + ' NOK, ' + sign + s.changePct + '%'; }).join(', ');
 
+    const token = (await sb.auth.getSession()).data.session?.access_token || '';
     const res = await fetch('/api/borsbrygg', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ stockSummary })
     });
     const ai = await res.json();
@@ -391,14 +393,16 @@ async function loadBorsbrygg() {
 }
 
 async function loadWinnersLosers() {
-  const allTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT','KOG','SALM','ORK','STB','GJF','NAS','SUBC'];
   try {
-    const results = await Promise.all(allTickers.map(function(t) { return fetch('/api/stock?ticker='+t).then(function(r){return r.json();}).catch(function(){return null;}); }));
-    const valid = results.filter(function(r){return r&&!r.error&&r.changePct!==undefined;}).sort(function(a,b){return parseFloat(b.changePct)-parseFloat(a.changePct);});
-    const winners = valid.slice(0,3); const losers = valid.slice(-3).reverse();
+    const res = await fetch('/api/movers');
+    const data = await res.json();
+    if (!res.ok) throw new Error('movers feil');
+    const winners = (data.winners || []).slice(0, 3);
+    const losers = (data.losers || []).slice(0, 3);
     function renderItem(s) {
-      const sign = parseFloat(s.changePct)>=0?'+':''; const cls = parseFloat(s.changePct)>=0?'up':'down';
-      return '<div class="wl-item"><div><div class="wl-name">'+s.name.split(' ')[0]+'</div><div class="wl-ticker">'+s.ticker+'</div></div><div class="wl-pct '+cls+'">'+sign+s.changePct+'%</div></div>';
+      const cls = s.up ? 'up' : 'down';
+      const sign = s.up ? '+' : '-';
+      return '<div class="wl-item"><div><div class="wl-name">' + s.name.split(' ')[0] + '</div><div class="wl-ticker">' + s.ticker + '</div></div><div class="wl-pct ' + cls + '">' + sign + s.changePct + '%</div></div>';
     }
     document.getElementById('winnersList').innerHTML = winners.map(renderItem).join('') || '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
     document.getElementById('losersList').innerHTML = losers.map(renderItem).join('') || '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
@@ -411,7 +415,6 @@ async function loadWinnersLosers() {
 // Arkiv
 async function loadArchive(reset) {
   if (reset) { archiveOffset = 0; document.getElementById('archiveList').innerHTML = ''; }
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const todayStr = new Date().toLocaleDateString('sv-SE', {timeZone:'Europe/Oslo'});
   const { data, error } = await sb
     .from('borsbrygg_editions')
@@ -485,7 +488,8 @@ async function openArchiveModal(date, title) {
   document.getElementById('modalBody').innerHTML = '<div class="edition-loading"><div class="edition-spinner"></div>Laster utgave...</div>';
 
   try {
-    const res = await fetch('/api/borsbrygg?date=' + date);
+    const token = (await sb.auth.getSession()).data.session?.access_token || '';
+    const res = await fetch('/api/borsbrygg?date=' + date, { headers: { 'Authorization': 'Bearer ' + token } });
     const data = await res.json();
     if (!res.ok || data.error) throw new Error(data.error || 'Ikke funnet');
     const ai = data.content || data;
@@ -505,7 +509,6 @@ document.getElementById('archiveModal').addEventListener('click', function(e) {
 // Auth
 (async function checkAuth() {
   try {
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     function applySession(user) {
       const name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
       const initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
