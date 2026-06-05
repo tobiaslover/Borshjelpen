@@ -1554,7 +1554,6 @@ window._authReady = (async function checkAuth() {
     var sb = supabase.createClient('https://twckvtwzyadevqbyehnu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c');
     window._sb = sb;
     var sess = (await sb.auth.getSession()).data.session;
-    renderWatchlist();
     if (sess) {
       var user = sess.user;
       var name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
@@ -1574,6 +1573,9 @@ window._authReady = (async function checkAuth() {
       document.getElementById('navName').textContent = name.split(' ')[0];
       if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
     }
+    // Watchlist hentes etter plan-spørringen, så user_watchlist og user_plans
+    // ikke fyres samtidig (Safari dropper forbindelser ved mange parallelle kall).
+    await renderWatchlist();
   } catch(e) {}
 })();
 
