@@ -14,13 +14,20 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Ikke autentisert' });
   }
   const token = authHeader.replace('Bearer ', '');
-  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-  const { data: { user }, error: authError } = await sb.auth.getUser(token);
-  if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
 
-  // Porteføljeanalyse er KUN for Proff — håndheves server-side, ikke bare i UI.
-  const { data: planData } = await sb.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle();
-  const plan = planData?.plan || 'free';
+  let user, plan;
+  try {
+    const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    const { data: { user: u }, error: authError } = await sb.auth.getUser(token);
+    if (authError || !u) return res.status(401).json({ error: 'Ugyldig token' });
+    user = u;
+    // Porteføljeanalyse er KUN for Proff — håndheves server-side, ikke bare i UI.
+    const { data: planData } = await sb.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle();
+    plan = planData?.plan || 'free';
+  } catch (e) {
+    return res.status(500).json({ error: 'Klarte ikke å verifisere bruker: ' + e.message });
+  }
+
   if (plan !== 'proff') {
     return res.status(403).json({ error: 'Porteføljeanalyse krever Proff', plan });
   }
