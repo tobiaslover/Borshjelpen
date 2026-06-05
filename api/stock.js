@@ -6,101 +6,92 @@ export default async function handler(req, res) {
   const { ticker } = req.query;
   if (!ticker) return res.status(400).json({ error: 'Ticker mangler' });
 
-  const upper = ticker.toUpperCase().replace('.OL','').replace(':OSE','');
+  const upper = ticker.toUpperCase().replace('.OL', '').replace(':OSE', '');
   const olSymbol = upper + '.OL';
   const apiKey = process.env.FMP_API_KEY;
 
-  const yHeaders = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-    'Accept': 'application/json',
-    'Referer': 'https://finance.yahoo.com/',
-  };
-
   try {
-    const [yahooRes, profileRes, metricsRes, ratiosRes, incomeRes] = await Promise.all([
-      fetch(`https://query2.finance.yahoo.com/v8/finance/chart/${olSymbol}?interval=1d&range=5d`, { headers: yHeaders }),
+    // Kurs OG nøkkeltall hentes nå fra FMP (lisensiert kilde). Oslo Børs-aksjer
+    // med .OL-suffiks prises nativt i NOK — ingen valutakonvertering nødvendig.
+    const [quoteRes, profileRes, metricsRes, ratiosRes, incomeRes] = await Promise.all([
+      fetch(`https://financialmodelingprep.com/stable/quote?symbol=${olSymbol}&apikey=${apiKey}`),
       fetch(`https://financialmodelingprep.com/stable/profile?symbol=${olSymbol}&apikey=${apiKey}`),
       fetch(`https://financialmodelingprep.com/stable/key-metrics-ttm?symbol=${olSymbol}&apikey=${apiKey}`),
       fetch(`https://financialmodelingprep.com/stable/ratios-ttm?symbol=${olSymbol}&apikey=${apiKey}`),
       fetch(`https://financialmodelingprep.com/stable/income-statement?symbol=${olSymbol}&limit=1&apikey=${apiKey}`),
     ]);
 
-    if (!yahooRes.ok) {
-      return res.status(404).json({ error: `Aksje "${upper}" ikke funnet. Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI.` });
-    }
-
-    const yahooData = await yahooRes.json();
-    const result = yahooData?.chart?.result?.[0];
-    const meta = result?.meta;
-    const closes = (result?.indicators?.quote?.[0]?.close || []).filter(v => v != null);
-    const price = meta?.regularMarketPrice || closes[closes.length - 1] || 0;
-    const prevClose = closes[closes.length - 2] || price;
-    const change = +(price - prevClose).toFixed(2);
-    const changePct = prevClose ? +((change / prevClose) * 100).toFixed(2) : 0;
-    const name = meta?.longName || meta?.shortName || upper;
-
-    let profile = null, metrics = null, ratios = null, income = null;
+    let quote = null, profile = null, metrics = null, ratios = null, income = null;
+    if (quoteRes.ok) { try { const d = await quoteRes.json(); quote = Array.isArray(d) ? d[0] : d; } catch(e) {} }
     if (profileRes.ok) { try { const d = await profileRes.json(); profile = Array.isArray(d) ? d[0] : d; } catch(e) {} }
     if (metricsRes.ok) { try { const d = await metricsRes.json(); metrics = Array.isArray(d) ? d[0] : d; } catch(e) {} }
     if (ratiosRes.ok) { try { const d = await ratiosRes.json(); ratios = Array.isArray(d) ? d[0] : d; } catch(e) {} }
     if (incomeRes.ok) { try { const d = await incomeRes.json(); income = Array.isArray(d) ? d[0] : d; } catch(e) {} }
 
-    // Alt rapporteres i NOK som standard
-    // USD-liste oppdateres når bruker sender liste
-    const reportCurrency = 'NOK';
+    if (!quote || quote.price == null) {
+      return res.status(404).json({ error: `Aksje "${upper}" ikke funnet. Prøv f.eks. EQNR, DNB, TEL, AKRBP, MOWI.` });
+    }
+
+    const price = Number(quote.price) || 0;
+    const change = quote.change != null ? +Number(quote.change).toFixed(2) : 0;
+    const changePct = quote.changePercentage != null ? +Number(quote.changePercentage).toFixed(2) : 0;
+    const name = quote.name || profile?.companyName || upper;
+
+    // Kursvaluta = handelsvaluta for noteringen (NOK for .OL).
+    const priceCurrency = profile?.currency || 'NOK';
+    // Regnskapsvaluta kan avvike (enkelte shipping/energi-selskaper rapporterer i USD).
+    const reportCurrency = income?.reportedCurrency || priceCurrency;
 
     function fmtMoney(val, currency) {
-      if (!val) return null;
+      if (val == null || isNaN(val)) return null;
       const abs = Math.abs(val);
       const sign = val < 0 ? '-' : '';
       if (abs >= 1e12) return sign + (abs/1e12).toFixed(1) + ' tn ' + currency;
       if (abs >= 1e9) return sign + (abs/1e9).toFixed(1) + ' mrd ' + currency;
       if (abs >= 1e6) return sign + (abs/1e6).toFixed(0) + ' mill ' + currency;
-      return sign + val.toLocaleString('nb-NO') + ' ' + currency;
+      return sign + Number(val).toLocaleString('nb-NO') + ' ' + currency;
     }
-
-    function fmtUSD(val) { return fmtMoney(val, reportCurrency); }
 
     // P/E
     let pe = null;
     if (ratios?.peRatioTTM) pe = parseFloat(ratios.peRatioTTM).toFixed(1);
     else if (metrics?.earningsYieldTTM && metrics.earningsYieldTTM > 0) pe = (1 / metrics.earningsYieldTTM).toFixed(1);
 
-    // Utbytteyield
+    // Utbytteyield (prosent — valutauavhengig)
     let dividendYield = null;
     if (ratios?.dividendYieldTTM) dividendYield = (parseFloat(ratios.dividendYieldTTM) * 100).toFixed(2) + '%';
-    else if (profile?.lastDiv && profile?.price) dividendYield = ((profile.lastDiv / profile.price) * 100).toFixed(2) + '%';
+    else if (profile?.lastDiv && price) dividendYield = ((profile.lastDiv / price) * 100).toFixed(2) + '%';
 
-    // Markedsverdi
+    // Markedsverdi (prisbasert → kursvaluta)
     let marketCap = null;
-    const mc = metrics?.marketCap || profile?.marketCap;
-    if (mc) marketCap = fmtUSD(mc);
+    const mc = quote?.marketCap || metrics?.marketCap || profile?.marketCap;
+    if (mc) marketCap = fmtMoney(mc, priceCurrency);
 
     // P/B
     let pb = null;
     if (ratios?.priceToBookRatioTTM) pb = parseFloat(ratios.priceToBookRatioTTM).toFixed(1);
 
-    // EPS (siste år)
+    // EPS (regnskapsvaluta)
     let eps = null;
-    if (income?.eps) eps = parseFloat(income.eps).toFixed(2) + ' USD';
+    if (income?.eps != null) eps = parseFloat(income.eps).toFixed(2) + ' ' + reportCurrency;
 
-    // Omsetning
+    // Omsetning (regnskapsvaluta)
     let revenue = null;
-    if (income?.revenue) revenue = fmtUSD(income.revenue);
+    if (income?.revenue) revenue = fmtMoney(income.revenue, reportCurrency);
 
-    // EBIT
+    // EBIT (regnskapsvaluta)
     let ebit = null;
-    if (income?.operatingIncome) ebit = fmtUSD(income.operatingIncome);
+    if (income?.operatingIncome) ebit = fmtMoney(income.operatingIncome, reportCurrency);
 
-    // Utbytte per aksje
+    // Utbytte per aksje (utbetales i kursvaluta)
     let dividendPerShare = null;
-    if (profile?.lastDiv) dividendPerShare = parseFloat(profile.lastDiv).toFixed(2) + ' USD';
+    if (profile?.lastDiv) dividendPerShare = parseFloat(profile.lastDiv).toFixed(2) + ' ' + priceCurrency;
 
     res.status(200).json({
       ticker: upper,
       name,
       price: price.toFixed(2),
-      currency: 'NOK',
+      currency: priceCurrency,
       change: change.toFixed(2),
       changePct: Math.abs(changePct).toFixed(2),
       up: change >= 0,
@@ -116,9 +107,9 @@ export default async function handler(req, res) {
       pb,
       beta: profile?.beta ? parseFloat(profile.beta).toFixed(2) : null,
       // 52-ukers
-      fiftyTwoWeekHigh: meta?.fiftyTwoWeekHigh?.toFixed(2) || null,
-      fiftyTwoWeekLow: meta?.fiftyTwoWeekLow?.toFixed(2) || null,
-      volume: meta?.regularMarketVolume?.toLocaleString('nb-NO') || null,
+      fiftyTwoWeekHigh: quote?.yearHigh != null ? Number(quote.yearHigh).toFixed(2) : null,
+      fiftyTwoWeekLow: quote?.yearLow != null ? Number(quote.yearLow).toFixed(2) : null,
+      volume: quote?.volume != null ? Number(quote.volume).toLocaleString('nb-NO') : null,
       // Ekstra
       sector: profile?.sector || null,
       industry: profile?.industry || null,
