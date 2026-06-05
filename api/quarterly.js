@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
@@ -91,6 +90,8 @@ export default async function handler(req, res) {
     // Sende til AI for oppsummering
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const prompt = `Du er Børshjelpen sin finansanalytiker — du snakker som en ærlig, engasjert venn som kan finans godt. Forklar kvartalsrapporten grundig og konkret. Bruk de faktiske tallene aktivt i analysen.
+
+FORBUDTE ORD OG VURDERINGER (svært viktig): Bruk ALDRI verdiladede ord som feller en dom over aksjen eller kursen. Følgende ord — og alt i samme gate — er strengt forbudt: "undervurdert", "overvurdert", "billig", "dyr", "kjøp", "selg", "kjøpskandidat", "salgskandidat", "sterk kjøp", "bør kjøpe", "bør selge", "verdt å kjøpe", "et godt kjøp", "anbefaler". Konkluder ALDRI med at aksjen er rimelig, dyr, attraktiv eller en god/dårlig investering, og gi ALDRI kjøps-/salgsråd. Beskriv rapporten nøytralt og faktabasert, og la leseren trekke konklusjonen selv.
 
 Kvartalsrapport for ${name || ticker} (${qData.period}):
 
