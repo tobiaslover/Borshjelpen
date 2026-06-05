@@ -128,16 +128,16 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
     </div>
     <div id="formWrap">
       <div class="field">
-        <label>Navn</label>
+        <label for="navn">Navn</label>
         <input type="text" id="navn" placeholder="Ditt fulle navn" />
       </div>
       <div class="field">
-        <label>E-post</label>
+        <label for="epost">E-post</label>
         <input type="email" id="epost" placeholder="din@epost.no" />
         <div class="email-match-error" id="emailMatchError">E-posten må være den samme som på brukerkontoen din.</div>
       </div>
       <div class="field">
-        <label>Emne</label>
+        <label for="emne">Emne</label>
         <select id="emne">
           <option value="">Velg emne...</option>
           <option value="Teknisk problem">Teknisk problem</option>
@@ -149,7 +149,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
         </select>
       </div>
       <div class="field">
-        <label>Melding</label>
+        <label for="melding">Melding</label>
         <textarea id="melding" placeholder="Skriv meldingen din her..."></textarea>
       </div>
       <button class="btn" id="sendBtn" onclick="sendForm()">Send melding</button>
@@ -255,7 +255,9 @@ async function sendForm() {
     const res = await fetch('https://formspree.io/f/mojbgayn', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ navn, epost, emne, melding })
+      // "email" gjør at Formspree setter Reply-To, så du kan svare direkte til avsenderen.
+      // "_subject" gir en ryddig emnelinje i innboksen din.
+      body: JSON.stringify({ navn, email: epost, _subject: '[Børshjelpen] ' + emne, emne, melding })
     });
     if (res.ok) {
       document.getElementById('formWrap').style.display = 'none';
