@@ -378,10 +378,7 @@ function renderStreak(streak) {
   var el = document.getElementById('streakDisplay');
   if (!el) return;
   el.style.display = 'flex';
-  if (streak <= 0) {
-    el.innerHTML = '<span style="opacity:0.5;">🔥 Logg inn daglig for å starte en streak!</span>';
-    return;
-  }
+  if (streak < 1) streak = 1; // innlogget = du har logget inn i dag, altså minst 1 dag
   var flame = streak >= 30 ? '🔥🔥🔥' : streak >= 7 ? '🔥🔥' : '🔥';
   el.innerHTML = flame + ' <strong>' + streak + '</strong> dagers streak';
   var next = streak < 3 ? 3 : streak < 7 ? 7 : streak < 14 ? 14 : streak < 30 ? 30 : null;
