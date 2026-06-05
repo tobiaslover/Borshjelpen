@@ -1,38 +1,6 @@
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
-/**
- * Henter ekte nyheter for ÉN aksje server-side og bygger en kompakt digest.
- * Brukes kun som AI-kontekst for "aktuelt"-feltet — returneres aldri til klienten.
- * Feiler kilden, returneres tom streng, og prompten ber AI-en holde seg generell.
- */
-async function fetchTickerNews(ticker) {
-  const key = process.env.FMP_API_KEY;
-  const symbol = ticker.toUpperCase().replace('.OL', '') + '.OL';
-  try {
-    // NB: bekreft eksakt sti i FMP-dashbordet ditt (news/stock vs stock-news).
-    const res = await fetch(`https://financialmodelingprep.com/stable/news/stock?symbols=${symbol}&limit=8&apikey=${key}`);
-    if (!res.ok) return '';
-    const items = await res.json();
-    if (!Array.isArray(items) || !items.length) return '';
-    const seen = new Set();
-    return items
-      .filter(n => n && n.title && !seen.has(n.title) && seen.add(n.title))
-      .sort((a, b) => new Date(b.publishedDate || b.date || 0) - new Date(a.publishedDate || a.date || 0))
-      .slice(0, 6)
-      .map(n => {
-        const src = n.site || n.publisher || 'ukjent kilde';
-        const date = (n.publishedDate || n.date || '').slice(0, 16);
-        const snippet = (n.text || n.snippet || '').replace(/\s+/g, ' ').slice(0, 200);
-        return `- ${n.title} (${src}, ${date}): ${snippet}`;
-      })
-      .join('\n');
-  } catch (e) {
-    console.error('FMP ticker-news feil:', e.message);
-    return '';
-  }
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST');
@@ -67,9 +35,6 @@ export default async function handler(req, res) {
   }
   await sb.from('user_activity').insert({ user_id: user.id, type: 'ai_analyse', ticker: stock.ticker, name: stock.name || null, xp: 2 });
 
-  // Hent ekte nyheter for denne aksjen (kun AI-kontekst — vises aldri offentlig)
-  const newsDigest = await fetchTickerNews(stock.ticker);
-
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   try {
@@ -85,10 +50,9 @@ export default async function handler(req, res) {
 Skriv på naturlig norsk bokmål. Unngå finanssjargong der det ikke er nødvendig — og forklar det kort når du bruker det. Vær konkret, ikke vag.
 
 VIKTIG OM FAKTA — IKKE DIKT:
-Du får oppgitt faktiske nøkkeltall, og noen ganger en liste med FAKTISKE NYHETER om aksjen nederst i brukermeldingen.
-- Feltet "aktuelt" skal bygge på de oppgitte nyhetene og nøkkeltallene. Refererer du til en hendelse, skal den stå i de oppgitte nyhetene.
-- Finn ALDRI opp nyheter, hendelser, tall, sitater, oppkjøp, kvartalsresultater eller datoer som ikke er oppgitt.
-- Får du INGEN nyheter oppgitt: hold "aktuelt" generell og forsiktig (basert på sektor, makro og nøkkeltall) uten å påstå konkrete ferske hendelser.
+Du får oppgitt faktiske nøkkeltall, men IKKE en nyhetsfeed.
+- "aktuelt" skal være forsiktig og generell: bygg på sektor, makrobilde og de oppgitte nøkkeltallene. Påstå ALDRI konkrete ferske hendelser (oppkjøp, kvartalsresultater, kontrakter, datoer) som du ikke har dekning for.
+- Finn ALDRI opp nyheter, tall, sitater eller hendelser.
 - "pris_vurdering", "bull", "bear", "scenarios" osv. skal baseres på de oppgitte nøkkeltallene, ikke oppdiktede tall.
 
 JSON-struktur:
@@ -143,10 +107,7 @@ Lønnsomhet: Bruttomargin: ${stock.grossMargin || '—'}, Nettomargin: ${stock.p
 
 Finansiell styrke: Gjeld/EK: ${stock.debtEquity || '—'}, Fri kontantstrøm-yield: ${stock.fcfYield || '—'}
 
-Sektor: ${stock.sector}, Bransje: ${stock.industry || '—'}` +
-            (newsDigest
-              ? `\n\nFAKTISKE NYHETER om ${stock.ticker} fra siste tid (bruk KUN disse til "aktuelt" — ikke dikt opp annet):\n${newsDigest}`
-              : `\n\nIngen nyheter er tilgjengelige for denne aksjen akkurat nå. Hold "aktuelt" generell uten å påstå konkrete ferske hendelser.`)
+Sektor: ${stock.sector}, Bransje: ${stock.industry || '—'}`
         }
       ]
     });
