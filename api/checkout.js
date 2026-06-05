@@ -39,6 +39,7 @@ export default async function handler(req, res) {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: PRICE_IDS[plan], quantity: 1 }],
+      allow_promotion_codes: true,
       customer_email: userEmail || email || undefined,
       client_reference_id: userId || undefined,
       success_url: 'https://borshjelpen.vercel.app/profil.html?subscribed=true',
