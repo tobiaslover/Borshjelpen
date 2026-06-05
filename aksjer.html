@@ -1529,7 +1529,7 @@ function renderPfBody(text) {
     if (l.indexOf('- ') === 0) {
       flush();
       var item = escapeHtml(l.slice(2)).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      html += '<div style="display:flex;gap:8px;padding:3px 0;font-size:13px;line-height:1.6;color:#1a1a1a;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>' + item + '</span></div>';
+      html += '<div style="display:flex;gap:8px;padding:2px 0;font-size:13px;line-height:1.55;color:#1a1a1a;"><span style="color:#C8A96E;flex-shrink:0;">•</span><span>' + item + '</span></div>';
     } else {
       para.push(escapeHtml(l).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
     }
@@ -1545,7 +1545,7 @@ function renderPfCards(reply) {
   for (var i = 1; i < parts.length; i += 2) {
     var title = (parts[i] || '').trim();
     var body = (parts[i + 1] || '').trim();
-    html += '<div class="card" style="margin-bottom:1rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">' + escapeHtml(title) + '</div>' + renderPfBody(body) + '</div>';
+    html += '<div class="card" style="margin-bottom:0.75rem;border-left:3px solid #C8A96E;border-radius:0 14px 14px 0;"><div class="card-title">' + escapeHtml(title) + '</div>' + renderPfBody(body) + '</div>';
   }
   if (!html.trim()) html = renderPfBody(clean);
   return html;
