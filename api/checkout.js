@@ -1,8 +1,8 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 const PRICE_IDS = {
-  investor: 'price_1TdRLURo4ICbszahft9ufQZP',
-  proff: 'price_1TdRMNRo4ICbszahkffRfUgL'
+  investor: 'price_1Tf56fRzknTRj7hIbLhwquKo',
+  proff: 'price_1Tf56zRzknTRj7hIP9cMHf5c'
 };
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
