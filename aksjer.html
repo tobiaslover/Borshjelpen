@@ -537,6 +537,10 @@ function renderStock(s) {
   var sign = s.up ? '+' : '';
   var changeStr = sign + parseFloat(s.change).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
   var pctStr = sign + parseFloat(s.changePct).toFixed(2) + '%';
+  // Sektor på norsk: bruk vår egen database, ellers oversett API-sektoren, ellers rå verdi
+  var SECTOR_NO = { 'energy':'Energi', 'financial services':'Finans', 'financials':'Finans', 'basic materials':'Materialer', 'materials':'Materialer', 'industrials':'Industri', 'technology':'Teknologi', 'information technology':'Teknologi', 'healthcare':'Helse', 'health care':'Helse', 'consumer cyclical':'Forbruk', 'consumer discretionary':'Forbruk', 'consumer defensive':'Forbruk', 'consumer staples':'Forbruk', 'communication services':'Kommunikasjon', 'real estate':'Eiendom', 'utilities':'Forsyning' };
+  var dbStock = (typeof osloStocks !== 'undefined') ? osloStocks.find(function(x) { return x.ticker === s.ticker; }) : null;
+  var visSektor = (dbStock && dbStock.sector) || (s.sector ? (SECTOR_NO[s.sector.toLowerCase()] || s.sector) : '');
   document.getElementById('result').innerHTML =
     '<div id="stockBadges" class="stock-badges"></div>' +
     '<div class="result-header">' +
@@ -547,7 +551,7 @@ function renderStock(s) {
             '<div class="company-name">' + s.name + '</div>' +
             '<button id="watchlistBtn" onclick="toggleWatchlist(currentStock)" style="font-size:11px;padding:4px 12px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap;">+ Watchlist</button>' +
           '</div>' +
-          '<div class="company-meta">' + s.exchange + ' · ' + s.ticker + (s.sector ? ' · ' + s.sector : '') + '</div>' +
+          '<div class="company-meta">' + s.exchange + ' · ' + s.ticker + (visSektor ? ' · ' + visSektor : '') + '</div>' +
         '</div>' +
       '</div>' +
       '<div class="price-block">' +
