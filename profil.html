@@ -304,15 +304,50 @@ function renderUser(user) {
     document.getElementById('mobileMenuName').textContent = name.split(' ')[0];
     document.getElementById('mobileMenuUser').style.display = 'flex';
   }
-  loadActivity(user.id);
-  loadStats(user.id);
-  loadWatchlist();
+  loadProfileData(user.id);
 }
 
-async function loadStats(userId) {
+// Henter user_activity ÉN gang og gjenbruker den til både statistikk og aktivitetsliste.
+// Kallene kjøres i sekvens (ikke alle samtidig) fordi Safari dropper forbindelser
+// når mange forespørsler fyres mot samme vert på én gang.
+async function loadProfileData(userId) {
+  var acts = [];
   try {
-    const { data } = await sb.from('user_activity').select('type, xp, created_at').eq('user_id', userId);
-    const all = data || [];
+    const { data } = await sb.from('user_activity').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    acts = data || [];
+  } catch(e) {}
+  renderStats(acts);
+  renderActivity(acts.slice(0, 10));
+  await loadStreak(userId);
+  await loadWatchlist();
+}
+
+async function loadStreak(userId) {
+  try {
+    const { data: planInfo } = await sb.from('user_plans').select('streak').eq('user_id', userId).maybeSingle();
+    const streak = (planInfo && planInfo.streak) || 0;
+    const streakEl = document.getElementById('streakBadge');
+    if (!streakEl) return;
+    streakEl.style.display = 'inline-flex';
+    if (streak < 1) {
+      // Innlogget = du har logget inn i dag, altså minst 1 dag
+      var f0 = '🔥';
+      streakEl.textContent = f0 + ' 1 dagers streak';
+      streakEl.style.opacity = '1';
+      streakEl.style.background = '#1B3A5C';
+      streakEl.style.color = '#C8A96E';
+    } else {
+      var flame = streak >= 30 ? '🔥🔥🔥' : streak >= 7 ? '🔥🔥' : '🔥';
+      streakEl.textContent = flame + ' ' + streak + ' dagers streak';
+      streakEl.style.opacity = '1';
+      streakEl.style.background = '#1B3A5C';
+      streakEl.style.color = '#C8A96E';
+    }
+  } catch(e) {}
+}
+
+function renderStats(all) {
+  try {
     document.getElementById('statSearch').textContent = all.filter(d => d.type === 'search').length;
     // AI-spørsmål = chat + AI-analyser
     document.getElementById('statAI').textContent = all.filter(d => d.type === 'chat' || d.type === 'ai_analyse').length;
@@ -327,26 +362,6 @@ async function loadStats(userId) {
     else if (xp >= 100) level = '📈 Investor';
     const planEl = document.getElementById('profilePlan');
     if (planEl) planEl.textContent = level;
-
-    // Streak
-    const { data: planInfo } = await sb.from('user_plans').select('streak').eq('user_id', userId).maybeSingle();
-    const streak = (planInfo && planInfo.streak) || 0;
-    const streakEl = document.getElementById('streakBadge');
-    if (streakEl) {
-      streakEl.style.display = 'inline-flex';
-      if (streak <= 0) {
-        streakEl.textContent = '🔥 Start din streak!';
-        streakEl.style.opacity = '0.5';
-        streakEl.style.background = '#f0f0f0';
-        streakEl.style.color = '#aaa';
-      } else {
-        var flame = streak >= 30 ? '🔥🔥🔥' : streak >= 7 ? '🔥🔥' : '🔥';
-        streakEl.textContent = flame + ' ' + streak + ' dagers streak';
-        streakEl.style.opacity = '1';
-        streakEl.style.background = '#1B3A5C';
-        streakEl.style.color = '#C8A96E';
-      }
-    }
   } catch(e) {}
 }
 
@@ -389,11 +404,10 @@ async function loadWatchlist() {
   } catch(e) {}
 }
 
-async function loadActivity(userId) {
+function renderActivity(data) {
   const list = document.getElementById('activityList');
   try {
-    const { data, error } = await sb.from('user_activity').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10);
-    if (error || !data || data.length === 0) {
+    if (!data || data.length === 0) {
       list.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#aaa;font-size:13px;">Ingen aktivitet ennå — søk på en aksje for å komme i gang!</div>';
       return;
     }
