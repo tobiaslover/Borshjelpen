@@ -24,6 +24,7 @@
 <meta name="twitter:description" content="Gratis guider om aksjer for nybegynnere. Uten finanssjargong.">
 <meta name="twitter:image" content="https://borshjelpen.no/og-image.png">
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
@@ -189,7 +190,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
   .featured-title { font-size: 24px; }
   .articles-wrap { padding: 0 1rem 3rem; }
   .articles-grid { grid-template-columns: 1fr; }
-  .filter-wrap { padding: 0 1rem; flex-wrap: wrap; gap: 6px; }
+  .filter-row { padding: 0 1rem; flex-wrap: wrap; gap: 6px; }
   .hero { padding: 2.5rem 1rem 3rem; }
   .hero h1 { font-size: 32px; }
 }
@@ -424,7 +425,7 @@ function filterArticles(category, btn) {
   cards.forEach(card => {
     if (category === 'alle' || card.dataset.category === category) {
       card.style.display = 'flex';
-      count++;
+      if (card.tagName === 'A') count++; // tell bare publiserte artikler, ikke «Kommer snart»-plassholdere
     } else {
       card.style.display = 'none';
     }
@@ -432,15 +433,17 @@ function filterArticles(category, btn) {
   document.getElementById('articleCount').textContent = count + (count === 1 ? ' artikkel' : ' artikler');
 }
 
+// Sett riktig tall ved innlasting (uten å markere noen pill, «Alle» er allerede aktiv)
+document.addEventListener('DOMContentLoaded', function() {
+  var n = document.querySelectorAll('#articlesGrid a.article-card').length;
+  document.getElementById('articleCount').textContent = n + (n === 1 ? ' artikkel' : ' artikler');
+});
+
 </script>
 <script>
 
 (async function checkAuth() {
   try {
-    var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    document.head.appendChild(script);
-    await new Promise(function(r) { script.onload = r; });
     var sb = supabase.createClient(
       'https://twckvtwzyadevqbyehnu.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
