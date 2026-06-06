@@ -262,6 +262,9 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
     </div>
     <p style="font-size:11px;color:#aaa;text-align:center;margin-top:1rem;">Ingen bindingstid · Avslutt når som helst</p>
 
+    <!-- Avslutningsnotis (vises når abonnementet er markert for avslutning) -->
+    <div id="cancelNotice" style="display:none;font-size:13px;color:#8B6E3A;background:#FFF8E7;border:1px solid #C8A96E;border-radius:12px;padding:10px 16px;text-align:center;line-height:1.5;margin-top:1rem;"></div>
+
     <!-- Kontohandlinger -->
     <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e8e8e8;display:flex;flex-direction:column;gap:8px;" id="accountBtns">
       <button id="cancelBtn" onclick="showCancelModal()" style="display:none;font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;">Avslutt abonnement</button>
@@ -277,6 +280,7 @@ const { createClient } = supabase;
 var sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
+let currentPlan = 'free';
 
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
@@ -370,10 +374,35 @@ function applyPlanBadge(plan) {
   }
 }
 
+// Viser "abonnementet avsluttes [dato]"-notis når cancel_at er satt (betalt plan).
+function applyCancelNotice(plan, cancelAt) {
+  var p = (plan || 'free').toLowerCase();
+  var notice = document.getElementById('cancelNotice');
+  var cancelBtn = document.getElementById('cancelBtn');
+  if (cancelAt && (p === 'investor' || p === 'proff')) {
+    var planName = p === 'proff' ? 'Proff' : 'Investor';
+    var dateStr = '';
+    try {
+      dateStr = new Date(cancelAt).toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch(e) {}
+    if (notice) {
+      notice.innerHTML = '📅 Abonnementet ditt avsluttes' + (dateStr ? ' <strong>' + dateStr + '</strong>' : ' ved periodeslutt') +
+        '. Du beholder ' + planName + '-tilgang frem til da.';
+      notice.style.display = 'block';
+    }
+    // Allerede markert for avslutning — skjul "Avslutt"-knappen
+    if (cancelBtn) cancelBtn.style.display = 'none';
+  } else {
+    if (notice) notice.style.display = 'none';
+  }
+}
+
 async function loadStreak(userId) {
   try {
-    const { data: planInfo } = await sb.from('user_plans').select('streak, plan').eq('user_id', userId).maybeSingle();
+    const { data: planInfo } = await sb.from('user_plans').select('streak, plan, cancel_at').eq('user_id', userId).maybeSingle();
+    currentPlan = (planInfo && planInfo.plan) || 'free';
     applyPlanBadge(planInfo && planInfo.plan);
+    applyCancelNotice(currentPlan, planInfo && planInfo.cancel_at);
     const streak = (planInfo && planInfo.streak) || 0;
     const streakEl = document.getElementById('streakBadge');
     if (!streakEl) return;
@@ -556,7 +585,15 @@ async function confirmCancel() {
     const data = await res.json();
     if (res.ok) {
       closeCancelModal();
-      alert('Abonnementet er avsluttet. Du beholder tilgang til betalingsperioden er over.');
+      var dateStr = '';
+      if (data.cancel_at) {
+        try { dateStr = new Date(data.cancel_at).toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' }); } catch(e) {}
+      }
+      alert(dateStr
+        ? 'Abonnementet avsluttes ' + dateStr + '. Du beholder tilgang frem til da.'
+        : 'Abonnementet er avsluttet. Du beholder tilgang til betalingsperioden er over.');
+      // Oppdater visningen umiddelbart
+      applyCancelNotice(currentPlan, data.cancel_at || true);
     } else if (data.error && data.error.includes('abonnement')) {
       closeCancelModal();
       alert('Du er på gratis-plan og har ingen aktivt abonnement å avslutte.');
