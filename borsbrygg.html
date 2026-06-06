@@ -26,6 +26,7 @@
 <meta name="twitter:description" content="Dagens viktigste børsnyheter forklart på 2 minutter. Ingen finanssjargong.">
 <meta name="twitter:image" content="https://borshjelpen.no/og-image.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/plans.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -251,6 +252,15 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
       <div class="bb-today-badge">Dagens utgave</div>
     </div>
 
+    <!-- Oppgrader-teaser for gratisbrukere -->
+    <div id="bbLockedTeaser" style="display:none;background:white;border:1px solid #e8e8e8;border-radius:16px;padding:3rem 2rem;text-align:center;margin-top:.5rem;">
+      <div style="font-size:42px;margin-bottom:1rem;">🔒</div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#1B3A5C;margin-bottom:8px;">Børsbrygg krever Investor</div>
+      <p style="font-size:14px;color:#666;max-width:440px;margin:0 auto 1.5rem;line-height:1.6;">Få dagens viktigste børsnyheter fra Oslo Børs forklart på 2 minutter — daglig, på vanlig norsk, med risiko og begge sider av saken. Tilgjengelig på Investor og Proff.</p>
+      <button onclick="location.href='/priser.html'" style="padding:12px 28px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Oppgrader til Investor →</button>
+    </div>
+
+    <div id="bbRealContent">
     <!-- Dagens utgave -->
     <div class="edition-card">
       <div class="edition-header">
@@ -283,6 +293,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
     </div>
     <div id="archiveMoreBtn" style="display:none;text-align:center;margin-top:12px;">
       <button onclick="loadMoreArchive()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:white;color:#1B3A5C;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">Last inn flere utgaver ↓</button>
+    </div>
     </div>
   </div>
 </div>
@@ -530,6 +541,26 @@ document.getElementById('archiveModal').addEventListener('click', function(e) {
       applySession(session.user);
       document.getElementById('lockedView').style.display = 'none';
       document.getElementById('subscriberView').style.display = 'block';
+
+      // Børsbrygg krever betalt plan (Investor/Proff). Hent brukerens plan.
+      var bbPlan = 'free';
+      try {
+        var bbPd = await sb.from('user_plans').select('plan').eq('user_id', session.user.id).maybeSingle();
+        bbPlan = (bbPd.data && bbPd.data.plan) || 'free';
+      } catch(e) {}
+      var bbDef = (window.PLANS && window.PLANS[bbPlan]) || null;
+      var bbHasAccess = bbDef ? bbDef.borsbrygg === true : (bbPlan === 'investor' || bbPlan === 'proff');
+
+      if (!bbHasAccess) {
+        // Gratisbruker: vis tittel + oppgrader-teaser. Ikke last innhold, ingen XP.
+        document.getElementById('bbRealContent').style.display = 'none';
+        document.getElementById('bbLockedTeaser').style.display = 'block';
+        return;
+      }
+
+      // Betalende bruker: full tilgang
+      document.getElementById('bbLockedTeaser').style.display = 'none';
+      document.getElementById('bbRealContent').style.display = 'block';
       loadBorsbrygg();
       loadWinnersLosers();
       loadArchive(true);
