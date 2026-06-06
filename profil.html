@@ -264,7 +264,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 
     <!-- Kontohandlinger -->
     <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e8e8e8;display:flex;flex-direction:column;gap:8px;" id="accountBtns">
-      <span id="cancelBtnWrap" style="display:none;"><button onclick="showCancelModal()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;">Avslutt abonnement</button></span>
+      <button id="cancelBtn" onclick="showCancelModal()" style="display:none;font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;">Avslutt abonnement</button>
       <button onclick="showDeleteModal()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #ffcccc;background:none;color:#A32D2D;cursor:pointer;font-family:'DM Sans',sans-serif;">Slett konto</button>
     </div>
   </div>
@@ -346,8 +346,8 @@ function applyPlanBadge(plan) {
     }
   }
   // Vis/skjul "Avslutt abonnement"-knappen — kun relevant for betalende
-  var cancelWrap = document.getElementById('cancelBtnWrap');
-  if (cancelWrap) cancelWrap.style.display = (p === 'investor' || p === 'proff') ? '' : 'none';
+  var cancelBtn = document.getElementById('cancelBtn');
+  if (cancelBtn) cancelBtn.style.display = (p === 'investor' || p === 'proff') ? 'block' : 'none';
 
   // Flytt "Din nåværende plan"-merket til riktig kort i oppgrader-seksjonen
   var freeMarker = document.getElementById('planMarkerFree');
