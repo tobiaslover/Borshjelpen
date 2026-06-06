@@ -1,7 +1,6 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 export const config = { api: { bodyParser: false } };
-
 async function getRawBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -10,7 +9,6 @@ async function getRawBody(req) {
     req.on('error', reject);
   });
 }
-
 // Finn bruker på e-post — paginerer gjennom alle sider, ikke bare den første.
 // (sb.auth.admin.listUsers() returnerer som standard kun ~50 brukere.)
 async function findUserByEmail(sb, email) {
@@ -28,7 +26,6 @@ async function findUserByEmail(sb, email) {
     page++;
   }
 }
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -42,11 +39,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Webhook feil: ' + err.message });
   }
   const session = event.data.object;
-
   if (event.type === 'checkout.session.completed') {
     const plan = session.metadata?.plan;
     let user = null;
-
     // 1) Foretrekk client_reference_id (vår egen user_id) — skalerer og er entydig.
     //    Send den med fra checkout.js (client_reference_id: user.id) for best resultat.
     if (session.client_reference_id) {
@@ -55,31 +50,28 @@ export default async function handler(req, res) {
         user = (r && r.data && r.data.user) || null;
       } catch (e) {}
     }
-
     // 2) Fallback: match på e-post (customer_email er ikke alltid satt — sjekk også customer_details).
     if (!user) {
       const email = session.customer_email || session.customer_details?.email;
       user = await findUserByEmail(sb, email);
     }
-
     if (user && plan) {
       await sb.from('user_plans').upsert({
         user_id: user.id,
         plan: plan,
         stripe_customer_id: session.customer,
         stripe_subscription_id: session.subscription,
+        cancel_at: null, // nytt/fornyet abonnement — fjern evt. tidligere avslutningsdato
         updated_at: new Date().toISOString()
       });
     }
   }
-
   if (event.type === 'customer.subscription.deleted') {
     const customerId = session.customer;
     const { data } = await sb.from('user_plans').select('user_id').eq('stripe_customer_id', customerId).maybeSingle();
     if (data) {
-      await sb.from('user_plans').update({ plan: 'free', updated_at: new Date().toISOString() }).eq('user_id', data.user_id);
+      await sb.from('user_plans').update({ plan: 'free', cancel_at: null, updated_at: new Date().toISOString() }).eq('user_id', data.user_id);
     }
   }
-
   res.status(200).json({ received: true });
 }
