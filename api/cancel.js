@@ -14,7 +14,6 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Ikke autentisert' });
   }
   const token = authHeader.replace('Bearer ', '');
-
   const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   // Hent bruker fra token
@@ -34,16 +33,25 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Ingen aktivt abonnement funnet' });
     }
 
-    await stripe.subscriptions.update(data.stripe_subscription_id, {
+    // Marker for avslutning ved periodeslutt. Abonnementet forblir AKTIVT i Stripe
+    // ut den betalte perioden. Vi nedgraderer IKKE planen i Supabase her —
+    // det gjøres av webhooken (customer.subscription.deleted) når perioden
+    // faktisk utløper, slik at brukeren beholder tilgangen ut perioden de har betalt for.
+    const sub = await stripe.subscriptions.update(data.stripe_subscription_id, {
       cancel_at_period_end: true
     });
 
-    await sb
-      .from('user_plans')
-      .update({ plan: 'free', updated_at: new Date().toISOString() })
-      .eq('user_id', user.id);
+    // Finn når perioden utløper (robust på tvers av Stripe API-versjoner)
+    let periodEnd = sub.current_period_end
+      || sub.cancel_at
+      || (sub.items && sub.items.data && sub.items.data[0] && sub.items.data[0].current_period_end)
+      || null;
 
-    res.status(200).json({ success: true });
+    res.status(200).json({
+      success: true,
+      cancel_at_period_end: true,
+      period_end: periodEnd // unix-tidsstempel (sekunder), eller null
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
