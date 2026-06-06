@@ -47,10 +47,18 @@ export default async function handler(req, res) {
       || (sub.items && sub.items.data && sub.items.data[0] && sub.items.data[0].current_period_end)
       || null;
 
+    // Lagre utløpsdatoen i Supabase (rører IKKE plan — brukeren beholder tilgangen ut perioden).
+    const cancelAtISO = periodEnd ? new Date(periodEnd * 1000).toISOString() : null;
+    await sb
+      .from('user_plans')
+      .update({ cancel_at: cancelAtISO, updated_at: new Date().toISOString() })
+      .eq('user_id', user.id);
+
     res.status(200).json({
       success: true,
       cancel_at_period_end: true,
-      period_end: periodEnd // unix-tidsstempel (sekunder), eller null
+      period_end: periodEnd, // unix-tidsstempel (sekunder), eller null
+      cancel_at: cancelAtISO // ISO-dato, eller null
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
