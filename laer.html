@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aksjeguiden — Børshjelpen</title>
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/favicon.png">
-<meta name="description" content="Lær om aksjer og børsen på vanlig norsk. Gratis guider om hva en aksje er, P/E-tall, utbytte, bull og bear — uten finanssjargong. For nybegynnere på Oslo Børs.">
+<meta name="description" content="Lær om aksjer og børsen. Gratis guider om hva en aksje er, P/E-tall, utbytte, bull og bear — uten finanssjargong. For nybegynnere på Oslo Børs.">
 <meta name="keywords" content="lær om aksjer, hva er en aksje, P/E-tall forklart, utbytte aksjer, bull bear marked, Oslo Børs nybegynner, aksjer for nybegynnere">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://borshjelpen.no/laer.html">
@@ -14,7 +12,7 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://borshjelpen.no/laer.html">
-<meta property="og:title" content="Lær om børsen på vanlig norsk — Børshjelpen">
+<meta property="og:title" content="Lær om børsen — Børshjelpen">
 <meta property="og:description" content="Gratis guider om aksjer og børsen for nybegynnere. Alt fra hva en aksje er til hvordan du leser en kvartalsrapport.">
 <meta property="og:image" content="https://borshjelpen.no/og-image.png">
 <meta property="og:locale" content="nb_NO">
@@ -22,7 +20,7 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Lær om børsen på vanlig norsk — Børshjelpen">
+<meta name="twitter:title" content="Lær om børsen — Børshjelpen">
 <meta name="twitter:description" content="Gratis guider om aksjer for nybegynnere. Uten finanssjargong.">
 <meta name="twitter:image" content="https://borshjelpen.no/og-image.png">
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -203,7 +201,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 <nav class="nav">
   <a href="/oversikt.html" class="logo">Børs<span>hjelpen</span></a>
   <div class="nav-links">
-    <a href="/borshjelpen.html" id="navHjem">Hjem</a>
+    <a href="/borshjelpen.html">Hjem</a>
     <a href="/oversikt.html" id="navOversikt" style="display:none;">Oversikt</a>
     <a href="/aksjer.html">Aksjer</a>
     <a href="/laer.html">Aksjeguiden</a>
@@ -226,11 +224,11 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 
 <div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
-    <a href="/oversikt.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
+    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
     <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
   </div>
   <div style="display:flex;flex-direction:column;flex:1;">
-    <a href="/borshjelpen.html" id="mobileHjem" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/borshjelpen.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/oversikt.html" id="mobileOversikt" onclick="closeMobileMenu()" style="display:none;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📊</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Oversikt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjeguiden</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
@@ -411,7 +409,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 <div class="nl-cta">
   <div class="nl-cta-inner">
     <h2>Klar til å prøve i praksis?</h2>
-    <p>Søk opp en aksje og se hva AI-en forteller deg — alt forklart på vanlig norsk.</p>
+    <p>Søk opp en aksje og se hva AI-en forteller deg — alt forklart enkelt.</p>
     <a href="/aksjer.html" class="nl-cta-btn">Søk opp en aksje →</a>
   </div>
 </div>
@@ -458,8 +456,6 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('navUser').style.display = 'flex';
       if(document.getElementById('navOversikt')) document.getElementById('navOversikt').style.display = 'block';
       if(document.getElementById('mobileOversikt')) document.getElementById('mobileOversikt').style.display = 'flex';
-      if(document.getElementById('navHjem')) document.getElementById('navHjem').style.display = 'none';
-      if(document.getElementById('mobileHjem')) document.getElementById('mobileHjem').style.display = 'none';
       document.getElementById('navAv').textContent = initials;
       document.getElementById('navName').textContent = name.split(' ')[0];
       if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
