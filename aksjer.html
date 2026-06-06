@@ -174,6 +174,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 .wl-change-up { font-size: 12px; color: #2C7A5C; font-weight: 500; }
 .wl-change-down { font-size: 12px; color: #A32D2D; font-weight: 500; }
 .watchlist-limit { font-size: 11px; color: #C8A96E; text-align: right; margin-bottom: 6px; }
+.wl-empty { grid-column: 1 / -1; text-align: center; color: #aaa; font-size: 13px; line-height: 1.5; padding: 1.5rem 1rem; border: 1px dashed #e0e0e0; border-radius: 12px; }
 @media (max-width: 480px) { .watchlist-grid { grid-template-columns: repeat(2, 1fr); } }
 .hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 100; position: relative; }
 .hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
@@ -1424,13 +1425,20 @@ async function renderWatchlistBtn(s, inList) {
 }
 
 async function renderWatchlist() {
-  var list = await getWatchlist();
   var section = document.getElementById('watchlistSection');
   var grid = document.getElementById('watchlistGrid');
+  // Vis kun for innloggede brukere
+  var sbWl = window._sb;
+  var sessWl = sbWl ? (await sbWl.auth.getSession()).data.session : null;
+  if (!sessWl) { section.style.display = 'none'; return; }
+  var list = await getWatchlist();
   var limit = getWatchlistLimit();
-  if (!list.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   document.getElementById('watchlistLimit').textContent = list.length + '/' + (limit===Infinity?'∞':limit) + ' aksjer';
+  if (!list.length) {
+    grid.innerHTML = '<div class="wl-empty">Du følger ingen aksjer ennå. Søk opp en aksje og trykk <strong>«+ Watchlist»</strong> for å følge den her.</div>';
+    return;
+  }
   grid.innerHTML = list.map(function(s) {
     var card = '<div class="watchlist-card" onclick="search(&quot;' + s.ticker + '&quot;)">';
     card += '<button class="watchlist-remove" onclick="event.stopPropagation();removeFromWatchlist(&quot;' + s.ticker + '&quot;)" title="Fjern">✕</button>';
