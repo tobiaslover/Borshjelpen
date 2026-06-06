@@ -178,7 +178,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
       <div class="profile-name" id="profileName">Laster...</div>
       <div class="profile-email" id="profileEmail"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px;">
-        <div class="profile-plan" style="background:#E6EEF5;color:#1B3A5C;">🔵 Gratis</div>
+        <div class="profile-plan" id="subPlanBadge" style="background:#E6EEF5;color:#1B3A5C;">🔵 Gratis</div>
         <div class="profile-plan" id="profilePlan" style="background:#1B3A5C;color:#C8A96E;">🌱 Nybegynner</div>
         <div id="streakBadge" style="display:inline-flex;font-size:11px;padding:3px 12px;border-radius:100px;background:#1B3A5C;color:#C8A96E;font-weight:500;"></div>
         <button onclick="doLogout()" style="font-size:11px;padding:4px 14px;border-radius:100px;background:#f0f0f0;color:#888;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;display:inline-flex;align-items:center;">Logg ut</button>
@@ -223,7 +223,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
           <div style="font-size:12px;color:#555;">✓ Børsbrygg</div>
           <div style="font-size:12px;color:#555;">✓ Læring</div>
         </div>
-        <div style="font-size:12px;color:#1B3A5C;font-weight:500;text-align:center;">Din nåværende plan</div>
+        <div id="planMarkerFree" style="font-size:12px;color:#1B3A5C;font-weight:500;text-align:center;">Din nåværende plan</div>
       </div>
 
       <div style="background:linear-gradient(135deg,#e8e8e8,#f5f5f5);border:2px solid #aaa;border-radius:16px;padding:1.25rem;position:relative;">
@@ -239,7 +239,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
           <div style="font-size:12px;color:#444;">✓ Børsmeldinger oppsummert</div>
           <div style="font-size:12px;color:#444;">✓ Læring</div>
         </div>
-        <button onclick="location.href='/priser.html'" style="width:100%;padding:9px;border-radius:100px;border:none;background:#888;color:white;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Abonner →</button>
+        <button id="planBtnInvestor" onclick="location.href='/priser.html'" style="width:100%;padding:9px;border-radius:100px;border:none;background:#888;color:white;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Abonner →</button>
       </div>
 
       <div style="background:linear-gradient(135deg,#FFF8E7,#FFF0C0);border:2px solid #C8A96E;border-radius:16px;padding:1.25rem;">
@@ -256,7 +256,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
           <div style="font-size:12px;color:#555;">✓ Kvartalsrapporter oppsummert</div>
           <div style="font-size:12px;color:#555;">✓ Porteføljeanalyse</div>
         </div>
-        <button onclick="location.href='/priser.html'" style="width:100%;padding:9px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
+        <button id="planBtnProff" onclick="location.href='/priser.html'" style="width:100%;padding:9px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Kom i gang →</button>
       </div>
 
     </div>
@@ -264,7 +264,7 @@ nav { display: flex; align-items: center; padding: 1.2rem 2rem; background: whit
 
     <!-- Kontohandlinger -->
     <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e8e8e8;display:flex;flex-direction:column;gap:8px;" id="accountBtns">
-      <button onclick="showCancelModal()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;">Avslutt abonnement</button>
+      <span id="cancelBtnWrap" style="display:none;"><button onclick="showCancelModal()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;">Avslutt abonnement</button></span>
       <button onclick="showDeleteModal()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #ffcccc;background:none;color:#A32D2D;cursor:pointer;font-family:'DM Sans',sans-serif;">Slett konto</button>
     </div>
   </div>
@@ -325,9 +325,55 @@ async function loadProfileData(userId) {
   await loadWatchlist();
 }
 
+// Setter abonnement-badgen (Gratis/Investor/Proff) + flytter "Din nåværende plan"-merket
+// til riktig kort i oppgrader-seksjonen, basert på plan fra user_plans.
+function applyPlanBadge(plan) {
+  var p = (plan || 'free').toLowerCase();
+  var badge = document.getElementById('subPlanBadge');
+  if (badge) {
+    if (p === 'investor') {
+      badge.textContent = '📈 Investor';
+      badge.style.background = '#1B3A5C';
+      badge.style.color = '#C8A96E';
+    } else if (p === 'proff') {
+      badge.textContent = '👑 Proff';
+      badge.style.background = '#C8A96E';
+      badge.style.color = '#1B3A5C';
+    } else {
+      badge.textContent = '🔵 Gratis';
+      badge.style.background = '#E6EEF5';
+      badge.style.color = '#1B3A5C';
+    }
+  }
+  // Vis/skjul "Avslutt abonnement"-knappen — kun relevant for betalende
+  var cancelWrap = document.getElementById('cancelBtnWrap');
+  if (cancelWrap) cancelWrap.style.display = (p === 'investor' || p === 'proff') ? '' : 'none';
+
+  // Flytt "Din nåværende plan"-merket til riktig kort i oppgrader-seksjonen
+  var freeMarker = document.getElementById('planMarkerFree');
+  var btnInv = document.getElementById('planBtnInvestor');
+  var btnProff = document.getElementById('planBtnProff');
+  function makeCurrent(btn) {
+    if (!btn) return;
+    btn.textContent = 'Din nåværende plan';
+    btn.disabled = true;
+    btn.onclick = null;
+    btn.style.cursor = 'default';
+    btn.style.opacity = '0.7';
+  }
+  if (p === 'investor') {
+    if (freeMarker) { freeMarker.textContent = 'Abonner →'; freeMarker.style.cursor = 'pointer'; freeMarker.onclick = function(){ location.href='/priser.html'; }; }
+    makeCurrent(btnInv);
+  } else if (p === 'proff') {
+    if (freeMarker) { freeMarker.textContent = 'Abonner →'; freeMarker.style.cursor = 'pointer'; freeMarker.onclick = function(){ location.href='/priser.html'; }; }
+    makeCurrent(btnProff);
+  }
+}
+
 async function loadStreak(userId) {
   try {
-    const { data: planInfo } = await sb.from('user_plans').select('streak').eq('user_id', userId).maybeSingle();
+    const { data: planInfo } = await sb.from('user_plans').select('streak, plan').eq('user_id', userId).maybeSingle();
+    applyPlanBadge(planInfo && planInfo.plan);
     const streak = (planInfo && planInfo.streak) || 0;
     const streakEl = document.getElementById('streakBadge');
     if (!streakEl) return;
