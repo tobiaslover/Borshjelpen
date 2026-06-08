@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Børsbrygg — Daglig børsoppsummering — Børshjelpen</title>
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/favicon.png">
-<meta name="description" content="Børsbrygg — daglig børsoppsummering. Få dagens viktigste nyheter fra Oslo Børs forklart på 2 minutter, med risiko og begge sider av saken.">
+<meta name="description" content="Børsbrygg — daglig børsoppsummering på vanlig norsk. Få dagens viktigste nyheter fra Oslo Børs forklart på 2 minutter, med risiko og begge sider av saken.">
 <meta name="keywords" content="børsoppsummering, Oslo Børs nyheter, daglig børs, Børsbrygg, norske aksjenyheter, børs forklart norsk">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://borshjelpen.no/borsbrygg.html">
@@ -26,7 +24,6 @@
 <meta name="twitter:description" content="Dagens viktigste børsnyheter forklart på 2 minutter. Ingen finanssjargong.">
 <meta name="twitter:image" content="https://borshjelpen.no/og-image.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/plans.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -132,7 +129,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 <nav class="nav">
   <a href="/oversikt.html" class="logo">Børs<span>hjelpen</span></a>
   <div class="nav-links">
-    <a href="/borshjelpen.html" id="navHjem">Hjem</a>
+    <a href="/borshjelpen.html">Hjem</a>
     <a href="/oversikt.html" id="navOversikt" style="display:none;">Oversikt</a>
     <a href="/aksjer.html">Aksjer</a>
     <a href="/laer.html">Aksjeguiden</a>
@@ -155,11 +152,11 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
 
 <div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
-    <a href="/oversikt.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
+    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
     <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
   </div>
   <div style="display:flex;flex-direction:column;flex:1;">
-    <a href="/borshjelpen.html" id="mobileHjem" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/borshjelpen.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/oversikt.html" id="mobileOversikt" onclick="closeMobileMenu()" style="display:none;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📊</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Oversikt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
     <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjeguiden</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
@@ -252,15 +249,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
       <div class="bb-today-badge">Dagens utgave</div>
     </div>
 
-    <!-- Oppgrader-teaser for gratisbrukere -->
-    <div id="bbLockedTeaser" style="display:none;background:white;border:1px solid #e8e8e8;border-radius:16px;padding:3rem 2rem;text-align:center;margin-top:.5rem;">
-      <div style="font-size:42px;margin-bottom:1rem;">🔒</div>
-      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#1B3A5C;margin-bottom:8px;">Børsbrygg krever Investor</div>
-      <p style="font-size:14px;color:#666;max-width:440px;margin:0 auto 1.5rem;line-height:1.6;">Få dagens viktigste børsnyheter fra Oslo Børs forklart på 2 minutter — daglig, med risiko og begge sider av saken. Tilgjengelig på Investor og Proff.</p>
-      <button onclick="location.href='/priser.html'" style="padding:12px 28px;border-radius:100px;border:none;background:#C8A96E;color:#1B3A5C;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Oppgrader til Investor →</button>
-    </div>
-
-    <div id="bbRealContent">
     <!-- Dagens utgave -->
     <div class="edition-card">
       <div class="edition-header">
@@ -294,7 +282,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
     <div id="archiveMoreBtn" style="display:none;text-align:center;margin-top:12px;">
       <button onclick="loadMoreArchive()" style="font-size:13px;padding:8px 20px;border-radius:100px;border:1px solid #e8e8e8;background:white;color:#1B3A5C;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">Last inn flere utgaver ↓</button>
     </div>
-    </div>
   </div>
 </div>
 
@@ -325,7 +312,7 @@ const todayCap = today.charAt(0).toUpperCase() + today.slice(1);
 if (document.getElementById('bbTodayDate')) document.getElementById('bbTodayDate').textContent = todayCap;
 if (document.getElementById('editionDate')) document.getElementById('editionDate').textContent = todayCap;
 
-const watchlistTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY'];
+const watchlistTickers = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR','NHY','KAHOT'];
 let archiveOffset = 0;
 const ARCHIVE_PAGE = 10;
 
@@ -358,7 +345,7 @@ function renderEdition(ai, container) {
     '</div></div>' +
     '<div class="story"><div class="story-tag">⚠️ Risiko og muligheter</div><div class="story-title">Hold øye med dette</div><div class="story-text">' + (ai.risiko||'') + '</div></div>' +
     renderTips(ai.nybegynner_tips) +
-    '<div style="font-size:11px;color:#aaa;font-style:italic;margin-top:1rem;padding-top:1rem;border-top:1px solid #f0f0f0;">Kursdata fra Financial Modeling Prep · Ikke finansiell rådgivning</div>';
+    '<div style="font-size:11px;color:#aaa;font-style:italic;margin-top:1rem;padding-top:1rem;border-top:1px solid #f0f0f0;">Kursdata fra Yahoo Finance · Forsinket ca. 15 min · Ikke finansiell rådgivning</div>';
 }
 
 function renderTips(tips) {
@@ -387,7 +374,7 @@ async function loadBorsbrygg() {
 
     const sorted = [...valid].sort(function(a,b) { return parseFloat(b.changePct) - parseFloat(a.changePct); });
     const winner = sorted[0]; const loser = sorted[sorted.length-1];
-    const stockSummary = valid.map(function(s) { var sign = s.up ? '+' : '-'; return s.name + ' (' + s.ticker + '): ' + s.price + ' NOK, ' + sign + s.changePct + '%'; }).join(', ');
+    const stockSummary = valid.map(function(s) { const sign = parseFloat(s.changePct) >= 0 ? '+' : ''; return s.name + ' (' + s.ticker + '): ' + s.price + ' NOK, ' + sign + s.changePct + '%'; }).join(', ');
 
     const token = (await sb.auth.getSession()).data.session?.access_token || '';
     const res = await fetch('/api/borsbrygg', {
@@ -396,7 +383,18 @@ async function loadBorsbrygg() {
       body: JSON.stringify({ stockSummary })
     });
     const ai = await res.json();
-    if (ai.error) throw new Error(ai.error);
+    if (ai.error) { document.getElementById('editionBody').innerHTML = '<div class="edition-loading">' + ai.error + '</div>'; return; }
+
+    // Søndag/mandag viser siste utgave (fredagens, via lørdag) — oppdater dato + badge
+    // så det ikke ser ut som en fersk dagsutgave.
+    if (ai._edition_date) {
+      var ed = new Date(ai._edition_date + 'T12:00:00');
+      var eds = ed.toLocaleDateString('nb-NO', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+      var edsCap = eds.charAt(0).toUpperCase() + eds.slice(1);
+      var elD = document.getElementById('editionDate'); if (elD) elD.textContent = edsCap;
+      var elT = document.getElementById('bbTodayDate'); if (elT) elT.textContent = edsCap;
+      var elB = document.querySelector('.bb-today-badge'); if (elB) elB.textContent = 'Siste utgave';
+    }
 
     document.getElementById('editionTitle').textContent = ai.tittel || (winner.name.split(' ')[0] + ' opp ' + winner.changePct + '%');
     renderEdition(ai, document.getElementById('editionBody'));
@@ -529,8 +527,6 @@ document.getElementById('archiveModal').addEventListener('click', function(e) {
       document.getElementById('navUser').style.display = 'flex';
       if(document.getElementById('navOversikt')) document.getElementById('navOversikt').style.display = 'block';
       if(document.getElementById('mobileOversikt')) document.getElementById('mobileOversikt').style.display = 'flex';
-      if(document.getElementById('navHjem')) document.getElementById('navHjem').style.display = 'none';
-      if(document.getElementById('mobileHjem')) document.getElementById('mobileHjem').style.display = 'none';
       document.getElementById('navAv').textContent = initials;
       document.getElementById('navName').textContent = name.split(' ')[0];
       if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
@@ -541,26 +537,6 @@ document.getElementById('archiveModal').addEventListener('click', function(e) {
       applySession(session.user);
       document.getElementById('lockedView').style.display = 'none';
       document.getElementById('subscriberView').style.display = 'block';
-
-      // Børsbrygg krever betalt plan (Investor/Proff). Hent brukerens plan.
-      var bbPlan = 'free';
-      try {
-        var bbPd = await sb.from('user_plans').select('plan').eq('user_id', session.user.id).maybeSingle();
-        bbPlan = (bbPd.data && bbPd.data.plan) || 'free';
-      } catch(e) {}
-      var bbDef = (window.PLANS && window.PLANS[bbPlan]) || null;
-      var bbHasAccess = bbDef ? bbDef.borsbrygg === true : (bbPlan === 'investor' || bbPlan === 'proff');
-
-      if (!bbHasAccess) {
-        // Gratisbruker: vis tittel + oppgrader-teaser. Ikke last innhold, ingen XP.
-        document.getElementById('bbRealContent').style.display = 'none';
-        document.getElementById('bbLockedTeaser').style.display = 'block';
-        return;
-      }
-
-      // Betalende bruker: full tilgang
-      document.getElementById('bbLockedTeaser').style.display = 'none';
-      document.getElementById('bbRealContent').style.display = 'block';
       loadBorsbrygg();
       loadWinnersLosers();
       loadArchive(true);
