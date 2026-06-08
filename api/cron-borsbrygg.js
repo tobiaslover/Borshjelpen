@@ -3,6 +3,14 @@ export default async function handler(req, res) {
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+
+  // Ikke generer når gårsdagen ikke var en handelsdag (søndag/mandag i Oslo-tid).
+  // Cronen fyrer hver dag (01:00 UTC), men utgaven skal kun lages tirsdag–lørdag.
+  const osloDow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Oslo' })).getDay();
+  if (osloDow === 0 || osloDow === 1) {
+    return res.status(200).json({ skipped: true, reason: 'Ingen handelsdag i går (helg)' });
+  }
+
   const tickers = ['EQNR', 'DNB', 'AKRBP', 'TEL', 'MOWI', 'YAR', 'NHY'];
   try {
     // Hent kursdata for alle tickers
