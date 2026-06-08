@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="/config.js"></script>
 <title>Abonnement og priser — Børshjelpen</title>
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/favicon.png">
@@ -191,8 +192,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 
 <script>
 async function startCheckout(plan) {
-  const confirmed = confirm('Ved å fortsette aksepterer du at tjenesten starter umiddelbart og at du dermed gir avkall på 14 dagers angrerett etter angrerettloven.\n\nVil du fortsette?');
-  if (!confirmed) return;
   const btn = document.getElementById('btn-' + plan);
   if (btn) { btn.textContent = 'Laster...'; btn.disabled = true; }
   try {
@@ -225,8 +224,8 @@ async function startCheckout(plan) {
 (async function checkAuth() {
   try {
     var sb = supabase.createClient(
-      'https://twckvtwzyadevqbyehnu.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
+      window.SB_CONFIG.url,
+      window.SB_CONFIG.key
     );
     window._sb = sb;
     var sess = (await sb.auth.getSession()).data.session;
