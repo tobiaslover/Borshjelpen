@@ -75,24 +75,41 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).end();
 
-  // Auth-sjekk på POST.
-  // Internt cron-kall (samme server-miljø) autentiseres med CRON_SECRET og slipper
-  // forbi brukertoken-kravet. En brukertoken kan aldri være lik CRON_SECRET.
+  // Auth-sjekk på POST
   const authHeader = req.headers.authorization;
-  const cronSecret = process.env.CRON_SECRET;
-  const isCron = cronSecret && authHeader === `Bearer ${cronSecret}`;
-  if (!isCron) {
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Ikke autentisert' });
-    }
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await sb.auth.getUser(token);
-    if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Ikke autentisert' });
   }
+  const token = authHeader.replace('Bearer ', '');
+  const { data: { user }, error: authError } = await sb.auth.getUser(token);
+  if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
 
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
 
-  // Sjekk cache
+  // Ukedag i Oslo-tid: 0=søndag, 1=mandag ... 6=lørdag
+  const osloDow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Oslo' })).getDay();
+  // Børsbrygg oppsummerer FORRIGE handelsdag, publisert morgenen etter.
+  // Ny utgave lages kun når gårsdagen var en handelsdag (man–fre):
+  //   tirsdag(2)–lørdag(6) = ja  |  søndag(0) og mandag(1) = nei
+  const isGenerationDay = (osloDow >= 2 && osloDow <= 6);
+
+  // Returnér siste eksisterende utgave (når det ikke skal lages ny, f.eks. søn/man)
+  async function returnLatest() {
+    try {
+      const { data: latest } = await sb
+        .from('borsbrygg_editions')
+        .select('date, content')
+        .order('date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (latest && latest.content) {
+        return res.status(200).json(Object.assign({}, latest.content, { _edition_date: latest.date, _is_today: false }));
+      }
+    } catch (e) {}
+    return res.status(200).json({ error: 'Ingen utgave tilgjengelig ennå.' });
+  }
+
+  // Sjekk cache (dagens utgave finnes allerede)
   try {
     const { data: existing } = await sb
       .from('borsbrygg_editions')
@@ -104,8 +121,17 @@ export default async function handler(req, res) {
     }
   } catch (e) {}
 
+  // Ingen utgave for i dag ennå.
+  if (!isGenerationDay) {
+    // Søndag/mandag: ikke generer — vis siste eksisterende utgave (fredagens, via lørdag).
+    return await returnLatest();
+  }
+
   const { stockSummary } = req.body || {};
-  if (!stockSummary) return res.status(400).json({ error: 'stockSummary mangler' });
+  if (!stockSummary) {
+    // Mangler kursdata — fall tilbake til siste utgave i stedet for å feile.
+    return await returnLatest();
+  }
 
   // Hent ekte nyheter som kontekst (kun til AI — vises aldri offentlig)
   const newsDigest = await fetchNewsDigest();
@@ -121,9 +147,6 @@ export default async function handler(req, res) {
         {
           role: 'system',
           content: `Du er Børshjelpen sin daglige børskommentator — du skriver som en engasjert, ærlig venn som kan finans godt. Tonen er varm, direkte og forklarende — som en god morgenavis skrevet av noen som faktisk bryr seg om at leseren forstår. Ikke kald, ikke robotaktig. Bruk konkrete tall og eksempler. Forklar "hvorfor" bak tallene, ikke bare hva som skjedde.
-
-FORBUDTE ORD OG VURDERINGER (svært viktig):
-Bruk ALDRI verdiladede ord som feller en dom over en aksje eller kurs, og gi ALDRI kjøps- eller salgsråd. Følgende ord — og alt i samme gate — er strengt forbudt: "undervurdert", "overvurdert", "billig", "dyr", "kjøp", "selg", "kjøpskandidat", "salgskandidat", "sterk kjøp", "bør kjøpe", "bør selge", "verdt å kjøpe", "et godt kjøp", "anbefaler". Konkluder ALDRI med at en aksje er rimelig, dyr, attraktiv eller en god/dårlig investering. Beskriv hendelsene nøytralt og la leseren trekke konklusjonen selv.
 
 VIKTIG OM FAKTA — IKKE DIKT:
 Nederst i brukermeldingen får du (1) faktisk kursdata og ofte (2) en liste med FAKTISKE NYHETER fra siste døgn.
@@ -187,15 +210,24 @@ JSON-struktur (bruk eksakt disse nøklene):
       return res.status(500).json({ error: 'Ugyldig JSON fra AI: ' + e.message });
     }
 
-    // Lagre i Supabase (kun AI-ens omskrevne output — ikke rå-nyhetene)
-    try {
-      await sb.from('borsbrygg_editions').insert({
-        date: today,
-        title: ai.tittel || ('Børsbrygg ' + today),
-        content: ai
-      });
-    } catch (e) {
-      console.error('Supabase insert feil:', e.message);
+    // Lagre i Supabase. UNIQUE(date) garanterer maks ÉN utgave per dag.
+    const { error: insErr } = await sb.from('borsbrygg_editions').insert({
+      date: today,
+      title: ai.tittel || ('Børsbrygg ' + today),
+      content: ai
+    });
+
+    if (insErr) {
+      // En annen forespørsel rakk å lage dagens utgave først (unik-konflikt på date).
+      // Hent den LAGREDE utgaven og returner DEN, så alle får nøyaktig samme innhold.
+      const { data: canonical } = await sb
+        .from('borsbrygg_editions')
+        .select('content')
+        .eq('date', today)
+        .maybeSingle();
+      if (canonical && canonical.content) {
+        return res.status(200).json(canonical.content);
+      }
     }
 
     return res.status(200).json(ai);
