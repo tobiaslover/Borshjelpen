@@ -1,3 +1,4 @@
+
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 const PRICE_IDS = {
@@ -12,7 +13,6 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Kun POST støttes' });
   const { plan, email } = req.body || {};
   if (!plan || !PRICE_IDS[plan]) return res.status(400).json({ error: 'Ugyldig plan' });
-
   // Diagnostikk: bekreft at nødvendige miljøvariabler faktisk finnes i den kjørende
   // deployen (uten å lekke selve verdiene). Dukker dette opp i Vercel Logs, vet vi
   // umiddelbart om en variabel mangler/ikke er deployet.
@@ -30,7 +30,6 @@ export default async function handler(req, res) {
     console.error('CHECKOUT_ERROR: STRIPE_SECRET_KEY mangler i miljøet');
     return res.status(500).json({ error: 'Server mangler STRIPE_SECRET_KEY' });
   }
-
   // Hvis frontend sender en innlogget brukers token, verifiser den server-side og
   // bruk den VERIFISERTE bruker-id-en og e-posten. Det gjør webhook-matchingen
   // entydig (client_reference_id = user.id) og hindrer at klienten kan oppgi en
@@ -49,7 +48,6 @@ export default async function handler(req, res) {
       console.error('CHECKOUT_AUTH_WARN', e.message);
     }
   }
-
   try {
     const stripe = new Stripe(key);
     const session = await stripe.checkout.sessions.create({
@@ -57,6 +55,17 @@ export default async function handler(req, res) {
       payment_method_types: ['card'],
       line_items: [{ price: PRICE_IDS[plan], quantity: 1 }],
       allow_promotion_codes: true,
+      // Påkrevd avkrysning i Stripe Checkout: kunden må aktivt godta vilkårene og
+      // bekrefte at angreretten bortfaller før betaling. Stripe lagrer samtykket
+      // (consent.terms_of_service = accepted) med tidsstempel som dokumentasjon.
+      // Forutsetter at Terms of service-URL er satt under Stripe → Settings →
+      // Public details, ellers gir 'required' en feil.
+      consent_collection: { terms_of_service: 'required' },
+      custom_text: {
+        terms_of_service_acceptance: {
+          message: 'Jeg godtar [vilkårene](https://borshjelpen.no/vilkar.html) og bekrefter at tjenesten starter umiddelbart, slik at 14 dagers angrerett etter angrerettloven bortfaller.'
+        }
+      },
       customer_email: userEmail || email || undefined,
       client_reference_id: userId || undefined,
       success_url: 'https://borshjelpen.no/profil.html?subscribed=true',
