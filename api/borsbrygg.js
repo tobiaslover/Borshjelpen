@@ -138,12 +138,7 @@ export default async function handler(req, res) {
 
   try {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      max_tokens: 2000,
-      temperature: 0.3,
-      response_format: { type: 'json_object' },
-      messages: [
+    const messages = [
         {
           role: 'system',
           content: `Du er Børshjelpen sin daglige børskommentator — du skriver som en engasjert, ærlig venn som kan finans godt. Tonen er varm, direkte og forklarende — som en god morgenavis skrevet av noen som faktisk bryr seg om at leseren forstår. Ikke kald, ikke robotaktig. Bruk konkrete tall og eksempler. Forklar "hvorfor" bak tallene, ikke bare hva som skjedde.
@@ -156,6 +151,13 @@ Nederst i brukermeldingen får du (1) faktisk kursdata og ofte (2) en liste med 
 - Får du INGEN nyheter oppgitt: returner tom "nyheter"-liste, og hold "globale_faktorer" generell og forsiktig uten å påstå spesifikke hendelser du ikke har dekning for.
 
 Svar KUN med gyldig JSON. Bruk BARE ASCII-kompatible nøkkelnavn (ingen æøå i JSON-nøkler).
+
+INGEN INVESTERINGSRÅD — VIKTIG:
+- Gi ALDRI kjøps- eller salgsanbefalinger, kursmål eller spådommer om fremtidig kursutvikling.
+- Skriv BESKRIVENDE (hva som skjedde og hvorfor), ikke NORMATIVT (hva leseren bør gjøre).
+- Unngå formuleringer som kan leses som råd: "bør kjøpe/selge", "en god mulighet", "billig nå", "tiden for å gå inn", "anbefales", "vinneraksje" osv.
+- I "risiko" og "aksje_paavirkning": beskriv risikoer og faktiske hendelser nøytralt — ikke fortell leseren hva de skal gjøre med informasjonen.
+- Målet er å gi leseren forståelse til å ta egne, informerte valg — ikke å påvirke beslutningen.
 
 JSON-struktur (bruk eksakt disse nøklene):
 {
@@ -199,15 +201,77 @@ JSON-struktur (bruk eksakt disse nøklene):
               ? '\n\nFAKTISKE NYHETER fra siste døgn (bruk KUN disse — ikke dikt opp annet, og bruk de oppgitte kildene i "kilde"-feltene):\n' + newsDigest
               : '\n\nIngen nyheter er tilgjengelige akkurat nå. Returner tom "nyheter"-liste og hold "globale_faktorer" generell uten å påstå konkrete hendelser.')
         }
-      ]
-    });
+      ];
 
-    const raw = completion.choices[0].message.content;
-    let ai;
-    try {
-      ai = JSON.parse(raw);
-    } catch (e) {
-      return res.status(500).json({ error: 'Ugyldig JSON fra AI: ' + e.message });
+    // Genererer én utgave og parser JSON. Returnerer objekt eller null ved feil.
+    async function generate(extraMessages) {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        max_tokens: 2000,
+        temperature: 0.3,
+        response_format: { type: 'json_object' },
+        messages: extraMessages ? messages.concat(extraMessages) : messages
+      });
+      try {
+        return JSON.parse(completion.choices[0].message.content);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // DETERMINISTISK GUARDRAIL-FILTER:
+    // Skanner all generert tekst for formuleringer som kan leses som
+    // investeringsråd. Slår filteret ut, blir IKKE utgaven publisert som den er.
+    // (Backup til prompt-instruksen — prompten alene garanterer ikke at modellen
+    // aldri formulerer noe råd-aktig.)
+    const ADVICE_PATTERNS = [
+      /\bbør\s+(du\s+)?(kjøpe|selge|vurdere\s+å\s+kjøpe|vurdere\s+å\s+selge)/i,
+      /\b(kjøp|selg)\s+(nå|denne|aksjen)/i,
+      /\b(anbefal|anbefaler|anbefales|anbefaling)/i,
+      /\bkursmål\b/i,
+      /\b(gå\s+(inn|ut)\s+(i|av))\b/i,
+      /\b(en\s+)?(god|gylden|opplagt)\s+(kjøps?mulighet|mulighet\s+til\s+å\s+kjøpe)/i,
+      /\b(billig|dyr)\s+(akkurat\s+)?nå/i,
+      /\b(vinneraksje|tapsaksje)\b/i,
+      /\b(tiden\s+for\s+å\s+(kjøpe|selge|gå\s+inn))/i,
+      /\b(verdt\s+å\s+kjøpe|verdt\s+et\s+kjøp)\b/i,
+      /\blast\s+opp\b.*\baksj/i
+    ];
+    function flattenText(obj) {
+      let out = [];
+      (function walk(v) {
+        if (v == null) return;
+        if (typeof v === 'string') { out.push(v); return; }
+        if (Array.isArray(v)) { v.forEach(walk); return; }
+        if (typeof v === 'object') { Object.values(v).forEach(walk); return; }
+      })(obj);
+      return out.join(' \n ');
+    }
+    function containsAdvice(aiObj) {
+      if (!aiObj) return false;
+      const text = flattenText(aiObj);
+      return ADVICE_PATTERNS.some(re => re.test(text));
+    }
+
+    let ai = await generate(null);
+    if (!ai) {
+      return res.status(500).json({ error: 'Ugyldig JSON fra AI' });
+    }
+
+    // Slår filteret ut: prøv ÉN gang til med en strengere instruks.
+    if (containsAdvice(ai)) {
+      console.warn('BORSBRYGG_GUARDRAIL: råd-aktig formulering oppdaget — prøver på nytt.');
+      const retry = await generate([{
+        role: 'system',
+        content: 'FORRIGE FORSØK INNEHOLDT FORMULERINGER SOM KAN LESES SOM INVESTERINGSRÅD. Skriv om HELE utgaven rent beskrivende. Ingen kjøps-/salgsord, ingen "bør", ingen "anbefal", ingen kursmål, ingen "mulighet"/"billig nå"/"vinneraksje". Beskriv kun hva som skjedde og hvorfor. Svar KUN med gyldig JSON i samme struktur.'
+      }]);
+      if (retry && !containsAdvice(retry)) {
+        ai = retry;
+      } else {
+        // Fortsatt råd-aktig (eller feil): IKKE publiser. Vis forrige rene utgave.
+        console.warn('BORSBRYGG_GUARDRAIL: fortsatt råd-aktig etter nytt forsøk — viser siste utgave i stedet.');
+        return await returnLatest();
+      }
     }
 
     // Lagre i Supabase. UNIQUE(date) garanterer maks ÉN utgave per dag.
