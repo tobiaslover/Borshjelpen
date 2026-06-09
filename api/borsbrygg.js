@@ -225,6 +225,7 @@ JSON-struktur (bruk eksakt disse nøklene):
     // (Backup til prompt-instruksen — prompten alene garanterer ikke at modellen
     // aldri formulerer noe råd-aktig.)
     const ADVICE_PATTERNS = [
+      // --- Direkte kjøps-/salgssignaler ---
       /\bbør\s+(du\s+)?(kjøpe|selge|vurdere\s+å\s+kjøpe|vurdere\s+å\s+selge)/i,
       /\b(kjøp|selg)\s+(nå|denne|aksjen)/i,
       /\b(anbefal|anbefaler|anbefales|anbefaling)/i,
@@ -235,7 +236,54 @@ JSON-struktur (bruk eksakt disse nøklene):
       /\b(vinneraksje|tapsaksje)\b/i,
       /\b(tiden\s+for\s+å\s+(kjøpe|selge|gå\s+inn))/i,
       /\b(verdt\s+å\s+kjøpe|verdt\s+et\s+kjøp)\b/i,
-      /\blast\s+opp\b.*\baksj/i
+      /\blast\s+opp\b.*\baksj/i,
+
+      // --- Direkte oppfordringer ---
+      /\b(du|man)\s+bør\b/i,
+      /\bdet\s+lønner\s+seg\b/i,
+      /\b(smart|lurt)\s+å\s/i,
+      /\bverdt\s+å\s+vurdere\b/i,
+      /\bvurder(e)?\s+(å\s+)?(kjøpe|selge)/i,
+      /\bikke\s+gå\s+glipp\b/i,
+      /\bbenytt\s+sjansen\b/i,
+      /\bgrip\s+(muligheten|sjansen)\b/i,
+      /\bposisjoner\s+deg\b/i,
+      /\bsikre\s+deg\b/i,
+      /\bfå\s+med\s+deg\b/i,
+      /\bta\s+rygg\b/i,
+
+      // --- Verdivurderinger som antyder handling ---
+      /\b(underpriset|overpriset|undervurdert|overvurdert)\b/i,
+      /\battraktiv(t)?\s+(prising|nivå|priset|inngang)/i,
+      /\bgunstig\s+(inngang|nivå|kjøp|priset)/i,
+      /\b(godt|bra)\s+inngangspunkt\b/i,
+      /\bbillig\s+på\s+disse\s+nivå/i,
+      /\b(en\s+)?god\s+deal\b/i,
+      /\bhandles\s+med\s+rabatt\b/i,
+      /\b(oppside|nedside)\b/i,
+      /\bpotensial(e|et)?\s+til\s+å\s+(stige|øke|doble)/i,
+      /\bligger\s+an\s+til\s+å\s+(stige|øke|falle|synke)/i,
+
+      // --- Spådommer om fremtidig kurs ---
+      /\bvil\s+(stige|falle|øke|synke)\b/i,
+      /\bkommer\s+til\s+å\s+(stige|falle|øke|synke)/i,
+      /\bventes\s+å\s+nå/i,
+      /\bkan\s+doble\s+seg\b/i,
+      /\bpå\s+vei\s+(opp|ned)\b/i,
+      /\bser\s+lyst\s+ut\s+fremover\b/i,
+      /\b(bunnen|toppen)\s+er\s+nådd/i,
+      /\bklar\s+for\s+(oppgang|nedgang)\b/i,
+
+      // --- Myke føringer ---
+      /\baksje\s+å\s+følge\s+med\s+på/i,
+      /\b(en\s+av\s+)?favoritt/i,
+      /\bspennende\s+case\b/i,
+      /\baksje\s+for\s+langsiktige\b/i,
+      /\bpasser\s+for\s+deg\s+som\b/i,
+      /\bnoe\s+for\s+den\s+tålmodige\b/i,
+      /\btåler\s+en\s+støyt\b/i,
+      /\btrygg\s+havn\b/i,
+      /\bdefensivt\s+valg\b/i
     ];
     function flattenText(obj) {
       let out = [];
