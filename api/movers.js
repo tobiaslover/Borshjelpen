@@ -1,5 +1,5 @@
 // Henter fra Financial Modeling Prep (FMP):
-// - OBX og OSEBX indeksnivåer (med fallback: beregnet fra aksjene hvis FMP ikke har indeksen)
+// - OBX og OSEBX indeksnivåer (KUN faktiske indeksverdier fra FMP)
 // - Vinnere og tapere fra OBX-aksjene (25 mest likvide), priset i NOK via .OL
 
 // OBX-komponenter (oppdatert juni 2026)
@@ -32,9 +32,11 @@ const OBX_TICKERS = [
   'BAKKA',  // Bakkafrost
 ];
 
-// Mulige FMP-symboler for indeksene (prøves i rekkefølge, første som gir pris vinner)
-const OBX_INDEX_SYMBOLS = ['^OBX', 'OBX.OL'];
-const OSEBX_INDEX_SYMBOLS = ['^OSEBX', 'OSEBX.OL'];
+// Mulige FMP-symboler for indeksene (prøves i rekkefølge, første som gir pris vinner).
+// MERK: oppdater disse til det symbolet som faktisk returnerer pris fra din FMP-plan.
+// Test i nettleser: https://financialmodelingprep.com/stable/quote?symbol=^OSEBX&apikey=DIN_KEY
+const OBX_INDEX_SYMBOLS = ['^OBX', 'OBX.OL', 'OBX'];
+const OSEBX_INDEX_SYMBOLS = ['^OSEBX', 'OSEBX.OL', 'OSEBX'];
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -94,22 +96,27 @@ export default async function handler(req, res) {
     indexSymbols.forEach((sym, i) => { indexParsed[sym] = parseIndex(pickOne(indexRaws[i])); });
     function firstIndex(syms) { for (const s of syms) { if (indexParsed[s]) return indexParsed[s]; } return null; }
 
-    let obx = firstIndex(OBX_INDEX_SYMBOLS);
-    let osebx = firstIndex(OSEBX_INDEX_SYMBOLS);
+    // Diagnostikk i Vercel Logs: hvilke(t) indeks-symbol returnerte faktisk en pris?
+    // Bruk dette til å finne riktig FMP-symbol, og oppdater listene øverst.
+    const indexDebug = {};
+    indexSymbols.forEach((sym, i) => {
+      const q = pickOne(indexRaws[i]);
+      indexDebug[sym] = (q && q.price != null) ? Number(q.price) : null;
+    });
+    console.log('MOVERS_INDEX_DEBUG', indexDebug);
 
-    // Parse OBX-aksjer
+    // KUN ekte indeksverdier fra FMP. Finnes de ikke, er obx/osebx = null,
+    // og frontend viser "—" / utilgjengelig.
+    //
+    // VIKTIG: vi fabrikkerer IKKE lenger et indekstall fra gjennomsnittet av
+    // OBX-aksjene. Et uvektet snitt av et utvalg aksjer er ikke den faktiske
+    // (markedsvekt-justerte) indeksen og kan vise FEIL retning — det er verre
+    // enn å vise ingenting på en finanstjeneste.
+    const obx = firstIndex(OBX_INDEX_SYMBOLS);
+    const osebx = firstIndex(OSEBX_INDEX_SYMBOLS);
+
+    // Parse OBX-aksjer (brukes til vinnere/tapere — ekte per-aksje-kurser)
     const stocks = OBX_TICKERS.map((t, i) => parseStock(pickOne(stockRaws[i]), t)).filter(Boolean);
-
-    // Fallback hvis FMP ikke har indeksen: beregn snitt-endring fra aksjene (pris = null)
-    if ((!obx || !obx.price) && stocks.length) {
-      const avgChange = stocks.reduce((sum, s) => sum + s.changePctRaw, 0) / stocks.length;
-      obx = { price: null, change: avgChange.toFixed(2), changePct: Math.abs(avgChange).toFixed(2), up: avgChange >= 0 };
-    }
-    if ((!osebx || !osebx.price) && stocks.length) {
-      // OSEBX er bredere enn OBX — estimert litt mer stabil
-      const avgChange = (stocks.reduce((sum, s) => sum + s.changePctRaw, 0) / stocks.length) * 0.95;
-      osebx = { price: null, change: avgChange.toFixed(2), changePct: Math.abs(avgChange).toFixed(2), up: avgChange >= 0 };
-    }
 
     // Sorter OBX-aksjer for vinnere/tapere
     const sorted = [...stocks].sort((a, b) => b.changePctRaw - a.changePctRaw);
