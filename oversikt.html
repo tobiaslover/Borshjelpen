@@ -254,8 +254,8 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
   <!-- INDEKSER + VINNERE/TAPERE -->
   <div class="grid-3col">
     <div class="card">
-      <div class="card-title">Indekser</div>
-      <div id="indexList"><div class="spinner"></div></div>
+      <div class="card-title">Indekser <span style="font-size:10px;background:#FFF3E0;color:#7a4000;padding:2px 7px;border-radius:100px;font-weight:500;margin-left:6px;letter-spacing:0.5px;">🔧 Under utvikling</span></div>
+      <div id="indexList" style="text-align:center;padding:1.5rem 0;color:#aaa;font-size:13px;">🔧 Under utvikling — kommer snart</div>
     </div>
     <div class="card">
       <div class="card-title">🏆 OBX Vinnere <button onclick="openMoversModal()" style="font-size:11px;color:#C8A96E;font-weight:400;margin-left:8px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;">Se alle →</button></div>
@@ -482,9 +482,9 @@ async function loadIndexes() {
       '</div>';
     }
 
-    document.getElementById('indexList').innerHTML =
-      renderIndex('OBX', 'Oslo Børs 25 største', obx) +
-      renderIndex('OSEBX', 'Oslo Børs Benchmark', osebx);
+    // Indeks-kortet står i "under utvikling"-modus (FMP-planen dekker ikke
+    // OSEBX/OBX). Vi overskriver derfor IKKE #indexList her. Vinnere/tapere
+    // under bruker fortsatt ekte aksjedata.
 
     var winners = data.winners || [];
     var losers = data.losers || [];
@@ -518,7 +518,7 @@ async function loadIndexes() {
     document.getElementById('losersList').innerHTML = lHtml;
 
   } catch(e) {
-    document.getElementById('indexList').innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente indeksdata.</div>';
+    // Ikke overskriv indeks-kortet (står i "under utvikling"-modus).
     var wl = document.getElementById('winnersList'); if (wl) wl.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente data.</div>';
     var ll = document.getElementById('losersList'); if (ll) ll.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente data.</div>';
   }
