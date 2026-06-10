@@ -594,9 +594,12 @@ function renderStock(s) {
     '</div>' +
     '<div class="disclaimer">Kurs- og nøkkeltall fra Financial Modeling Prep · Ikke finansiell rådgivning</div>';
   document.getElementById('trending').innerHTML = '';
-  // Skjul watchlist-overskrift og portefølje når aksje er søkt opp
+  // Skjul watchlist og portefølje når en aksje er søkt opp
+  // (de vises kun på forsiden av aksjesøk — ikke på en aksjetreffside)
   var pfSec = document.getElementById('portfolioSection');
   if (pfSec) pfSec.style.display = 'none';
+  var wlSec = document.getElementById('watchlistSection');
+  if (wlSec) wlSec.style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
   loadQuarterlyReport(s);
   renderWatchlistBtn(s);
@@ -1427,6 +1430,10 @@ async function renderWatchlistBtn(s, inList) {
 async function renderWatchlist() {
   var section = document.getElementById('watchlistSection');
   var grid = document.getElementById('watchlistGrid');
+  // Watchlisten skal KUN vises på forsiden av aksjesøk (ingen aksje åpen).
+  // Er en aksje søkt opp, hold den skjult uansett når denne kjøres
+  // (f.eks. etter toggle av watchlist, eller ved ?ticker=-dyplenke).
+  if (currentStockContext) { section.style.display = 'none'; return; }
   // Vis kun for innloggede brukere
   var sbWl = window._sb;
   var sessWl = sbWl ? (await sbWl.auth.getSession()).data.session : null;
