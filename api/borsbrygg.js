@@ -127,11 +127,15 @@ export default async function handler(req, res) {
     return await returnLatest();
   }
 
-  const { stockSummary } = req.body || {};
+  const { stockSummary, hasIndexData } = req.body || {};
   if (!stockSummary) {
     // Mangler kursdata — fall tilbake til siste utgave i stedet for å feile.
     return await returnLatest();
   }
+  // hasIndexData = true KUN når cronen faktisk fikk ekte OSEBX/OBX-data fra movers.
+  // Mangler feltet (eller er false), behandler vi det som "ingen indeksdata" —
+  // da skal utgaven ALDRI påstå en samlet børsretning (backstop nedenfor).
+  const indexDataPresent = hasIndexData === true;
 
   // Hent ekte nyheter som kontekst (kun til AI — vises aldri offentlig)
   const newsDigest = await fetchNewsDigest();
@@ -150,6 +154,12 @@ Nederst i brukermeldingen får du (1) faktisk kursdata og ofte (2) en liste med 
 - Finn ALDRI opp nyheter, hendelser, tall, sitater eller selskapshendelser som ikke står i dataene.
 - Får du INGEN nyheter oppgitt: returner tom "nyheter"-liste, og hold "globale_faktorer" generell og forsiktig uten å påstå spesifikke hendelser du ikke har dekning for.
 
+INGEN OPPDIKTET SAMLET BØRSRETNING — SVÆRT VIKTIG:
+- Øverst i kursdataen får du enten en INDEKS-linje med FAKTISK indeksverdi (OSEBX/OBX), ELLER beskjed om at ingen offisiell indeksdata finnes.
+- KUN hvis du faktisk får en indeksverdi, kan du skrive at "Oslo Børs / OSEBX steg/falt X %". Bruk da tallet som er oppgitt — finn aldri på et eget.
+- Får du IKKE indeksdata: påstå ALDRI en samlet børs- eller indeksretning, og finn ALDRI opp et indekstall (f.eks. "Oslo Børs steg 1,12 %"). Et utvalg enkeltaksjer er IKKE den markedsvekt-justerte hovedindeksen og kan peke FEIL vei. Dette gjelder også tittelen.
+- Beskriv da i stedet konkret hvilke av de største aksjene som steg og hvilke som falt. Du kan henvise til bredde-tallet ("blant de største steg X og falt Y"), men kall det aldri "Oslo Børs steg/falt".
+
 Svar KUN med gyldig JSON. Bruk BARE ASCII-kompatible nøkkelnavn (ingen æøå i JSON-nøkler).
 
 INGEN INVESTERINGSRÅD — VIKTIG:
@@ -162,7 +172,7 @@ INGEN INVESTERINGSRÅD — VIKTIG:
 JSON-struktur (bruk eksakt disse nøklene):
 {
   "tittel": "Engasjerende tittel på maks 10 ord — som en avisoverskrift, ikke en rapport",
-  "hva_skjedde": "3-4 setninger om hva som skjedde på Oslo Børs I GÅR. Vær konkret — bruk faktiske tall fra kursdataen. Forklar HVORFOR børsen gikk opp eller ned, ikke bare at den gjorde det.",
+  "hva_skjedde": "4-5 setninger om hva som skjedde blant de største aksjene på Oslo Børs I GÅR. Ta utgangspunkt i de faktiske aksjene du har data på: hvem steg mest, hvem falt mest, og hvilke bevegelser som er verdt å merke seg — inkludert en eller to mindre opplagte bevegelser blant de største (en aksje som overrasket på opp- eller nedsiden). Bruk faktiske tall fra kursdataen. Forklar HVORFOR de største bevegelsene skjedde der du har grunnlag for det. IKKE påstå en samlet børs- eller indeksretning med mindre du faktisk har fått indeksdata oppgitt.",
   "globale_faktorer": "2-3 setninger om globale faktorer som påvirket børsen I GÅR, basert på de oppgitte nyhetene. Hva skjedde i USA, Kina, med oljeprisen, rentene eller valutamarkedet som spilte inn?",
   "nyheter": [
     {
@@ -176,7 +186,7 @@ JSON-struktur (bruk eksakt disse nøklene):
     {
       "ticker": "EQNR",
       "navn": "Equinor",
-      "forklaring": "Konkret forklaring på hva som skjedde med aksjen og HVORFOR — bruk faktiske tall der de er tilgjengelige"
+      "forklaring": "Konkret forklaring på hva som skjedde med aksjen og HVORFOR — bruk faktiske tall der de er tilgjengelige. Ta med flere aksjer i denne listen: de største vinnerne OG de største taperne du har data på, samt gjerne en mindre opplagt bevegelse som er verdt å merke seg."
     }
   ],
   "risiko": "2-3 setninger om hva investorer bør holde øye med fremover. Vær spesifikk — hva er de faktiske risikoene akkurat nå, ikke generelle advarsler.",
@@ -301,23 +311,49 @@ JSON-struktur (bruk eksakt disse nøklene):
       return ADVICE_PATTERNS.some(re => re.test(text));
     }
 
+    // BACKSTOP MOT OPPDIKTET BØRSRETNING:
+    // Fanger påstander om at hele børsen/hovedindeksen steg eller falt. Brukes
+    // KUN når vi ikke har ekte indeksdata (indexDataPresent === false) — da skal
+    // utgaven beskrive enkeltaksjer, ikke påstå en samlet retning vi ikke vet.
+    // Mønstrene er forankret i indeks-/børsord + retning, så vanlige per-aksje-
+    // setninger ("Equinor steg 2 %") trigger dem IKKE.
+    const INDEX_DIRECTION_PATTERNS = [
+      /\boslo\s*børs(en)?\b[^.]{0,60}?\b(steg|falt|stiger|faller|gikk\s+(opp|ned)|endte\s+(opp|ned|i\s+(pluss|minus))|klatret|stupte|sank|løftet\s+seg|trakk\s+(opp|ned))/i,
+      /\b(osebx|obx|hovedindeksen|hovedindeks|referanseindeksen)\b[^.]{0,60}?\b(steg|falt|stiger|faller|gikk\s+(opp|ned)|endte|opp|ned|i\s+(pluss|minus)|klatret|stupte|sank)/i,
+      /\b(børsen|markedet)\s+(samlet\s+)?(steg|falt|stiger|faller|gikk\s+(opp|ned)|endte\s+(opp|ned|i\s+(pluss|minus)))/i,
+      /\b(oslo\s*børs|osebx|obx|hovedindeksen|hovedindeks)\b[^.]{0,40}?[+\-]?\d+[.,]\d+\s*%/i
+    ];
+    function claimsAggregateDirection(aiObj) {
+      if (!aiObj) return false;
+      return INDEX_DIRECTION_PATTERNS.some(re => re.test(flattenText(aiObj)));
+    }
+
+    // Returnerer hvilket guardrail som slo ut ('advice' | 'index'), ellers null.
+    function failsGuardrails(aiObj) {
+      if (containsAdvice(aiObj)) return 'advice';
+      if (!indexDataPresent && claimsAggregateDirection(aiObj)) return 'index';
+      return null;
+    }
+    const RETRY_INSTRUCTIONS = {
+      advice: 'FORRIGE FORSØK INNEHOLDT FORMULERINGER SOM KAN LESES SOM INVESTERINGSRÅD. Skriv om HELE utgaven rent beskrivende. Ingen kjøps-/salgsord, ingen "bør", ingen "anbefal", ingen kursmål, ingen "mulighet"/"billig nå"/"vinneraksje". Beskriv kun hva som skjedde og hvorfor. Svar KUN med gyldig JSON i samme struktur.',
+      index: 'FORRIGE FORSØK PÅSTOD EN SAMLET BØRS- ELLER INDEKSRETNING UTEN AT DET FINNES FAKTISK INDEKSDATA. Skriv om HELE utgaven uten å si at "Oslo Børs / OSEBX / OBX / hovedindeksen / markedet steg eller falt", og uten noe indekstall. Beskriv KUN de konkrete aksjene som steg og falt, med faktiske tall. Svar KUN med gyldig JSON i samme struktur.'
+    };
+
     let ai = await generate(null);
     if (!ai) {
       return res.status(500).json({ error: 'Ugyldig JSON fra AI' });
     }
 
-    // Slår filteret ut: prøv ÉN gang til med en strengere instruks.
-    if (containsAdvice(ai)) {
-      console.warn('BORSBRYGG_GUARDRAIL: råd-aktig formulering oppdaget — prøver på nytt.');
-      const retry = await generate([{
-        role: 'system',
-        content: 'FORRIGE FORSØK INNEHOLDT FORMULERINGER SOM KAN LESES SOM INVESTERINGSRÅD. Skriv om HELE utgaven rent beskrivende. Ingen kjøps-/salgsord, ingen "bør", ingen "anbefal", ingen kursmål, ingen "mulighet"/"billig nå"/"vinneraksje". Beskriv kun hva som skjedde og hvorfor. Svar KUN med gyldig JSON i samme struktur.'
-      }]);
-      if (retry && !containsAdvice(retry)) {
+    // Slår et guardrail ut: prøv ÉN gang til med en målrettet, strengere instruks.
+    const problem = failsGuardrails(ai);
+    if (problem) {
+      console.warn('BORSBRYGG_GUARDRAIL: ' + problem + ' oppdaget — prøver på nytt.');
+      const retry = await generate([{ role: 'system', content: RETRY_INSTRUCTIONS[problem] }]);
+      if (retry && !failsGuardrails(retry)) {
         ai = retry;
       } else {
-        // Fortsatt råd-aktig (eller feil): IKKE publiser. Vis forrige rene utgave.
-        console.warn('BORSBRYGG_GUARDRAIL: fortsatt råd-aktig etter nytt forsøk — viser siste utgave i stedet.');
+        // Fortsatt problem (eller feil): IKKE publiser. Vis forrige rene utgave.
+        console.warn('BORSBRYGG_GUARDRAIL: fortsatt problem etter nytt forsøk — viser siste utgave i stedet.');
         return await returnLatest();
       }
     }
