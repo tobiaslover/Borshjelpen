@@ -31,6 +31,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://borshjelpen.no/artikler/hva-er-ask.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://borshjelpen.no/priser.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
