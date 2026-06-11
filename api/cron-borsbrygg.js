@@ -57,6 +57,14 @@ export default async function handler(req, res) {
 
     const stockSummary = parts.join('\n\n');
 
+    // Øyeblikksbilde av vinnere/tapere som fryses inn i utgaven (topp 3 hver vei).
+    // borsbrygg.html viser dette uendret hele dagen i stedet for live /api/movers.
+    const snap = s => ({ ticker: s.ticker, name: s.name, changePct: s.changePct, up: s.up });
+    const moversSnapshot = {
+      winners: topGainers.slice(0, 3).map(snap),
+      losers: topFallers.slice(0, 3).map(snap)
+    };
+
     // Trigger Børsbrygg-generering (autentiser som internt cron-kall)
     const response = await fetch('https://borshjelpen.no/api/borsbrygg', {
       method: 'POST',
@@ -64,7 +72,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.CRON_SECRET}`
       },
-      body: JSON.stringify({ stockSummary, hasIndexData })
+      body: JSON.stringify({ stockSummary, hasIndexData, moversSnapshot })
     });
     const data = await response.json();
     return res.status(200).json({ success: true, title: data.tittel, stocks: all.length, hasIndexData });
