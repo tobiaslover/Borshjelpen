@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hva er utbytte? — Børshjelpen</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<meta name="description" content="Utbytte er en del av selskapets overskudd betalt ut til aksjonærene. Lær hvordan utbytte fungerer, hva ex-dato betyr og hvorfor kursen faller på utbyttedagen — forklart enkelt uten finanssjargong.">
+<meta property="og:title" content="Hva er utbytte? — Børshjelpen">
+<meta property="og:description" content="Utbytte er en del av selskapets overskudd betalt ut til aksjonærene. Lær hvordan det fungerer — forklart enkelt uten finanssjargong.">
+<meta name="keywords" content="hva er utbytte, utbytte aksjer, direkteavkastning, ex-dato, utbyttegrad, dividend, Oslo Børs, utbytte skatt, aksjer nybegynner">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://borshjelpen.no/hva-er-utbytte.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://borshjelpen.no/hva-er-utbytte.html">
+<meta property="og:image" content="https://borshjelpen.no/og-image.png">
+<meta property="og:locale" content="nb_NO">
+<meta property="og:site_name" content="Børshjelpen">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hva er utbytte? — Børshjelpen">
+<meta name="twitter:description" content="Utbytte er en del av selskapets overskudd betalt ut til aksjonærene. Lær hvordan det fungerer — forklart enkelt uten finanssjargong.">
+<meta name="twitter:image" content="https://borshjelpen.no/og-image.png">
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
+.logo span { color: #C8A96E; }
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #666; text-decoration: none; }
+.nav-links a:hover { color: #1B3A5C; }
+.nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 200; position: relative; }
+.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
+@media (max-width: 768px) { .nav-links { display: none !important; } .hamburger-btn { display: block; } }
+
+.hero { background: #1B3A5C; padding: 4rem 2rem; }
+.hero-inner { max-width: 760px; margin: 0 auto; }
+.breadcrumb { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 1.5rem; }
+.breadcrumb a { color: rgba(255,255,255,0.4); text-decoration: none; }
+.breadcrumb a:hover { color: #C8A96E; }
+.hero-label { font-size: 11px; color: #C8A96E; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: 48px; color: white; font-weight: 700; line-height: 1.15; margin-bottom: 1rem; }
+.hero-sub { font-size: 18px; color: rgba(255,255,255,0.6); line-height: 1.6; font-weight: 300; max-width: 580px; }
+.hero-meta { display: flex; gap: 1.5rem; margin-top: 2rem; font-size: 13px; color: rgba(255,255,255,0.35); }
+
+.article { max-width: 760px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+
+.toc { background: #f8f7f4; border-radius: 14px; padding: 1.5rem; margin-bottom: 3rem; }
+.toc-title { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+.toc ol { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 6px; }
+.toc li { font-size: 14px; }
+.toc a { color: #1B3A5C; text-decoration: none; }
+.toc a:hover { color: #C8A96E; }
+
+h2 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #1B3A5C; margin: 2.5rem 0 1rem; line-height: 1.2; }
+h3 { font-size: 18px; font-weight: 500; color: #1a1a1a; margin: 1.75rem 0 0.75rem; }
+p { font-size: 16px; line-height: 1.85; color: #333; margin-bottom: 1.25rem; }
+strong { color: #1a1a1a; font-weight: 500; }
+
+.highlight-box {
+  background: #EEE8DA;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.75rem 0;
+}
+.highlight-box p { color: #5a4520; margin-bottom: 0; font-size: 15px; }
+.highlight-box strong { color: #3a2800; }
+
+.example-box {
+  background: #E6EEF5;
+  border-left: 3px solid #1B3A5C;
+  border-radius: 0 12px 12px 0;
+  padding: 1.25rem 1.5rem;
+  margin: 1.75rem 0;
+}
+.example-box .ex-label { font-size: 10px; font-weight: 500; color: #1B3A5C; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.example-box p { color: #2a4a6a; margin-bottom: 0; font-size: 15px; }
+
+.key-terms { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.75rem 0; }
+.term-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1.25rem; }
+.term-name { font-size: 13px; font-weight: 500; color: #C8A96E; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.term-def { font-size: 14px; color: #555; line-height: 1.5; }
+
+.divider { width: 40px; height: 2px; background: #C8A96E; margin: 2.5rem 0; }
+
+.summary-box {
+  background: #1B3A5C;
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 3rem 0;
+}
+.summary-box h3 { color: #C8A96E; margin-top: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+.summary-box ul { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
+.summary-box li { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.5; }
+
+.cta-box {
+  background: #f8f7f4;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  margin-top: 3rem;
+}
+.cta-box h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 8px; color: #1B3A5C; }
+.cta-box p { font-size: 14px; color: #888; margin-bottom: 1.5rem; }
+.cta-btn { background: #1B3A5C; color: white; padding: 12px 28px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
+
+.disclaimer { font-size: 12px; color: #aaa; font-style: italic; border-top: 1px solid #e8e8e8; padding-top: 1.5rem; margin-top: 3rem; line-height: 1.6; }
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 32px; }
+  .key-terms { grid-template-columns: 1fr; }
+  .nav-links a { display: none; }
+}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Hva er utbytte?",
+  "description": "Utbytte er en del av selskapets overskudd betalt ut til aksjonærene. Lær hvordan utbytte fungerer, hva ex-dato betyr og hvorfor kursen faller på utbyttedagen — forklart enkelt uten finanssjargong.",
+  "author": {
+    "@type": "Organization",
+    "name": "Børshjelpen med hjelp av AI",
+    "url": "https://borshjelpen.no"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Børshjelpen",
+    "url": "https://borshjelpen.no",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://borshjelpen.no/og-image.png"
+    }
+  },
+  "datePublished": "2026-06-11",
+  "dateModified": "2026-06-11",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://borshjelpen.no/hva-er-utbytte.html"
+  },
+  "image": "https://borshjelpen.no/og-image.png",
+  "inLanguage": "nb-NO"
+}
+</script>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/oversikt.html" class="logo">Børs<span>hjelpen</span></a>
+  <div class="nav-links">
+    <a href="/borshjelpen.html" id="navHjem">Hjem</a>
+    <a href="/oversikt.html" id="navOversikt" style="display:none;">Oversikt</a>
+    <a href="/aksjer.html">Aksjer</a>
+    <a href="/laer.html">Aksjeguiden</a>
+    <a href="/borsbrygg.html">Børsbrygg</a>
+    <a href="/kontakt.html">Kontakt</a>
+    <a href="/om.html">Om oss</a>
+    <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
+      <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
+    </div>
+    <div id="navUser" style="display:none;align-items:center;gap:8px;">
+      <div onclick="location.href='/profil.html'" style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;border:1px solid #e8e8e8;cursor:pointer;">
+        <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+        <span id="navName" style="font-size:13px;font-weight:500;color:#1a1a1a;">Min side</span>
+      </div>
+    </div>
+  </div>
+  <button class="hamburger-btn" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
+</nav>
+
+<div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
+    <a href="/oversikt.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
+    <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
+  </div>
+  <div style="display:flex;flex-direction:column;flex:1;">
+    <a href="/borshjelpen.html" id="mobileHjem" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/oversikt.html" id="mobileOversikt" onclick="closeMobileMenu()" style="display:none;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📊</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Oversikt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjeguiden</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/kontakt.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">✉️</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Kontakt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/om.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">💡</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Om oss</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/priser.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">⭐</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Priser</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+  </div>
+  <div style="padding-top:1.5rem;">
+    <div id="mobileMenuUser" style="display:none;align-items:center;gap:12px;padding:12px 16px;background:#f8f7f4;border-radius:12px;cursor:pointer;margin-bottom:8px;" onclick="location.href='/profil.html'">
+      <div id="mobileMenuAv" style="width:40px;height:40px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:14px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+      <span id="mobileMenuName" style="font-size:15px;font-weight:500;">Min side</span>
+    </div>
+    <div id="mobileMenuAuth">
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:14px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Registrer deg gratis</button>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb"><a href="/laer.html">Lær</a> → Grunnleggende</div>
+    <div class="hero-label">Grunnleggende</div>
+    <h1>Hva er utbytte?</h1>
+    <p class="hero-sub">Utbytte er penger rett inn på kontoen — uten å selge en eneste aksje. Men det er ikke gratis penger, og det er ikke garantert. Her er hvordan det fungerer.</p>
+    <div class="hero-meta">
+      <span>⏱ 6 min lesetid</span>
+      <span>·</span>
+      <span>Nybegynnernivå</span>
+      <span>·</span>
+      <span>Børshjelpen med hjelp av AI · juni 2026</span>
+    </div>
+  </div>
+</div>
+
+<article class="article">
+
+  <div class="toc">
+    <div class="toc-title">I denne artikkelen</div>
+    <ol>
+      <li><a href="#hva">Hva er utbytte?</a></li>
+      <li><a href="#hvorfor">Hvorfor betaler noen selskaper utbytte?</a></li>
+      <li><a href="#datoer">De viktige datoene</a></li>
+      <li><a href="#gratis">Utbytte er ikke «gratis penger»</a></li>
+      <li><a href="#garanti">Utbytte er ikke garantert</a></li>
+      <li><a href="#skatt">Kort om skatt</a></li>
+      <li><a href="#begreper">Viktige begreper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="hva">Hva er utbytte?</h2>
+  <p>Utbytte er en <strong>del av overskuddet et selskap betaler ut til aksjonærene sine</strong>. Eier du aksjer i selskapet på riktig tidspunkt, får du penger rett inn på kontoen — uten å selge en eneste aksje. Det er selskapets måte å dele av fortjenesten med dem som eier en bit av det.</p>
+  <p>Selskapet bestemmer selv hvor mye som skal deles ut. Noen betaler én gang i året, noen kvartalsvis, og noen betaler ikke utbytte i det hele tatt.</p>
+
+  <div class="example-box">
+    <div class="ex-label">Eksempel</div>
+    <p>Du eier 100 aksjer, og styret bestemmer at det skal betales 5 kroner i utbytte per aksje. Da får du 100 × 5 = 500 kroner utbetalt. Aksjene dine ligger fortsatt der — du har bare fått en andel av overskuddet i tillegg.</p>
+  </div>
+
+  <h2 id="hvorfor">Hvorfor betaler noen selskaper utbytte?</h2>
+  <p>Et selskap som tjener penger står overfor et valg: skal overskuddet deles ut til eierne, eller pløyes tilbake inn i selskapet for å vokse videre?</p>
+  <p>Modne, stabile selskaper som tjener jevnt og trutt — for eksempel banker, forsikringsselskaper og en del energiselskaper — deler ofte ut en stor del av overskuddet, fordi de ikke trenger alle pengene til å vokse. På Oslo Børs er selskaper som Equinor og DNB kjent for å betale utbytte.</p>
+  <p>Yngre vekstselskaper, særlig innen teknologi, beholder gjerne pengene selv. De mener de kan skape mer verdi ved å investere i vekst enn ved å betale ut. At et selskap <strong>ikke</strong> betaler utbytte er altså ikke nødvendigvis negativt — det kan bety at de satser på å vokse.</p>
+
+  <h2 id="datoer">De viktige datoene</h2>
+  <p>Utbytte følger en fast rekkefølge av datoer, og det er lett å trå feil her som nybegynner. Det viktigste begrepet er <strong>ex-datoen</strong> (også kalt ex-utbytte-dagen).</p>
+  <p>For å ha rett på utbyttet må du eie aksjen <strong>før ex-datoen</strong>. Kjøper du aksjen på selve ex-datoen eller senere, går du glipp av denne utbetalingen — da tilfaller den den forrige eieren. Selve pengene kommer som regel på kontoen noen dager eller uker senere, på betalingsdagen.</p>
+
+  <div class="highlight-box">
+    <p><strong>Kort sagt:</strong> Det er ikke nok å eie aksjen den dagen utbyttet utbetales. Du må ha eid den før ex-datoen. Kjøper du for sent, får du verken utbyttet eller en rabatt — du betaler full pris uten å være med på utdelingen.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 id="gratis">Utbytte er ikke «gratis penger»</h2>
+  <p>Dette er kanskje det viktigste å forstå. På ex-datoen faller normalt aksjekursen omtrent like mye som utbyttet som betales ut. Deler selskapet ut 5 kroner per aksje, faller kursen typisk rundt 5 kroner den dagen.</p>
+  <p>Logikken er enkel: pengene som deles ut, forlater selskapet. Selskapet er dermed verdt litt mindre rett etterpå, og det gjenspeiles i kursen. Du har altså ikke «tjent» 5 kroner gratis — du har fått 5 kroner i kontanter, mens aksjen din ble omtrent 5 kroner mindre verdt. Verdien har <strong>flyttet seg</strong> fra aksjekurs til kontanter, ikke oppstått fra ingenting.</p>
+
+  <div class="highlight-box">
+    <p><strong>Betyr det at utbytte er meningsløst?</strong> Nei. Mange setter pris på den jevne kontantstrømmen, og over tid kan reinvestert utbytte utgjøre en stor del av totalavkastningen. Men det er en omfordeling av verdi, ikke en bonus på toppen — og det er greit å vite før man jakter på «høyt utbytte» alene.</p>
+  </div>
+
+  <h2 id="garanti">Utbytte er ikke garantert</h2>
+  <p>Utbytte er ikke en fast rettighet slik renter på et banklån er. Styret vedtar utbyttet for én periode av gangen, og det kan både settes opp, ned eller kuttes helt.</p>
+  <p>I dårlige tider — eller når et selskap trenger å spare penger — er utbyttekutt et av de første grepene som tas. Et høyt historisk utbytte er derfor ingen garanti for at det fortsetter. En aksje med svært høy direkteavkastning kan noen ganger være et tegn på at markedet forventer at utbyttet blir kuttet.</p>
+
+  <h2 id="skatt">Kort om skatt</h2>
+  <p>I Norge skattlegges utbytte til privatpersoner etter <strong>aksjonærmodellen</strong>. Forenklet betyr det at utbyttet ganges opp med en fastsatt faktor og deretter skattlegges, mens et såkalt skjermingsfradrag reduserer hvor mye du betaler skatt av.</p>
+  <p>Selve satsen og oppjusteringsfaktoren settes årlig i statsbudsjettet og endrer seg fra år til år, så sjekk gjeldende tall hos Skatteetaten. Dette er en generell forklaring, ikke skatterådgivning — har du et konkret tilfelle, er det lurt å bruke Skatteetatens egne ressurser eller en regnskapsfører.</p>
+
+  <h2 id="begreper">Viktige begreper</h2>
+
+  <div class="key-terms">
+    <div class="term-card">
+      <div class="term-name">Utbytte</div>
+      <div class="term-def">Kontantutbetaling til aksjonærene fra selskapets overskudd. Ikke alle selskaper betaler dette.</div>
+    </div>
+    <div class="term-card">
+      <div class="term-name">Direkteavkastning</div>
+      <div class="term-def">Utbytte i forhold til aksjekursen. 5 kr utbytte på en aksje til 100 kr gir 5 %. Gjør det lett å sammenligne på tvers av selskaper.</div>
+    </div>
+    <div class="term-card">
+      <div class="term-name">Utbyttegrad</div>
+      <div class="term-def">Hvor stor del av overskuddet som deles ut. Over 100 % betyr at selskapet deler ut mer enn det tjener.</div>
+    </div>
+    <div class="term-card">
+      <div class="term-name">Ex-dato</div>
+      <div class="term-def">Skjæringsdatoen. Du må eie aksjen før denne dagen for å ha rett på utbyttet.</div>
+    </div>
+    <div class="term-card">
+      <div class="term-name">Betalingsdag</div>
+      <div class="term-def">Dagen pengene faktisk kommer inn på kontoen — som regel litt etter ex-datoen.</div>
+    </div>
+    <div class="term-card">
+      <div class="term-name">Aksjonærmodellen</div>
+      <div class="term-def">Reglene for hvordan utbytte til privatpersoner skattlegges i Norge, med skjermingsfradrag.</div>
+    </div>
+  </div>
+
+  <div class="summary-box">
+    <h3>Oppsummering</h3>
+    <ul>
+      <li>Utbytte er en andel av selskapets overskudd betalt ut til aksjonærene</li>
+      <li>Modne selskaper betaler ofte utbytte; vekstselskaper beholder gjerne pengene</li>
+      <li>Du må eie aksjen før ex-datoen for å ha krav på utbyttet</li>
+      <li>Kursen faller normalt tilsvarende på ex-datoen — verdi flyttes, den oppstår ikke</li>
+      <li>Utbytte vedtas på nytt hver periode og er aldri garantert</li>
+    </ul>
+  </div>
+
+  <div class="cta-box">
+    <h3>Klar til å prøve?</h3>
+    <p>Søk opp en aksje og se hva Børshjelpen-AI forteller deg om den — uten finanssjargong.</p>
+    <a href="/aksjer.html" class="cta-btn">Søk opp en aksje →</a>
+  </div>
+
+  <p class="disclaimer">Dette er ikke finansiell rådgivning. Artikkelen er skrevet for informasjons- og opplæringsformål. Snakk alltid med en kvalifisert finansrådgiver før du tar investeringsbeslutninger. Børshjelpen org.nr. 936 537 758.</p>
+
+</article>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async function checkAuth() {
+  try {
+    var sb = supabase.createClient(
+      'https://twckvtwzyadevqbyehnu.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
+    );
+    var sess = (await sb.auth.getSession()).data.session;
+    if (sess) {
+      var name = (sess.user.user_metadata && sess.user.user_metadata.full_name) || sess.user.email.split('@')[0];
+      var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      document.getElementById('navAuth').style.display = 'none';
+      document.getElementById('navUser').style.display = 'flex';
+      if(document.getElementById('navOversikt')) document.getElementById('navOversikt').style.display = 'block';
+      if(document.getElementById('mobileOversikt')) document.getElementById('mobileOversikt').style.display = 'flex';
+      if(document.getElementById('navHjem')) document.getElementById('navHjem').style.display = 'none';
+      if(document.getElementById('mobileHjem')) document.getElementById('mobileHjem').style.display = 'none';
+      document.getElementById('navAv').textContent = initials;
+      document.getElementById('navName').textContent = name.split(' ')[0];
+      if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
+    }
+  } catch(e) {}
+})();
+function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
+</script>
+</body>
+</html>
