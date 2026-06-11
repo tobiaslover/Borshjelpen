@@ -21,12 +21,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://borshjelpen.no/hva-er-en-aksje.html</loc>
+    <loc>https://borshjelpen.no/artikler/hva-er-en-aksje.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://borshjelpen.no/hva-er-utbytte.html</loc>
+    <loc>https://borshjelpen.no/artikler/hva-er-utbytte.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
