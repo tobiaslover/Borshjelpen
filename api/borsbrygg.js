@@ -47,6 +47,36 @@ async function fetchNewsDigest() {
   return digest;
 }
 
+// Bygger et FAST øyeblikksbilde av vinnere/tapere som lagres SAMMEN med utgaven.
+// Da kan borsbrygg.html vise det uendret hele dagen, i stedet for å hente
+// /api/movers live (som bytter fra gårsdagens slutt til dagens intradag når
+// børsen åpner). Foretrekker øyeblikksbildet cronen sender; faller ellers
+// tilbake til ett serverkall mot /api/movers ved generering.
+async function buildMoversSnapshot(fromBody) {
+  const pick = s => ({ ticker: s.ticker, name: s.name, changePct: s.changePct, up: s.up });
+  if (fromBody && Array.isArray(fromBody.winners) && Array.isArray(fromBody.losers)
+      && (fromBody.winners.length || fromBody.losers.length)) {
+    return {
+      winners: fromBody.winners.slice(0, 3).map(pick),
+      losers: fromBody.losers.slice(0, 3).map(pick),
+      _frozen_at: new Date().toISOString()
+    };
+  }
+  try {
+    const data = await fetch('https://borshjelpen.no/api/movers').then(r => r.json());
+    const all = Array.isArray(data && data.all) ? data.all : [];
+    const gainers = all.filter(s => s.changePctRaw > 0);
+    const fallers = all.filter(s => s.changePctRaw < 0);
+    return {
+      winners: gainers.slice(0, 3).map(pick),
+      losers: fallers.slice().reverse().slice(0, 3).map(pick),
+      _frozen_at: new Date().toISOString()
+    };
+  } catch (e) {
+    return { winners: [], losers: [], _frozen_at: new Date().toISOString() };
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET');
@@ -127,7 +157,7 @@ export default async function handler(req, res) {
     return await returnLatest();
   }
 
-  const { stockSummary, hasIndexData } = req.body || {};
+  const { stockSummary, hasIndexData, moversSnapshot } = req.body || {};
   if (!stockSummary) {
     // Mangler kursdata — fall tilbake til siste utgave i stedet for å feile.
     return await returnLatest();
@@ -357,6 +387,9 @@ JSON-struktur (bruk eksakt disse nøklene):
         return await returnLatest();
       }
     }
+
+    // Frys vinnere/tapere inn i utgaven, så de står likt hele dagen.
+    ai.movers = await buildMoversSnapshot(moversSnapshot);
 
     // Lagre i Supabase. UNIQUE(date) garanterer maks ÉN utgave per dag.
     const { error: insErr } = await sb.from('borsbrygg_editions').insert({
