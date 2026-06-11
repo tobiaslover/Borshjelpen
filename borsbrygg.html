@@ -409,29 +409,26 @@ async function loadBorsbrygg() {
 
     document.getElementById('editionTitle').textContent = ai.tittel || (winner.name.split(' ')[0] + ' opp ' + winner.changePct + '%');
     renderEdition(ai, document.getElementById('editionBody'));
+    renderWinnersLosers(ai.movers);
   } catch(e) {
     document.getElementById('editionBody').innerHTML = '<div class="edition-loading">Kunne ikke laste innhold: ' + e.message + '</div>';
   }
 }
 
-async function loadWinnersLosers() {
-  try {
-    const res = await fetch('/api/movers');
-    const data = await res.json();
-    if (!res.ok) throw new Error('movers feil');
-    const winners = (data.winners || []).slice(0, 3);
-    const losers = (data.losers || []).slice(0, 3);
-    function renderItem(s) {
-      const cls = s.up ? 'up' : 'down';
-      const sign = s.up ? '+' : '-';
-      return '<div class="wl-item"><div><div class="wl-name">' + s.name.split(' ')[0] + '</div><div class="wl-ticker">' + s.ticker + '</div></div><div class="wl-pct ' + cls + '">' + sign + s.changePct + '%</div></div>';
-    }
-    document.getElementById('winnersList').innerHTML = winners.map(renderItem).join('') || '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
-    document.getElementById('losersList').innerHTML = losers.map(renderItem).join('') || '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
-  } catch(e) {
-    document.getElementById('winnersList').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
-    document.getElementById('losersList').innerHTML = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
+// Vinnere/tapere rendres fra det FROSNE øyeblikksbildet i utgaven (ai.movers),
+// ikke fra live /api/movers. Da står de likt hele dagen — også etter at børsen
+// åpner. Eldre utgaver uten øyeblikksbilde viser "Ingen data" til ny utgave lages.
+function renderWinnersLosers(movers) {
+  function renderItem(s) {
+    const cls = s.up ? 'up' : 'down';
+    const sign = s.up ? '+' : '-';
+    return '<div class="wl-item"><div><div class="wl-name">' + s.name.split(' ')[0] + '</div><div class="wl-ticker">' + s.ticker + '</div></div><div class="wl-pct ' + cls + '">' + sign + s.changePct + '%</div></div>';
   }
+  const empty = '<div style="padding:1rem;text-align:center;color:#aaa;font-size:13px;">Ingen data</div>';
+  const winners = (movers && Array.isArray(movers.winners)) ? movers.winners.slice(0, 3) : [];
+  const losers  = (movers && Array.isArray(movers.losers))  ? movers.losers.slice(0, 3)  : [];
+  document.getElementById('winnersList').innerHTML = winners.map(renderItem).join('') || empty;
+  document.getElementById('losersList').innerHTML = losers.map(renderItem).join('') || empty;
 }
 
 // Arkiv
@@ -571,7 +568,6 @@ document.getElementById('archiveModal').addEventListener('click', function(e) {
       document.getElementById('bbLockedTeaser').style.display = 'none';
       document.getElementById('bbRealContent').style.display = 'block';
       loadBorsbrygg();
-      loadWinnersLosers();
       loadArchive(true);
       try {
         // Sjekk om bruker allerede har fått XP for børsbrygg i dag
