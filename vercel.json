@@ -4,5 +4,9 @@
   ],
   "rewrites": [
     { "source": "/", "destination": "/borshjelpen.html" }
+  ],
+  "redirects": [
+    { "source": "/hva-er-en-aksje.html", "destination": "/artikler/hva-er-en-aksje.html", "permanent": true },
+    { "source": "/hva-er-utbytte.html", "destination": "/artikler/hva-er-utbytte.html", "permanent": true }
   ]
 }
