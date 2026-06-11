@@ -172,7 +172,7 @@ INGEN INVESTERINGSRÅD — VIKTIG:
 JSON-struktur (bruk eksakt disse nøklene):
 {
   "tittel": "Engasjerende tittel på maks 10 ord — som en avisoverskrift, ikke en rapport",
-  "hva_skjedde": "4-5 setninger om hva som skjedde blant de største aksjene på Oslo Børs I GÅR. Ta utgangspunkt i de faktiske aksjene du har data på: hvem steg mest, hvem falt mest, og hvilke bevegelser som er verdt å merke seg — inkludert en eller to mindre opplagte bevegelser blant de største (en aksje som overrasket på opp- eller nedsiden). Bruk faktiske tall fra kursdataen. Forklar HVORFOR de største bevegelsene skjedde der du har grunnlag for det. IKKE påstå en samlet børs- eller indeksretning med mindre du faktisk har fått indeksdata oppgitt.",
+  "hva_skjedde": "5-7 setninger om hva som skjedde blant de største aksjene på Oslo Børs I GÅR. Gi vinnere og tapere LIKE mye plass: forklar både hvem som steg mest og hvem som falt mest, med faktiske tall. Når aksjer beveget seg i hver sin retning samme dag (f.eks. en oljeaksje opp mens en forsvars- eller teknologiaksje ned), forklar HVORFOR de divergerte — ulike sektorer reagerer på ulike drivere (oljepris, renter, kvartalstall, sektorrotasjon, gevinstsikring). Ta også med en eller to mindre opplagte bevegelser blant de største. Bruk faktiske tall fra kursdataen, og forklar HVORFOR de største bevegelsene skjedde der du har grunnlag for det. IKKE påstå en samlet børs- eller indeksretning med mindre du faktisk har fått indeksdata oppgitt.",
   "globale_faktorer": "2-3 setninger om globale faktorer som påvirket børsen I GÅR, basert på de oppgitte nyhetene. Hva skjedde i USA, Kina, med oljeprisen, rentene eller valutamarkedet som spilte inn?",
   "nyheter": [
     {
@@ -186,7 +186,7 @@ JSON-struktur (bruk eksakt disse nøklene):
     {
       "ticker": "EQNR",
       "navn": "Equinor",
-      "forklaring": "Konkret forklaring på hva som skjedde med aksjen og HVORFOR — bruk faktiske tall der de er tilgjengelige. Ta med flere aksjer i denne listen: de største vinnerne OG de største taperne du har data på, samt gjerne en mindre opplagt bevegelse som er verdt å merke seg."
+      "forklaring": "Konkret forklaring på hva som skjedde med aksjen og HVORFOR — bruk faktiske tall. Lag denne listen FYLDIG: ta med både de største vinnerne OG de største taperne du har data på (sikt på 5-7 aksjer totalt, og minst like mange tapere som vinnere når begge finnes). Forklar nedgangene like grundig som oppgangene — f.eks. hvorfor falt KOG 5 % samme dag som EQNR steg? Pek på den faktiske driveren (sektor, oljepris, renter, kvartalstall, gevinstsikring) der du har grunnlag for det, og ikke bare konstater at aksjen gikk ned."
     }
   ],
   "risiko": "2-3 setninger om hva investorer bør holde øye med fremover. Vær spesifikk — hva er de faktiske risikoene akkurat nå, ikke generelle advarsler.",
@@ -217,7 +217,7 @@ JSON-struktur (bruk eksakt disse nøklene):
     async function generate(extraMessages) {
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
-        max_tokens: 2000,
+        max_tokens: 2800,
         temperature: 0.3,
         response_format: { type: 'json_object' },
         messages: extraMessages ? messages.concat(extraMessages) : messages
