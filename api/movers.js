@@ -65,7 +65,9 @@ export default async function handler(req, res) {
       price: Number(q.price).toFixed(2),
       changePct: Math.abs(changePct).toFixed(2),
       changePctRaw: changePct,
-      up: (Number(q.change) || 0) >= 0
+      // up bindes til SAMME signerte tall som prosenten (changePercentage), ikke til
+      // det separate change-feltet. Da kan pilen aldri si "opp" mens prosenten er negativ.
+      up: changePct >= 0
     };
   }
 
@@ -79,7 +81,8 @@ export default async function handler(req, res) {
       price: Math.round(price).toLocaleString('nb-NO'),
       change: change.toFixed(2),
       changePct: Math.abs(changePct).toFixed(2),
-      up: change >= 0
+      // up bindes til samme signerte prosent som vises (changePercentage).
+      up: changePct >= 0
     };
   }
 
