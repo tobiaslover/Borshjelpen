@@ -13,18 +13,39 @@ async function fetchNewsDigest() {
   const items = [];
 
   // Makro/generelle markedsnyheter fra FMP (lisensiert — du betaler for denne).
-  // NB: FMP har IKKE selskapsnyheter for norske aksjer, så vi henter kun den
-  // generelle feeden (olje, renter, jobbtall, globalt risikohumør — det som
-  // faktisk driver Oslo Børs). Norske selskapsnyheter krever lisens fra
-  // Oslo Børs/Euronext eller en betalt norsk leverandør (se notater).
-  try {
-    const res = await fetch(`https://financialmodelingprep.com/stable/news/general-latest?limit=15&apikey=${key}`);
-    if (res.ok) {
-      const gen = await res.json();
-      if (Array.isArray(gen)) items.push(...gen);
+  // NB: FMP har IKKE selskapsnyheter for norske aksjer, så vi henter den generelle
+  // feeden (olje, renter, jobbtall, globalt risikohumør — det som faktisk driver
+  // Oslo Børs). Norske selskapsnyheter krever lisens fra Oslo Børs/Euronext eller
+  // en betalt norsk leverandør (se notater).
+
+  // Trekk ut en array fra ulike mulige FMP-svarformer (ren array, eller pakket
+  // inn i content/news/data). Da blir vi ikke stående med tom liste bare fordi
+  // FMP pakker svaret annerledes enn forventet.
+  function asArray(d) {
+    if (Array.isArray(d)) return d;
+    if (d && Array.isArray(d.content)) return d.content;
+    if (d && Array.isArray(d.news)) return d.news;
+    if (d && Array.isArray(d.data)) return d.data;
+    return [];
+  }
+
+  // Prøv flere endepunkter i rekkefølge; bruk det første som faktisk gir noe.
+  const endpoints = [
+    `https://financialmodelingprep.com/stable/news/general-latest?limit=20&apikey=${key}`,
+    `https://financialmodelingprep.com/stable/news/stock-latest?limit=20&apikey=${key}`
+  ];
+
+  for (const url of endpoints) {
+    try {
+      const res = await fetch(url);
+      const body = res.ok ? await res.json() : null;
+      const arr = asArray(body);
+      // Diagnostikk i Vercel Logs: hvilket endepunkt, HTTP-status og antall treff.
+      console.log('BORSBRYGG_NEWS', url.split('/').pop().split('?')[0], 'status', res.status, 'count', arr.length);
+      if (arr.length) { items.push(...arr); break; }
+    } catch (e) {
+      console.error('FMP news feil:', e.message);
     }
-  } catch (e) {
-    console.error('FMP news feil:', e.message);
   }
 
   if (!items.length) return '';
