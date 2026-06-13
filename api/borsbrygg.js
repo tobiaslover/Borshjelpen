@@ -239,7 +239,11 @@ JSON-struktur (bruk eksakt disse nøklene):
             'Kursdata fra gårsdagens børsdag på Oslo Børs: ' + stockSummary +
             (newsDigest
               ? '\n\nFAKTISKE NYHETER fra siste døgn (bruk KUN disse — ikke dikt opp annet, og bruk de oppgitte kildene i "kilde"-feltene):\n' + newsDigest
-              : '\n\nIngen nyheter er tilgjengelige akkurat nå. Returner tom "nyheter"-liste og hold "globale_faktorer" generell uten å påstå konkrete hendelser.')
+              : '\n\nIngen nyheter er tilgjengelige akkurat nå. Returner tom "nyheter"-liste og hold "globale_faktorer" generell uten å påstå konkrete hendelser.') +
+            '\n\nVARIASJON: Skriv en helt fersk utgave forankret i DAGENS konkrete tall over. ' +
+            'La faktiske selskaper, prosenter og bevegelser fra kursdataene drive teksten, og nevn dem eksplisitt. ' +
+            'Ikke bruk generiske, gjenbrukbare formuleringer som kunne passet en hvilken som helst dag — ' +
+            'en leser skal kunne se at teksten gjelder nettopp denne børsdagen. Unngå å resirkulere standardfraser om markedet.'
         }
       ];
 
@@ -248,7 +252,7 @@ JSON-struktur (bruk eksakt disse nøklene):
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         max_tokens: 2800,
-        temperature: 0.3,
+        temperature: 0.6,
         response_format: { type: 'json_object' },
         messages: extraMessages ? messages.concat(extraMessages) : messages
       });
