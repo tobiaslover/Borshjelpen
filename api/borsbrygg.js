@@ -77,6 +77,55 @@ async function buildMoversSnapshot(fromBody) {
   }
 }
 
+// Bygger markedskonteksten SERVER-SIDE fra movers, slik at fortegnet ALLTID er
+// korrekt (via changePctRaw) uansett hvem som trigger genereringen. Front-endens
+// egen stockSummary setter fortegn med parseFloat(changePct) >= 0 og mister minus
+// på fallende aksjer — da blir "−4,60%" til "+4,60%" og AI-en skriver «økning».
+// Denne erstatter den, og gir samtidig alle 25 OBX + indeks/bredde (mer variasjon).
+async function buildMarketContext() {
+  try {
+    const movers = await fetch('https://borshjelpen.no/api/movers').then(r => r.json());
+    const all = movers && Array.isArray(movers.all) ? movers.all : [];
+    if (!all.length) return { ok: false };
+
+    const fmt = s => `${s.name} (${s.ticker}): ${s.price} NOK, ${s.changePctRaw >= 0 ? '+' : '-'}${s.changePct}%`;
+    const gainers = all.filter(s => s.changePctRaw > 0);
+    const fallers = all.filter(s => s.changePctRaw < 0);
+    const flat    = all.filter(s => s.changePctRaw === 0);
+    const topGainers = gainers.slice(0, 5);
+    const topFallers = fallers.slice().reverse().slice(0, 5);
+
+    const idx = movers.osebx || movers.obx || null;
+    const idxName = movers.osebx ? 'OSEBX' : (movers.obx ? 'OBX' : null);
+    const hasIndexData = !!idx;
+    const indexLine = hasIndexData
+      ? `INDEKS (FAKTISK indeksdata fra FMP): ${idxName} ${idx.price}, ${idx.up ? '+' : '-'}${idx.changePct}%. Dette er ekte indeksdata — du KAN oppgi denne samlede børsretningen.`
+      : `INDEKS: Ingen offisiell OSEBX/OBX-indeksdata er tilgjengelig i dag. Du skal derfor IKKE oppgi en samlet børsretning eller noe indekstall ("Oslo Børs steg/falt X%"). Beskriv i stedet konkret hvilke av de største aksjene som steg og hvilke som falt.`;
+    const breadthLine = `Bredde blant de 25 største OBX-aksjene: ${gainers.length} steg, ${fallers.length} falt${flat.length ? `, ${flat.length} uendret` : ''}. (Dette beskriver utvalget av de største — det er IKKE det samme som hele hovedindeksens retning.)`;
+
+    const parts = [
+      indexLine,
+      breadthLine,
+      topGainers.length ? `Størst oppgang i går: ${topGainers.map(fmt).join('; ')}.` : null,
+      topFallers.length ? `Størst nedgang i går: ${topFallers.map(fmt).join('; ')}.` : null,
+      `Alle 25 OBX-aksjer (sortert størst opp -> størst ned): ${all.map(fmt).join('; ')}.`
+    ].filter(Boolean);
+
+    const pick = s => ({ ticker: s.ticker, name: s.name, changePct: s.changePct, up: s.up });
+    return {
+      ok: true,
+      stockSummary: parts.join('\n\n'),
+      hasIndexData,
+      moversSnapshot: {
+        winners: topGainers.slice(0, 3).map(pick),
+        losers: topFallers.slice(0, 3).map(pick)
+      }
+    };
+  } catch (e) {
+    return { ok: false };
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET');
@@ -111,8 +160,15 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Ikke autentisert' });
   }
   const token = authHeader.replace('Bearer ', '');
-  const { data: { user }, error: authError } = await sb.auth.getUser(token);
-  if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
+  // Internt cron-kall autentiserer med CRON_SECRET — ikke en Supabase-bruker-token.
+  // Uten dette returnerte cronens POST 401, og utgaven ble i stedet generert av
+  // første innloggede besøk (med front-endens summary, som mister fortegnet på
+  // fallende aksjer). Slipp cronen gjennom; valider Supabase-token for alle andre.
+  const isCron = !!process.env.CRON_SECRET && token === process.env.CRON_SECRET;
+  if (!isCron) {
+    const { data: { user }, error: authError } = await sb.auth.getUser(token);
+    if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
+  }
 
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
 
@@ -157,12 +213,23 @@ export default async function handler(req, res) {
     return await returnLatest();
   }
 
-  const { stockSummary, hasIndexData, moversSnapshot } = req.body || {};
+  let { stockSummary, hasIndexData, moversSnapshot } = req.body || {};
+
+  // Bygg konteksten server-side fra movers (korrekt fortegn + alle 25 + indeks/bredde).
+  // Dette overstyrer en ev. summary fra front-end. Faller tilbake til body kun hvis
+  // movers ikke svarer.
+  const ctx = await buildMarketContext();
+  if (ctx.ok) {
+    stockSummary = ctx.stockSummary;
+    hasIndexData = ctx.hasIndexData;
+    moversSnapshot = ctx.moversSnapshot;
+  }
+
   if (!stockSummary) {
     // Mangler kursdata — fall tilbake til siste utgave i stedet for å feile.
     return await returnLatest();
   }
-  // hasIndexData = true KUN når cronen faktisk fikk ekte OSEBX/OBX-data fra movers.
+  // hasIndexData = true KUN når vi faktisk fikk ekte OSEBX/OBX-data fra movers.
   // Mangler feltet (eller er false), behandler vi det som "ingen indeksdata" —
   // da skal utgaven ALDRI påstå en samlet børsretning (backstop nedenfor).
   const indexDataPresent = hasIndexData === true;
