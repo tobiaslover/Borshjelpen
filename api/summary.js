@@ -1,6 +1,10 @@
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
+// Populære aksjer er åpne uten innlogging (smakebit + SEO-landingssider).
+// AI-analyse for disse genereres også for gjester. Alle andre tickere krever konto.
+const PUBLIC_TICKERS = ['EQNR', 'DNB', 'AKRBP', 'TEL', 'MOWI', 'YAR'];
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST');
@@ -8,32 +12,44 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  // Verifiser Supabase JWT
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Ikke autentisert' });
-  }
-  const token = authHeader.replace('Bearer ', '');
-  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-  const { data: { user }, error: authError } = await sb.auth.getUser(token);
-  if (authError || !user) return res.status(401).json({ error: 'Ugyldig token' });
-
   const stock = req.body;
   if (!stock || !stock.ticker) return res.status(400).json({ error: 'Aksjedata mangler' });
+  const reqTicker = String(stock.ticker).toUpperCase().trim();
+  const isPublic = PUBLIC_TICKERS.indexOf(reqTicker) !== -1;
 
-  // Rate limit: gratis 2/dag, investor/proff 200/dag
-  const LIMITS = { free: 2, investor: 200, proff: 200 };
-  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
-  const { data: planData } = await sb.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle();
-  const plan = planData?.plan || 'free';
-  const limit = LIMITS[plan] ?? 2;
-  // NB: kolonnen heter "type" (samme som resten av appen), ikke "activity".
-  const { count } = await sb.from('user_activity').select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id).eq('type', 'ai_analyse').gte('created_at', today + 'T00:00:00+02:00');
-  if ((count || 0) >= limit) {
-    return res.status(429).json({ error: `Du har nådd dagens grense på ${limit} AI-analyser.`, limit, plan });
+  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+  // Forsøk å autentisere. Innlogget bruker => rate limit + XP-logging som før.
+  // Uinnlogget gjest => tillatt KUN for de offentlige tickerne (ingen logging).
+  const authHeader = req.headers.authorization;
+  let user = null;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.replace('Bearer ', '');
+    if (token) {
+      const { data, error } = await sb.auth.getUser(token);
+      if (!error && data && data.user) user = data.user;
+    }
   }
-  await sb.from('user_activity').insert({ user_id: user.id, type: 'ai_analyse', ticker: stock.ticker, name: stock.name || null, xp: 2 });
+
+  if (!user) {
+    // Ingen gyldig bruker: kun offentlige aksjer slipper gjennom.
+    if (!isPublic) return res.status(401).json({ error: 'Ikke autentisert' });
+    // Gjest på offentlig aksje => fortsett uten rate limit / logging.
+  } else {
+    // Innlogget: rate limit (gratis 2/dag, investor/proff 200/dag) + logging.
+    const LIMITS = { free: 2, investor: 200, proff: 200 };
+    const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
+    const { data: planData } = await sb.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle();
+    const plan = planData?.plan || 'free';
+    const limit = LIMITS[plan] ?? 2;
+    // NB: kolonnen heter "type" (samme som resten av appen), ikke "activity".
+    const { count } = await sb.from('user_activity').select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id).eq('type', 'ai_analyse').gte('created_at', today + 'T00:00:00+02:00');
+    if ((count || 0) >= limit) {
+      return res.status(429).json({ error: `Du har nådd dagens grense på ${limit} AI-analyser.`, limit, plan });
+    }
+    await sb.from('user_activity').insert({ user_id: user.id, type: 'ai_analyse', ticker: stock.ticker, name: stock.name || null, xp: 2 });
+  }
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
