@@ -290,7 +290,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
       <div id="newsList" style="text-align:center;padding:1.5rem 0;color:#aaa;font-size:13px;">🔧 Under utvikling — kommer snart</div>
     </div>
     <div class="card">
-      <div class="card-title">📅 Kommende events <span style="font-size:10px;background:#E6EEF5;color:#1B3A5C;padding:2px 7px;border-radius:100px;font-weight:500;margin-left:6px;letter-spacing:0.5px;">Oslo Børs</span></div>
+      <div class="card-title"><span>📅 Kommende events <span style="font-size:10px;background:#E6EEF5;color:#1B3A5C;padding:2px 7px;border-radius:100px;font-weight:500;margin-left:6px;letter-spacing:0.5px;">Oslo Børs</span></span><button onclick="openEventsModal()" style="font-size:11px;color:#C8A96E;font-weight:400;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;">Se alle →</button></div>
       <div id="eventsList"><div class="spinner"></div></div>
     </div>
   </div>
@@ -741,10 +741,35 @@ function closeMoversModal() {
 window.addEventListener('DOMContentLoaded', function() {
   var mm = document.getElementById('moversModal');
   if (mm) mm.addEventListener('click', function(e) { if (e.target === this) closeMoversModal(); });
+  var em = document.getElementById('eventsModal');
+  if (em) em.addEventListener('click', function(e) { if (e.target === this) closeEventsModal(); });
 });
 
 var _eventsAll = [];     // alle kommende events (uten passerte)
-var _eventsShown = 5;    // hvor mange som vises nå
+
+function eventRowHtml(e) {
+  var d = new Date(e.date + 'T12:00:00');
+  var day = d.getDate();
+  var month = d.toLocaleString('nb-NO', {month:'short'}).toUpperCase().replace('.', '');
+  var isRapport = e.type === 'rapport';
+  var badgeColor = isRapport ? '#1B3A5C' : '#2C7A5C';
+  var badgeBg = isRapport ? '#E6EEF5' : '#E1F5EE';
+  var badgeText = isRapport ? 'Rapport' : 'Utbytte';
+  var sub = isRapport
+    ? 'Kvartalsrapport'
+    : 'Utbytte' + (e.amount ? ': ' + e.amount + ' NOK' : '');
+  return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
+    '<div style="width:40px;background:#1B3A5C;border-radius:8px;padding:6px 4px;text-align:center;flex-shrink:0;">' +
+      '<div style="font-size:14px;font-weight:700;color:white;line-height:1;">' + day + '</div>' +
+      '<div style="font-size:9px;color:#C8A96E;font-weight:500;margin-top:1px;">' + month + '</div>' +
+    '</div>' +
+    '<div style="flex:1;min-width:0;">' +
+      '<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (e.name || e.ticker) + '</div>' +
+      '<div style="font-size:11px;color:#aaa;">' + sub + '</div>' +
+    '</div>' +
+    '<span style="font-size:10px;background:' + badgeBg + ';color:' + badgeColor + ';padding:3px 8px;border-radius:100px;font-weight:500;flex-shrink:0;">' + badgeText + '</span>' +
+  '</div>';
+}
 
 async function loadEvents() {
   var el = document.getElementById('eventsList');
@@ -758,57 +783,33 @@ async function loadEvents() {
     // Ekstra dato-filter her som sikkerhet (Oslo-tid).
     var today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' }); // YYYY-MM-DD
     _eventsAll = (data.events || []).filter(function(e){ return e && e.date >= today; });
-    _eventsShown = 5;
-    renderEvents();
+
+    if (!_eventsAll.length) {
+      el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen kommende events.</div>';
+      return;
+    }
+    el.innerHTML = _eventsAll.slice(0, 5).map(eventRowHtml).join('');
   } catch(e) {
     if (el) el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente events.</div>';
   }
 }
 
-function renderEvents() {
-  var el = document.getElementById('eventsList');
-  if (!el) return;
+function openEventsModal() {
+  var modal = document.getElementById('eventsModal');
+  var body = document.getElementById('eventsModalBody');
+  if (!modal || !body) return;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
   if (!_eventsAll.length) {
-    el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen kommende events.</div>';
+    body.innerHTML = '<div style="text-align:center;padding:2rem;color:#aaa;">Ingen kommende events.</div>';
     return;
   }
-
-  var html = _eventsAll.slice(0, _eventsShown).map(function(e) {
-    var d = new Date(e.date + 'T12:00:00');
-    var day = d.getDate();
-    var month = d.toLocaleString('nb-NO', {month:'short'}).toUpperCase().replace('.', '');
-    var isRapport = e.type === 'rapport';
-    var badgeColor = isRapport ? '#1B3A5C' : '#2C7A5C';
-    var badgeBg = isRapport ? '#E6EEF5' : '#E1F5EE';
-    var badgeText = isRapport ? 'Rapport' : 'Utbytte';
-    var sub = isRapport
-      ? 'Kvartalsrapport'
-      : 'Utbytte' + (e.amount ? ': ' + e.amount + ' NOK' : '');
-    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
-      '<div style="width:40px;background:#1B3A5C;border-radius:8px;padding:6px 4px;text-align:center;flex-shrink:0;">' +
-        '<div style="font-size:14px;font-weight:700;color:white;line-height:1;">' + day + '</div>' +
-        '<div style="font-size:9px;color:#C8A96E;font-weight:500;margin-top:1px;">' + month + '</div>' +
-      '</div>' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (e.name || e.ticker) + '</div>' +
-        '<div style="font-size:11px;color:#aaa;">' + sub + '</div>' +
-      '</div>' +
-      '<span style="font-size:10px;background:' + badgeBg + ';color:' + badgeColor + ';padding:3px 8px;border-radius:100px;font-weight:500;flex-shrink:0;">' + badgeText + '</span>' +
-    '</div>';
-  }).join('');
-
-  if (_eventsShown < _eventsAll.length) {
-    html += '<div style="text-align:center;padding:12px 0 2px;">' +
-      '<button onclick="showMoreEvents()" style="font-size:12px;color:#1B3A5C;font-weight:500;background:none;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Se mer →</button>' +
-    '</div>';
-  }
-
-  el.innerHTML = html;
+  body.innerHTML = _eventsAll.map(eventRowHtml).join('');
 }
 
-function showMoreEvents() {
-  _eventsShown += 5;
-  renderEvents();
+function closeEventsModal() {
+  document.getElementById('eventsModal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
@@ -826,6 +827,17 @@ function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.st
       <button onclick="closeMoversModal()" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;line-height:1;">✕</button>
     </div>
     <div id="moversModalBody" style="padding:1.25rem;max-height:70vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- Events Modal -->
+<div id="eventsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;">
+  <div style="background:white;border-radius:16px;max-width:500px;width:100%;margin:auto;overflow:hidden;">
+    <div style="background:#1B3A5C;padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;color:white;font-weight:700;">Kommende events</div>
+      <button onclick="closeEventsModal()" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div id="eventsModalBody" style="padding:1.25rem;max-height:70vh;overflow-y:auto;"></div>
   </div>
 </div>
 </body>
