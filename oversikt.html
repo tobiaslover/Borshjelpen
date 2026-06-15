@@ -756,7 +756,7 @@ function eventRowHtml(e) {
   var badgeBg = isRapport ? '#E6EEF5' : '#E1F5EE';
   var badgeText = isRapport ? 'Rapport' : 'Utbytte';
   var sub = isRapport
-    ? 'Kvartalsrapport'
+    ? (e.period || 'Kvartalsrapport')
     : 'Ex-dag' + (e.amount ? ' · ' + e.amount + ' NOK' : '');
   return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
     '<div style="width:40px;background:#1B3A5C;border-radius:8px;padding:6px 4px;text-align:center;flex-shrink:0;">' +
