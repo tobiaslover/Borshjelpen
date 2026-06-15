@@ -196,12 +196,28 @@ export default async function handler(req, res) {
         //    enorme prosentutslag (AKH 0,01 kr "−16 %"). Statistisk støy, ikke en
         //    nyhet. Grensen er bevisst LAV (0,10) så aktive lavpris-aksjer som
         //    NORSE, NBX m.fl. beholdes — kun de helt ekstreme øreaksjene fjernes.
+        // 4) ETF/indeksprodukter -> f.eks. OBXD ("DNB OBX") er et børshandlet fond
+        //    som FØLGER OBX-indeksen, ikke en enkeltaksje. Hvis Børsbrygg plukker
+        //    den, kan "DNB OBX falt 1,6 %" feiltolkes som at INDEKSEN falt — nettopp
+        //    aggregat-retningen guardrailen skal hindre. Fjern slike produkter.
         const MAX_REALISTIC_PCT = 25;
         const MIN_PRICE = 0.1;
+        // Tickere som er fond/ETF/indeksprodukter (ikke enkeltselskaper).
+        // Eksplisitt ticker-liste er tryggest; utvid ved behov.
+        const EXCLUDE_TICKERS = new Set(['OBXD']);
+        // Navnemønster som røper et bull/bear-/ETF-produkt. Bevisst SMALT for å
+        // unngå falske treff (f.eks. "Index Pharmaceuticals" er et ekte selskap —
+        // ordet "index/indeks" alene diskvalifiserer derfor IKKE).
+        const isIndexProduct = s =>
+          EXCLUDE_TICKERS.has(s.ticker) ||
+          /\b(bull|bear)\b/i.test(s.name || '') ||
+          /\bETF\b/.test(s.name || '') ||
+          /\bOBX\b/.test(s.name || '');
         stocks = stocks.filter(s =>
           s.changePctRaw !== 0 &&
           Math.abs(s.changePctRaw) < MAX_REALISTIC_PCT &&
-          Number(s.price) >= MIN_PRICE
+          Number(s.price) >= MIN_PRICE &&
+          !isIndexProduct(s)
         );
 
         universeSize = stocks.length;
