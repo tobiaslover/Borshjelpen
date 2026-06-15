@@ -290,7 +290,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #f8f7f4; 
       <div id="newsList" style="text-align:center;padding:1.5rem 0;color:#aaa;font-size:13px;">🔧 Under utvikling — kommer snart</div>
     </div>
     <div class="card">
-      <div class="card-title">📅 Kommende events <span style="font-size:10px;background:#FFF3E0;color:#7a4000;padding:2px 7px;border-radius:100px;font-weight:500;margin-left:6px;letter-spacing:0.5px;">🔧 Under utvikling</span> <span style="font-size:10px;background:#E6EEF5;color:#1B3A5C;padding:2px 7px;border-radius:100px;font-weight:500;margin-left:4px;letter-spacing:0.5px;">OBX</span></div>
+      <div class="card-title">📅 Kommende events <span style="font-size:10px;background:#E6EEF5;color:#1B3A5C;padding:2px 7px;border-radius:100px;font-weight:500;margin-left:6px;letter-spacing:0.5px;">Oslo Børs</span></div>
       <div id="eventsList"><div class="spinner"></div></div>
     </div>
   </div>
@@ -750,19 +750,30 @@ async function loadEvents() {
     var res = await fetch('/api/events');
     if (!res.ok) throw new Error('feil');
     var data = await res.json();
-    var events = (data.events || []).slice(0, 5);
+
+    // events.js leverer allerede sortert kronologisk og uten passerte datoer.
+    // Ekstra dato-filter her som sikkerhet, så tar vi de 5 nærmeste i tid.
+    var today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' }); // YYYY-MM-DD
+    var events = (data.events || [])
+      .filter(function(e){ return e && e.date >= today; })
+      .slice(0, 5);
+
     if (!events.length) {
       el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen kommende events.</div>';
       return;
     }
+
     el.innerHTML = events.map(function(e) {
       var d = new Date(e.date + 'T12:00:00');
       var day = d.getDate();
-      var month = d.toLocaleString('nb-NO', {month:'short'}).toUpperCase();
+      var month = d.toLocaleString('nb-NO', {month:'short'}).toUpperCase().replace('.', '');
       var isRapport = e.type === 'rapport';
       var badgeColor = isRapport ? '#1B3A5C' : '#2C7A5C';
       var badgeBg = isRapport ? '#E6EEF5' : '#E1F5EE';
       var badgeText = isRapport ? 'Rapport' : 'Utbytte';
+      var sub = isRapport
+        ? 'Kvartalsrapport'
+        : 'Utbytte' + (e.amount ? ': ' + e.amount + ' NOK' : '');
       return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
         '<div style="width:40px;background:#1B3A5C;border-radius:8px;padding:6px 4px;text-align:center;flex-shrink:0;">' +
           '<div style="font-size:14px;font-weight:700;color:white;line-height:1;">' + day + '</div>' +
@@ -770,9 +781,7 @@ async function loadEvents() {
         '</div>' +
         '<div style="flex:1;min-width:0;">' +
           '<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (e.name || e.ticker) + '</div>' +
-          '<div style="font-size:11px;color:#aaa;">' +
-          (e.type === 'utbytte' ? 'Utbytte' + (e.amount ? ': ' + e.amount + ' NOK' : '') : 'Kvartalsrapport') +
-        '</div>' +
+          '<div style="font-size:11px;color:#aaa;">' + sub + '</div>' +
         '</div>' +
         '<span style="font-size:10px;background:' + badgeBg + ';color:' + badgeColor + ';padding:3px 8px;border-radius:100px;font-weight:500;flex-shrink:0;">' + badgeText + '</span>' +
       '</div>';
