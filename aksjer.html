@@ -420,6 +420,19 @@ async function search(ticker) {
   }
   document.getElementById('searchInput').value = ticker;
 
+  // SEO: når en aksje vises via ren URL (/aksjer/<slug>), oppdater canonical + tittel
+  // dynamisk slik at hver aksjeside har sin egen kanoniske adresse og sidetittel.
+  (function(){
+    var slugByTicker = { EQNR:'equinor', DNB:'dnb', AKRBP:'aker-bp', TEL:'telenor', MOWI:'mowi', YAR:'yar' };
+    var slug = slugByTicker[ticker];
+    if (slug) {
+      var canon = document.querySelector('link[rel="canonical"]');
+      if (canon) canon.setAttribute('href', 'https://borshjelpen.no/aksjer/' + slug);
+      var ogu = document.querySelector('meta[property="og:url"]');
+      if (ogu) ogu.setAttribute('content', 'https://borshjelpen.no/aksjer/' + slug);
+    }
+  })();
+
   // Sjekk cache først
   var cached = getCached(ticker);
   if (cached) {
@@ -1713,10 +1726,27 @@ window._authReady = (async function checkAuth() {
   } catch(e) {}
 })();
 
+// Rene URL-er: /aksjer/equinor -> EQNR. Slug-mapping for de åpne aksjene.
+var SLUG_TO_TICKER = { equinor:'EQNR', dnb:'DNB', 'aker-bp':'AKRBP', akerbp:'AKRBP', telenor:'TEL', mowi:'MOWI', yara:'YAR' };
+
+// Leser ticker fra enten ?ticker=EQNR eller stien /aksjer/<slug>.
+function getTickerFromUrl() {
+  var qp = new URLSearchParams(window.location.search).get('ticker');
+  if (qp) return qp.toUpperCase().trim();
+  var m = window.location.pathname.match(/\/aksjer\/([^\/?#]+)/i);
+  if (m && m[1]) {
+    var slug = decodeURIComponent(m[1]).toLowerCase();
+    if (SLUG_TO_TICKER[slug]) return SLUG_TO_TICKER[slug];
+    // Ukjent slug: bruk den rått som ticker (f.eks. /aksjer/SUBC)
+    return slug.toUpperCase();
+  }
+  return null;
+}
+
 // Kjør auth-avhengige handlinger først når Supabase faktisk er klar (ingen gjetting på timing)
 window._authReady.then(function() {
   initPortfolio();
-  var urlTicker = new URLSearchParams(window.location.search).get('ticker');
+  var urlTicker = getTickerFromUrl();
   if (urlTicker) search(urlTicker);
 });
 
