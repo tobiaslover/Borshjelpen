@@ -4,7 +4,8 @@
     { "path": "/api/cron-events", "schedule": "0 6 * * 1" }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/borshjelpen.html" }
+    { "source": "/", "destination": "/borshjelpen.html" },
+    { "source": "/aksjer/:slug", "destination": "/aksjer.html" }
   ],
   "redirects": [
     { "source": "/hva-er-en-aksje.html", "destination": "/artikler/hva-er-en-aksje.html", "permanent": true },
