@@ -748,6 +748,26 @@ function normName(s) {
     .trim();
 }
 
+// Utenlandsk selskapsform i navnet? (brukes til aa filtrere bort ikke-norske utstedere)
+// Norske former (ASA, AS, Sparebank) beholdes; utenlandske droppes fra kalenderen.
+function isForeign(name) {
+  const n = String(name || '').trim();
+  if (/sparebank/i.test(n)) return false;                 // norske sparebanker beholdes
+  if (/ AB(\s*\(publ\))?$/i.test(n)) return true;         // svensk
+  if (/ A\/S$/i.test(n)) return true;                     // dansk
+  if (/ (N\.?V\.?|B\.?V\.?)$/i.test(n)) return true;      // nederlandsk
+  if (/ (Ltd\.?|Limited)$/i.test(n)) return true;         // UK/intl
+  if (/ (PLC|Plc|p\.l\.c\.?)$/i.test(n)) return true;     // UK
+  if (/ Inc\.?$/i.test(n)) return true;                   // US
+  if (/ Corp\.?$/i.test(n)) return true;                  // US
+  if (/ S\.?A\.?$/i.test(n)) return true;                 // Lux/intl (S.A. / SA)
+  if (/ SE$/i.test(n)) return true;                       // europeisk selskap
+  if (/ (GmbH|KGaA|AG)( & CO KGaA)?$/i.test(n)) return true; // tysk/sveitsisk
+  if (/ Co\.? KG$/i.test(n)) return true;                 // tysk
+  if (/ P\/f$/i.test(n)) return true;                     // faeroysk
+  return false;
+}
+
 export default async function handler(req, res) {
   const auth = req.headers['authorization'] || '';
   const keyParam = req.query && req.query.key;
@@ -790,23 +810,32 @@ export default async function handler(req, res) {
   const divSeen = new Set();
   events = events.filter((e) => { const key = e.ticker + '|' + e.date + '|u'; if (divSeen.has(key)) return false; divSeen.add(key); return true; });
 
-  // 3) Rapporter fra hardkodet Euronext-kalender
-  let reportMatched = 0, reportUnmatched = 0;
-  const unmatchedSample = [];
+  // 3) Rapporter fra hardkodet Euronext-kalender.
+  //    Beholder en utsteder hvis den enten (a) har en .OL-ticker (bevist Oslo-notert)
+  //    eller (b) er norskregistrert (ASA/AS/Sparebank). Droppes KUN hvis den baade
+  //    er utenlandskregistrert OG mangler .OL-ticker (typisk utenlandsk obligasjons-
+  //    utsteder uten aksje i Oslo).
+  let reportIncluded = 0, reportDropped = 0, reportWithTicker = 0;
+  const droppedSample = [];
   REPORTS.forEach((row) => {
     const date = row[0], rawName = row[1], period = row[2];
     if (!date || date < from || date > to) return;       // kun innenfor horisonten
     const key = normName(rawName);
-    const ticker = normToTicker[key];
-    if (ticker) {
-      reportMatched++;
-      events.push({ date, ticker, name: nameOf(ticker + '.OL'), type: 'rapport', period: PERIOD_LABEL[period] || period });
-    } else {
-      reportUnmatched++;
-      if (unmatchedSample.length < 25) unmatchedSample.push(rawName);
-      // Vis likevel raden med Euronext-navnet (uten ticker-lenke) saa datoen ikke forsvinner
-      events.push({ date, ticker: '', name: rawName, type: 'rapport', period: PERIOD_LABEL[period] || period });
+    const ticker = normToTicker[key] || '';
+    if (!ticker && isForeign(rawName)) {
+      reportDropped++;
+      if (droppedSample.length < 40) droppedSample.push(rawName);
+      return;                                            // utenlandsk uten ticker -> dropp
     }
+    if (ticker) reportWithTicker++;
+    reportIncluded++;
+    events.push({
+      date,
+      ticker,
+      name: ticker ? nameOf(ticker + '.OL') : rawName,
+      type: 'rapport',
+      period: PERIOD_LABEL[period] || period,
+    });
   });
   // Dedup rapporter (samme ticker/navn + dato)
   const repSeen = new Set();
@@ -834,9 +863,10 @@ export default async function handler(req, res) {
     osloStocks: olSymbols.length,
     dividendEvents: events.filter((e) => e.type === 'utbytte').length,
     reportEvents: events.filter((e) => e.type === 'rapport').length,
-    reportMatched,
-    reportUnmatched,
-    unmatchedSample,
+    reportIncluded,
+    reportWithTicker,
+    reportDropped,
+    droppedSample,
     totalEvents: events.length,
     generatedAt,
   });
