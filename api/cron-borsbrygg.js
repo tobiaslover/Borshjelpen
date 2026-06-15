@@ -12,12 +12,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Hent alle 25 OBX-aksjer + ev. EKTE indeksdata fra movers.
-    // Movers er samme datakilde som oversikten bruker, og fabrikkerer IKKE et
-    // indekstall fra et snitt av aksjene. Vi mater derfor Børsbrygg med:
-    //   - alle 25 OBX-aksjene (ekte per-aksje-kurser, sortert størst opp -> ned)
+    // Hent HELE Oslo-universet (~330+ aksjer) + ev. EKTE indeksdata fra movers.
+    // scope=all gir bredt, representativt grunnlag for bredde og vinnere/tapere.
+    // Movers fabrikkerer IKKE et indekstall fra aksjene — den gir:
+    //   - alle Oslo Børs-aksjene (ekte per-aksje-kurser, sortert størst opp -> ned)
     //   - faktisk OSEBX/OBX-nivå KUN hvis FMP returnerer det (ellers: ingen indeks)
-    const movers = await fetch('https://borshjelpen.no/api/movers')
+    const movers = await fetch('https://borshjelpen.no/api/movers?scope=all')
       .then(r => r.json())
       .catch(() => null);
 
@@ -45,20 +45,19 @@ export default async function handler(req, res) {
       ? `INDEKS (FAKTISK indeksdata fra FMP): ${idxName} ${idx.price}, ${idx.up ? '+' : '-'}${idx.changePct}%. Dette er ekte indeksdata — du KAN oppgi denne samlede børsretningen.`
       : `INDEKS: Ingen offisiell OSEBX/OBX-indeksdata er tilgjengelig i dag. Du skal derfor IKKE oppgi en samlet børsretning eller noe indekstall ("Oslo Børs steg/falt X%"). Beskriv i stedet konkret hvilke av de største aksjene som steg og hvilke som falt.`;
 
-    const breadthLine = `Bredde blant de 25 største OBX-aksjene: ${gainers.length} steg, ${fallers.length} falt${flat.length ? `, ${flat.length} uendret` : ''}. (Dette beskriver utvalget av de største — det er IKKE det samme som hele hovedindeksens retning.)`;
+    const breadthLine = `Bredde blant ${all.length} aksjer på Oslo Børs: ${gainers.length} steg, ${fallers.length} falt${flat.length ? `, ${flat.length} uendret` : ''}. (Dette beskriver bredden i utvalget — det er IKKE det samme som hele den markedsvekt-justerte hovedindeksens retning.)`;
 
     const parts = [
       indexLine,
       breadthLine,
       topGainers.length ? `Størst oppgang i går: ${topGainers.map(fmt).join('; ')}.` : null,
       topFallers.length ? `Størst nedgang i går: ${topFallers.map(fmt).join('; ')}.` : null,
-      `Alle 25 OBX-aksjer (sortert størst opp -> størst ned): ${all.map(fmt).join('; ')}.`
+      `De største bevegelsene på Oslo Børs (sortert størst opp -> størst ned, topp 40): ${all.slice(0, 40).map(fmt).join('; ')}.`
     ].filter(Boolean);
 
     const stockSummary = parts.join('\n\n');
 
     // Øyeblikksbilde av vinnere/tapere som fryses inn i utgaven (topp 3 hver vei).
-    // borsbrygg.html viser dette uendret hele dagen i stedet for live /api/movers.
     const snap = s => ({ ticker: s.ticker, name: s.name, changePct: s.changePct, up: s.up });
     const moversSnapshot = {
       winners: topGainers.slice(0, 3).map(snap),
