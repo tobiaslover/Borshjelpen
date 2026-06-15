@@ -61,7 +61,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   if (!FMP_KEY || !SUPABASE_URL || !SERVICE_ROLE) {
-    return res.status(500).json({ error: 'Mangler env-variabler', have: { FMP: !!FMP_KEY, SUPABASE_URL: !!SUPABASE_URL, SERVICE_ROLE: !!SERVICE_ROLE } });
+    return res.status(500).json({ error: 'Mangler env-variabler', codeVersion: 'v2-service-key', have: { FMP: !!FMP_KEY, SUPABASE_URL: !!SUPABASE_URL, SERVICE_ROLE: !!SERVICE_ROLE } });
   }
 
   const today = new Date();
