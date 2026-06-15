@@ -743,6 +743,9 @@ window.addEventListener('DOMContentLoaded', function() {
   if (mm) mm.addEventListener('click', function(e) { if (e.target === this) closeMoversModal(); });
 });
 
+var _eventsAll = [];     // alle kommende events (uten passerte)
+var _eventsShown = 5;    // hvor mange som vises nå
+
 async function loadEvents() {
   var el = document.getElementById('eventsList');
   if (!el) return;
@@ -752,44 +755,60 @@ async function loadEvents() {
     var data = await res.json();
 
     // events.js leverer allerede sortert kronologisk og uten passerte datoer.
-    // Ekstra dato-filter her som sikkerhet, så tar vi de 5 nærmeste i tid.
+    // Ekstra dato-filter her som sikkerhet (Oslo-tid).
     var today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' }); // YYYY-MM-DD
-    var events = (data.events || [])
-      .filter(function(e){ return e && e.date >= today; })
-      .slice(0, 5);
-
-    if (!events.length) {
-      el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen kommende events.</div>';
-      return;
-    }
-
-    el.innerHTML = events.map(function(e) {
-      var d = new Date(e.date + 'T12:00:00');
-      var day = d.getDate();
-      var month = d.toLocaleString('nb-NO', {month:'short'}).toUpperCase().replace('.', '');
-      var isRapport = e.type === 'rapport';
-      var badgeColor = isRapport ? '#1B3A5C' : '#2C7A5C';
-      var badgeBg = isRapport ? '#E6EEF5' : '#E1F5EE';
-      var badgeText = isRapport ? 'Rapport' : 'Utbytte';
-      var sub = isRapport
-        ? 'Kvartalsrapport'
-        : 'Utbytte' + (e.amount ? ': ' + e.amount + ' NOK' : '');
-      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
-        '<div style="width:40px;background:#1B3A5C;border-radius:8px;padding:6px 4px;text-align:center;flex-shrink:0;">' +
-          '<div style="font-size:14px;font-weight:700;color:white;line-height:1;">' + day + '</div>' +
-          '<div style="font-size:9px;color:#C8A96E;font-weight:500;margin-top:1px;">' + month + '</div>' +
-        '</div>' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (e.name || e.ticker) + '</div>' +
-          '<div style="font-size:11px;color:#aaa;">' + sub + '</div>' +
-        '</div>' +
-        '<span style="font-size:10px;background:' + badgeBg + ';color:' + badgeColor + ';padding:3px 8px;border-radius:100px;font-weight:500;flex-shrink:0;">' + badgeText + '</span>' +
-      '</div>';
-    }).join('');
+    _eventsAll = (data.events || []).filter(function(e){ return e && e.date >= today; });
+    _eventsShown = 5;
+    renderEvents();
   } catch(e) {
-    var el2 = document.getElementById('eventsList');
-    if (el2) el2.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente events.</div>';
+    if (el) el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente events.</div>';
   }
+}
+
+function renderEvents() {
+  var el = document.getElementById('eventsList');
+  if (!el) return;
+  if (!_eventsAll.length) {
+    el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen kommende events.</div>';
+    return;
+  }
+
+  var html = _eventsAll.slice(0, _eventsShown).map(function(e) {
+    var d = new Date(e.date + 'T12:00:00');
+    var day = d.getDate();
+    var month = d.toLocaleString('nb-NO', {month:'short'}).toUpperCase().replace('.', '');
+    var isRapport = e.type === 'rapport';
+    var badgeColor = isRapport ? '#1B3A5C' : '#2C7A5C';
+    var badgeBg = isRapport ? '#E6EEF5' : '#E1F5EE';
+    var badgeText = isRapport ? 'Rapport' : 'Utbytte';
+    var sub = isRapport
+      ? 'Kvartalsrapport'
+      : 'Utbytte' + (e.amount ? ': ' + e.amount + ' NOK' : '');
+    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;">' +
+      '<div style="width:40px;background:#1B3A5C;border-radius:8px;padding:6px 4px;text-align:center;flex-shrink:0;">' +
+        '<div style="font-size:14px;font-weight:700;color:white;line-height:1;">' + day + '</div>' +
+        '<div style="font-size:9px;color:#C8A96E;font-weight:500;margin-top:1px;">' + month + '</div>' +
+      '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (e.name || e.ticker) + '</div>' +
+        '<div style="font-size:11px;color:#aaa;">' + sub + '</div>' +
+      '</div>' +
+      '<span style="font-size:10px;background:' + badgeBg + ';color:' + badgeColor + ';padding:3px 8px;border-radius:100px;font-weight:500;flex-shrink:0;">' + badgeText + '</span>' +
+    '</div>';
+  }).join('');
+
+  if (_eventsShown < _eventsAll.length) {
+    html += '<div style="text-align:center;padding:12px 0 2px;">' +
+      '<button onclick="showMoreEvents()" style="font-size:12px;color:#1B3A5C;font-weight:500;background:none;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Se mer →</button>' +
+    '</div>';
+  }
+
+  el.innerHTML = html;
+}
+
+function showMoreEvents() {
+  _eventsShown += 5;
+  renderEvents();
 }
 
 function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
