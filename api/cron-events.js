@@ -29,6 +29,25 @@ const ymd = (d) => d.toISOString().slice(0, 10);
 // === HARDKODET RAPPORTKALENDER (Euronext, manuelt innhentet) ===
 // Format: [dato 'YYYY-MM-DD', selskapsnavn (Euronext), periode 'Q1'|'Q2'|'Q3'|'Q4'|'H1'|'FY']
 const REPORTS = [
+  ['2026-06-15','Interoil Exploration and Prod. ASA','FY'],
+  ['2026-06-18','Norcod AS','Q1'],
+  ['2026-06-19','Kaldvik AS','FY'],
+  ['2026-06-24','SoftOx Solutions AS','Q1'],
+  ['2026-06-26','Helgeland Kraft AS','FY'],
+  ['2026-06-26','Pyrum Innovations AG','Q1'],
+  ['2026-06-30','Akobo Minerals AB (publ)','Q1'],
+  ['2026-06-30','Envipco Holding N.V.','FY'],
+  ['2026-06-30','Hofseth BioCare ASA','Q1'],
+  ['2026-06-30','Okechamp Global B.V.','FY'],
+  ['2026-06-30','Servatur Holding AS','Q4'],
+  ['2026-06-30','The Kingfish Company N.V.','FY'],
+  ['2026-07-03','Norwegian Property ASA','H1'],
+  ['2026-07-07','ABG Sundal Collier Holding ASA','H1'],
+  ['2026-07-09','BlueNord ASA','H1'],
+  ['2026-07-09','Bonheur ASA','H1'],
+  ['2026-07-09','Europris ASA','H1'],
+  ['2026-07-09','Gentian Diagnostics ASA','H1'],
+  ['2026-07-09','Stolt-Nielsen Limited','H1'],
   ['2026-07-10','Elkem ASA','H1'],
   ['2026-07-10','Entra ASA','H1'],
   ['2026-07-10','Kitron ASA','H1'],
@@ -651,7 +670,7 @@ const REPORTS = [
 ];
 
 // Periode -> visningstekst i undertittel
-const PERIOD_LABEL = { Q1:'Q1', Q2:'Q2', Q3:'Q3', Q4:'Q4', H1:'Halvår', FY:'Årsrapport' };
+const PERIOD_LABEL = { Q1:'Q1-rapport', Q2:'Q2-rapport', Q3:'Q3-rapport', Q4:'Q4-rapport', H1:'Halvårsrapport', FY:'Årsrapport' };
 
 async function fmpGet(url) {
   try {
