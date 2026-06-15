@@ -5,6 +5,42 @@ import { createClient } from '@supabase/supabase-js';
 // AI-analyse for disse genereres også for gjester. Alle andre tickere krever konto.
 const PUBLIC_TICKERS = ['EQNR', 'DNB', 'AKRBP', 'TEL', 'MOWI', 'YAR'];
 
+// Gjeste-rate-limit (kun utloggede): maks N AI-analyser per IP per tidsvindu.
+const GUEST_LIMIT = 10;                 // antall tillatte analyser
+const GUEST_WINDOW_MS = 60 * 60 * 1000; // per time
+
+// Henter klientens IP fra Vercel-headere (x-forwarded-for er mest pålitelig).
+function getClientIp(req) {
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) return String(xff).split(',')[0].trim();
+  return req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
+}
+
+// Teller og håndhever gjeste-limit i Supabase (guest_ratelimit-tabellen).
+// Returnerer true hvis forespørselen er innenfor grensen, false hvis over.
+async function allowGuest(sb, ip) {
+  try {
+    const now = Date.now();
+    const { data: row } = await sb.from('guest_ratelimit').select('window_start, count').eq('ip', ip).maybeSingle();
+    if (!row) {
+      await sb.from('guest_ratelimit').upsert({ ip, window_start: new Date(now).toISOString(), count: 1 }, { onConflict: 'ip' });
+      return true;
+    }
+    const windowStart = new Date(row.window_start).getTime();
+    if (now - windowStart > GUEST_WINDOW_MS) {
+      // Vinduet er utløpt - nullstill
+      await sb.from('guest_ratelimit').upsert({ ip, window_start: new Date(now).toISOString(), count: 1 }, { onConflict: 'ip' });
+      return true;
+    }
+    if ((row.count || 0) >= GUEST_LIMIT) return false;
+    await sb.from('guest_ratelimit').update({ count: (row.count || 0) + 1 }).eq('ip', ip);
+    return true;
+  } catch (e) {
+    // Ved feil i tellingen: slipp gjennom (fail-open) for ikke å blokkere ekte brukere.
+    return true;
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST');
@@ -34,7 +70,12 @@ export default async function handler(req, res) {
   if (!user) {
     // Ingen gyldig bruker: kun offentlige aksjer slipper gjennom.
     if (!isPublic) return res.status(401).json({ error: 'Ikke autentisert' });
-    // Gjest på offentlig aksje => fortsett uten rate limit / logging.
+    // Gjest på offentlig aksje => håndhev IP-basert rate limit.
+    const ip = getClientIp(req);
+    const ok = await allowGuest(sb, ip);
+    if (!ok) {
+      return res.status(429).json({ error: 'For mange forespørsler. Prøv igjen senere, eller logg inn for full tilgang.' });
+    }
   } else {
     // Innlogget: rate limit (gratis 2/dag, investor/proff 200/dag) + logging.
     const LIMITS = { free: 2, investor: 200, proff: 200 };
