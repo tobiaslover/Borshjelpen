@@ -803,17 +803,41 @@ async function loadEvents() {
   }
 }
 
+var _modalShown = 0;     // hvor mange events vist i modalen
+
 function openEventsModal() {
   var modal = document.getElementById('eventsModal');
   var body = document.getElementById('eventsModalBody');
   if (!modal || !body) return;
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  _modalShown = 0;
+  body.scrollTop = 0;
+  body.innerHTML = '<div id="eventsModalRows"></div><div id="eventsModalFooter"></div>';
+  renderMoreModal();
+}
+
+function renderMoreModal() {
+  var rowsEl = document.getElementById('eventsModalRows');
+  var footEl = document.getElementById('eventsModalFooter');
+  if (!rowsEl || !footEl) return;
   if (!_eventsAll.length) {
-    body.innerHTML = '<div style="text-align:center;padding:2rem;color:#aaa;">Ingen kommende events.</div>';
+    rowsEl.innerHTML = '<div style="text-align:center;padding:2rem;color:#aaa;">Ingen kommende events.</div>';
+    footEl.innerHTML = '';
     return;
   }
-  body.innerHTML = _eventsAll.map(eventRowHtml).join('') + eventsNote(_eventsAll);
+  var next = _eventsAll.slice(_modalShown, _modalShown + 50);
+  rowsEl.insertAdjacentHTML('beforeend', next.map(eventRowHtml).join(''));
+  _modalShown += next.length;
+
+  var foot = eventsNote(_eventsAll);
+  var remaining = _eventsAll.length - _modalShown;
+  if (remaining > 0) {
+    foot += '<div style="text-align:center;padding:12px 0 2px;">' +
+      '<button onclick="renderMoreModal()" style="font-size:13px;color:#1B3A5C;font-weight:500;background:none;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Se fler (' + remaining + ' igjen) →</button>' +
+    '</div>';
+  }
+  footEl.innerHTML = foot;
 }
 
 function closeEventsModal() {
