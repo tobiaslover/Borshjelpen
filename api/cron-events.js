@@ -109,6 +109,9 @@ export default async function handler(req, res) {
   let events = [];
 
   // 2) Utbytte per ticker
+  // Merk: For .OL-tickere gir FMP utbyttet allerede konvertert til NOK
+  // (borsens noteringsvaluta), ikke selskapets opprinnelige valuta. Beloepet
+  // er derfor i NOK selv om selskapet erklaerer i f.eks. USD.
   const divResults = await mapPool(olSymbols, CONCURRENCY, async (sym) => ({ sym, rows: await dividendsForSymbol(sym) }));
   divResults.forEach((r) => {
     if (!r || !Array.isArray(r.rows)) return;
