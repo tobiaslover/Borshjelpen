@@ -771,6 +771,14 @@ function eventRowHtml(e) {
   '</div>';
 }
 
+function eventsNote(list) {
+  var hasDiv = (list || []).some(function(e){ return e.type === 'utbytte'; });
+  if (!hasDiv) return '';
+  return '<div style="font-size:10px;color:#bbb;font-style:italic;line-height:1.5;padding:10px 2px 2px;">' +
+    'Utbyttebeløp er omregnet til NOK — avvik kan forekomme. Se selskapets egne sider for nøyaktig utbytte.' +
+  '</div>';
+}
+
 async function loadEvents() {
   var el = document.getElementById('eventsList');
   if (!el) return;
@@ -788,7 +796,8 @@ async function loadEvents() {
       el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Ingen kommende events.</div>';
       return;
     }
-    el.innerHTML = _eventsAll.slice(0, 5).map(eventRowHtml).join('');
+    var shown = _eventsAll.slice(0, 5);
+    el.innerHTML = shown.map(eventRowHtml).join('') + eventsNote(shown);
   } catch(e) {
     if (el) el.innerHTML = '<div style="font-size:13px;color:#aaa;padding:8px 0;">Kunne ikke hente events.</div>';
   }
@@ -804,7 +813,7 @@ function openEventsModal() {
     body.innerHTML = '<div style="text-align:center;padding:2rem;color:#aaa;">Ingen kommende events.</div>';
     return;
   }
-  body.innerHTML = _eventsAll.map(eventRowHtml).join('');
+  body.innerHTML = _eventsAll.map(eventRowHtml).join('') + eventsNote(_eventsAll);
 }
 
 function closeEventsModal() {
