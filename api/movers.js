@@ -1,8 +1,19 @@
 // Henter fra Financial Modeling Prep (FMP):
 // - OBX og OSEBX indeksnivåer (KUN faktiske indeksverdier fra FMP)
-// - Vinnere og tapere fra OBX-aksjene (25 mest likvide), priset i NOK via .OL
+// - Vinnere og tapere fra Oslo Børs-aksjer, priset i NOK via .OL
+//
+// To moduser:
+//   Standard (ingen query)  -> 25 mest likvide OBX-aksjer. RASKT. Brukes live av
+//                              oversikt.html sitt vinnere/tapere-kort på hver sidelast.
+//   ?scope=all              -> hele Oslo-universet (~330+ .OL-aksjer). TYNGRE.
+//                              Brukes av den daglige Børsbrygg-cronen (én gang/døgn),
+//                              for bredere og mer representativt bredde-/utvalgsgrunnlag.
+//
+// VIKTIG: vi fabrikkerer ALDRI et indekstall fra et snitt av aksjene. Et uvektet
+// snitt av et utvalg er ikke den (markedsvekt-justerte) indeksen og kan peke FEIL
+// vei. obx/osebx settes KUN fra ekte FMP-indeksdata, ellers null.
 
-// OBX-komponenter (oppdatert juni 2026)
+// OBX-komponenter (oppdatert juni 2026) — standard hurtigutvalg.
 const OBX_TICKERS = [
   'EQNR',   // Equinor
   'VAR',    // Vår Energi
@@ -33,15 +44,15 @@ const OBX_TICKERS = [
 ];
 
 // Mulige FMP-symboler for indeksene (prøves i rekkefølge, første som gir pris vinner).
-// MERK: oppdater disse til det symbolet som faktisk returnerer pris fra din FMP-plan.
-// Test i nettleser: https://financialmodelingprep.com/stable/quote?symbol=^OSEBX&apikey=DIN_KEY
 const OBX_INDEX_SYMBOLS = ['^OBX', 'OBX.OL', 'OBX'];
 const OSEBX_INDEX_SYMBOLS = ['^OSEBX', 'OSEBX.OL', 'OSEBX'];
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 'public, max-age=60');
+  // scope=all caches lenger (daglig cron), standard kort (live-kort).
+  const scopeAll = req.query && (req.query.scope === 'all');
+  res.setHeader('Cache-Control', scopeAll ? 'public, max-age=300' : 'public, max-age=60');
   if (req.method !== 'GET') return res.status(405).end();
 
   const apiKey = process.env.FMP_API_KEY;
@@ -52,6 +63,50 @@ export default async function handler(req, res) {
     return fetch(`https://financialmodelingprep.com/stable/quote?symbol=${encodeURIComponent(symbol)}&apikey=${apiKey}`)
       .then(r => (r.ok ? r.json() : null))
       .catch(() => null);
+  }
+
+  // Henter en liste over ALLE .OL-symboler på Oslo Børs (for scope=all).
+  // Samme kildestrategi som events-cronen: prøv flere endepunkter, bruk første
+  // som faktisk gir .OL-treff. Returnerer { 'EQNR.OL': 'Equinor', ... }.
+  function extractOL(arr) {
+    const map = {};
+    if (!Array.isArray(arr)) return map;
+    arr.forEach((it) => {
+      if (!it) return;
+      const sym = it.symbol || it.ticker;
+      if (!sym || typeof sym !== 'string' || !sym.endsWith('.OL')) return;
+      map[sym] = it.name || it.companyName || it.securityName || sym.replace('.OL', '');
+    });
+    return map;
+  }
+  async function getAllOsloSymbols() {
+    const k = '&apikey=' + apiKey;
+    const sources = [
+      'https://financialmodelingprep.com/stable/available-exchange-symbols?exchange=OSL' + k,
+      'https://financialmodelingprep.com/stable/company-screener?exchange=OSL&limit=3000' + k,
+      'https://financialmodelingprep.com/api/v3/symbol/OSL?apikey=' + apiKey,
+    ];
+    for (const url of sources) {
+      try {
+        const r = await fetch(url);
+        if (!r.ok) continue;
+        const body = await r.json();
+        const map = extractOL(body);
+        if (Object.keys(map).length > 0) return map;
+      } catch (e) { /* prøv neste */ }
+    }
+    return {};
+  }
+
+  // Henter quotes for mange symboler i bolker (unngår å sprenge ett gigantisk kall).
+  async function fmpQuoteBatch(symbols, batchSize) {
+    const out = [];
+    for (let i = 0; i < symbols.length; i += batchSize) {
+      const chunk = symbols.slice(i, i + batchSize);
+      const results = await Promise.all(chunk.map(fmpQuote));
+      out.push(...results);
+    }
+    return out;
   }
 
   function parseStock(q, ticker) {
@@ -81,26 +136,18 @@ export default async function handler(req, res) {
       price: Math.round(price).toLocaleString('nb-NO'),
       change: change.toFixed(2),
       changePct: Math.abs(changePct).toFixed(2),
-      // up bindes til samme signerte prosent som vises (changePercentage).
       up: changePct >= 0
     };
   }
 
   try {
-    // Hent alt parallelt: indekskandidater + 25 OBX-aksjer
+    // --- Indekser hentes likt i begge moduser (få kall, billig) ---
     const indexSymbols = [...OBX_INDEX_SYMBOLS, ...OSEBX_INDEX_SYMBOLS];
-    const [indexRaws, stockRaws] = await Promise.all([
-      Promise.all(indexSymbols.map(fmpQuote)),
-      Promise.all(OBX_TICKERS.map(t => fmpQuote(t + '.OL')))
-    ]);
-
-    // Map symbol -> parset indeks
+    const indexRaws = await Promise.all(indexSymbols.map(fmpQuote));
     const indexParsed = {};
     indexSymbols.forEach((sym, i) => { indexParsed[sym] = parseIndex(pickOne(indexRaws[i])); });
     function firstIndex(syms) { for (const s of syms) { if (indexParsed[s]) return indexParsed[s]; } return null; }
 
-    // Diagnostikk i Vercel Logs: hvilke(t) indeks-symbol returnerte faktisk en pris?
-    // Bruk dette til å finne riktig FMP-symbol, og oppdater listene øverst.
     const indexDebug = {};
     indexSymbols.forEach((sym, i) => {
       const q = pickOne(indexRaws[i]);
@@ -108,25 +155,56 @@ export default async function handler(req, res) {
     });
     console.log('MOVERS_INDEX_DEBUG', indexDebug);
 
-    // KUN ekte indeksverdier fra FMP. Finnes de ikke, er obx/osebx = null,
-    // og frontend viser "—" / utilgjengelig.
-    //
-    // VIKTIG: vi fabrikkerer IKKE lenger et indekstall fra gjennomsnittet av
-    // OBX-aksjene. Et uvektet snitt av et utvalg aksjer er ikke den faktiske
-    // (markedsvekt-justerte) indeksen og kan vise FEIL retning — det er verre
-    // enn å vise ingenting på en finanstjeneste.
+    // KUN ekte indeksverdier fra FMP. Finnes de ikke: null (frontend viser "—").
     const obx = firstIndex(OBX_INDEX_SYMBOLS);
     const osebx = firstIndex(OSEBX_INDEX_SYMBOLS);
 
-    // Parse OBX-aksjer (brukes til vinnere/tapere — ekte per-aksje-kurser)
-    const stocks = OBX_TICKERS.map((t, i) => parseStock(pickOne(stockRaws[i]), t)).filter(Boolean);
+    // --- Aksjeutvalg: bredt (scope=all) eller hurtig (standard 25 OBX) ---
+    let stocks;
+    let universeSize;
+    if (scopeAll) {
+      const nameMap = await getAllOsloSymbols();
+      const symbols = Object.keys(nameMap);
+      if (!symbols.length) {
+        // Klarte ikke hente hele universet: fall tilbake til 25 OBX, så cronen
+        // fortsatt får data (om enn smalere) i stedet for å feile helt.
+        const fallbackRaws = await Promise.all(OBX_TICKERS.map(t => fmpQuote(t + '.OL')));
+        stocks = OBX_TICKERS.map((t, i) => parseStock(pickOne(fallbackRaws[i]), t)).filter(Boolean);
+        universeSize = stocks.length;
+      } else {
+        const raws = await fmpQuoteBatch(symbols, 25);
+        stocks = symbols.map((sym, i) => {
+          const q = pickOne(raws[i]);
+          const ticker = sym.replace('.OL', '');
+          const parsed = parseStock(q, ticker);
+          // bruk navn fra symbol-listen hvis quote mangler navn
+          if (parsed && (!parsed.name || parsed.name === ticker) && nameMap[sym]) {
+            parsed.name = String(nameMap[sym]).replace(' ASA', '').replace(' PLC', '').split(' ').slice(0, 2).join(' ');
+          }
+          return parsed;
+        }).filter(Boolean);
+        universeSize = stocks.length;
+      }
+    } else {
+      const stockRaws = await Promise.all(OBX_TICKERS.map(t => fmpQuote(t + '.OL')));
+      stocks = OBX_TICKERS.map((t, i) => parseStock(pickOne(stockRaws[i]), t)).filter(Boolean);
+      universeSize = stocks.length;
+    }
 
-    // Sorter OBX-aksjer for vinnere/tapere
+    // Sorter for vinnere/tapere (størst opp -> størst ned)
     const sorted = [...stocks].sort((a, b) => b.changePctRaw - a.changePctRaw);
     const winners = sorted.slice(0, 5);
     const losers = sorted.slice(-5).reverse();
 
-    return res.status(200).json({ winners, losers, all: sorted, obx, osebx });
+    return res.status(200).json({
+      winners,
+      losers,
+      all: sorted,
+      obx,
+      osebx,
+      scope: scopeAll ? 'all' : 'obx25',
+      universeSize
+    });
   } catch (e) {
     console.error('movers error:', e.message);
     return res.status(500).json({ error: e.message });
