@@ -183,6 +183,27 @@ export default async function handler(req, res) {
           }
           return parsed;
         }).filter(Boolean);
+
+        // DATAKVALITET (kun scope=all): luk ut støy så vinnere/tapere og bredde
+        // beskriver EKTE handel, ikke datafeil og illikvide papirer.
+        // 1) changePctRaw === 0  -> på Oslo Børs betyr dette nesten alltid at
+        //    aksjen IKKE ble handlet (illikvid), ikke at den "sto stille".
+        //    Tar vi dem med, blåses bredde-tallet opp og mange feilmerkes som "opp".
+        // 2) |endring| >= 25 %   -> urealistisk for en vanlig børsdag for et reelt
+        //    selskap. FMP gir av og til søppel (notering, spleis, stale kurs) som
+        //    RAKP +1787 % — det ville gitt Børsbrygg en feil og pinlig overskrift.
+        // 3) pris < 0,10 kr     -> ekstreme penny-/øreaksjer der ett øre gir
+        //    enorme prosentutslag (AKH 0,01 kr "−16 %"). Statistisk støy, ikke en
+        //    nyhet. Grensen er bevisst LAV (0,10) så aktive lavpris-aksjer som
+        //    NORSE, NBX m.fl. beholdes — kun de helt ekstreme øreaksjene fjernes.
+        const MAX_REALISTIC_PCT = 25;
+        const MIN_PRICE = 0.1;
+        stocks = stocks.filter(s =>
+          s.changePctRaw !== 0 &&
+          Math.abs(s.changePctRaw) < MAX_REALISTIC_PCT &&
+          Number(s.price) >= MIN_PRICE
+        );
+
         universeSize = stocks.length;
       }
     } else {
