@@ -60,12 +60,15 @@ export default async function handler(req, res) {
     else if (metrics?.earningsYieldTTM && metrics.earningsYieldTTM > 0) pe = (1 / metrics.earningsYieldTTM).toFixed(1);
 
     // Utbytte: skill mellom siste UTBETALTE (dato <= i dag) og neste ANNONSERTE (dato > i dag).
+    // VIKTIG: bruk `dividend`-feltet først (det faktisk erklærte beløpet, NOK for .OL),
+    // med `adjDividend` som fallback. Dette holder beløpet samkjørt med events-kalenderen
+    // (api/cron-events.js), som bruker samme felt i samme rekkefølge for ex-dag-visningen.
     let lastDiv = null, lastDivDate = null, upcomingDiv = null, upcomingDivDate = null;
     if (dividends && dividends.length) {
       const todayMs = Date.now();
       const rows = dividends
         .filter(d => d && d.date)
-        .map(d => ({ date: d.date, amt: d.adjDividend != null ? d.adjDividend : d.dividend, t: new Date(d.date).getTime() }))
+        .map(d => ({ date: d.date, amt: d.dividend != null ? d.dividend : d.adjDividend, t: new Date(d.date).getTime() }))
         .filter(d => d.amt != null && !isNaN(d.t));
       const past = rows.filter(d => d.t <= todayMs).sort((a, b) => b.t - a.t);
       const future = rows.filter(d => d.t > todayMs).sort((a, b) => a.t - b.t);
@@ -104,7 +107,7 @@ export default async function handler(req, res) {
     // Siste utbetalte utbytte per aksje (i kursvaluta)
     let dividendPerShare = null;
     if (lastDiv != null) dividendPerShare = lastDiv.toFixed(2) + ' ' + priceCurrency;
-    // Neste annonserte utbytte per aksje (i kursvaluta)
+    // Neste annonserte utbytte per aksje (i kursvaluta) — samkjørt med ex-dag i events.
     let upcomingDividend = null;
     if (upcomingDiv != null) upcomingDividend = upcomingDiv.toFixed(2) + ' ' + priceCurrency;
 
