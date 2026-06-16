@@ -50,14 +50,29 @@ export default async function handler(req, res) {
     const cf = Array.isArray(cashflow) ? cashflow[0] : null;
     const latestEarnings = Array.isArray(earnings) ? earnings[0] : null;
 
-    // Hjelpefunksjon
-    function fmtB(val, currency = 'USD') {
+    // REGNSKAPSVALUTA: Oslo Børs-selskaper (.OL) rapporterer som hovedregel i NOK.
+    // FMP sin reportedCurrency er IKKE til å stole på for norske selskaper — den
+    // merker f.eks. DNB sine NOK-tall som "USD". Vi bruker derfor reportedCurrency
+    // KUN når den eksplisitt sier noe annet enn USD (de få ekte unntakene som
+    // faktisk fører regnskap i USD — typisk shipping/oljeservice som Frontline,
+    // Subsea 7 — har reportedCurrency satt korrekt og bevares). I praksis:
+    //   reportedCurrency === 'USD'  -> behandle som feilmerket NOK (norsk selskap)
+    //   reportedCurrency === noe annet (f.eks. 'NOK', 'EUR') -> bruk den
+    //   mangler                     -> NOK
+    // Selskaper som RIKTIG rapporterer i USD vil dermed vises som NOK her — det er
+    // en bevisst avveining fordi det store flertallet av .OL er NOK, og DNB-typen
+    // feilen er langt vanligere og mer synlig enn omvendt.
+    const rawCurrency = latest.reportedCurrency || null;
+    const reportCurrency = (!rawCurrency || rawCurrency === 'USD') ? 'NOK' : rawCurrency;
+
+    // Hjelpefunksjon — bruker regnskapsvalutaen vi utledet over som standard.
+    function fmtB(val, currency = reportCurrency) {
       if (!val) return '—';
       const abs = Math.abs(val);
       const sign = val < 0 ? '-' : '';
       if (abs >= 1e9) return sign + (abs/1e9).toFixed(1) + ' mrd ' + currency;
       if (abs >= 1e6) return sign + (abs/1e6).toFixed(0) + ' mill ' + currency;
-      return sign + val.toLocaleString() + ' ' + currency;
+      return sign + val.toLocaleString('nb-NO') + ' ' + currency;
     }
 
     function pctChange(a, b) {
@@ -69,6 +84,7 @@ export default async function handler(req, res) {
     const qData = {
       period: latest.period || latest.calendarYear + ' Q?',
       date: latest.date,
+      currency: reportCurrency,
       revenue: fmtB(latest.revenue),
       revenueChange: pctChange(latest.revenue, yearAgo?.revenue),
       ebit: fmtB(latest.operatingIncome),
@@ -92,6 +108,8 @@ export default async function handler(req, res) {
     const prompt = `Du er Børshjelpen sin finansanalytiker — du snakker som en ærlig, engasjert venn som kan finans godt. Forklar kvartalsrapporten grundig og konkret. Bruk de faktiske tallene aktivt i analysen.
 
 FORBUDTE ORD OG VURDERINGER (svært viktig): Bruk ALDRI verdiladede ord som feller en dom over aksjen eller kursen. Følgende ord — og alt i samme gate — er strengt forbudt: "undervurdert", "overvurdert", "billig", "dyr", "kjøp", "selg", "kjøpskandidat", "salgskandidat", "sterk kjøp", "bør kjøpe", "bør selge", "verdt å kjøpe", "et godt kjøp", "anbefaler". Konkluder ALDRI med at aksjen er rimelig, dyr, attraktiv eller en god/dårlig investering, og gi ALDRI kjøps-/salgsråd. Beskriv rapporten nøytralt og faktabasert, og la leseren trekke konklusjonen selv.
+
+Alle beløp er i ${reportCurrency}. Bruk ${reportCurrency} når du omtaler tall — finn aldri på en annen valuta.
 
 Kvartalsrapport for ${name || ticker} (${qData.period}):
 
