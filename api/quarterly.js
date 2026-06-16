@@ -52,18 +52,45 @@ export default async function handler(req, res) {
 
     // REGNSKAPSVALUTA: Oslo Børs-selskaper (.OL) rapporterer som hovedregel i NOK.
     // FMP sin reportedCurrency er IKKE til å stole på for norske selskaper — den
-    // merker f.eks. DNB sine NOK-tall som "USD". Vi bruker derfor reportedCurrency
-    // KUN når den eksplisitt sier noe annet enn USD (de få ekte unntakene som
-    // faktisk fører regnskap i USD — typisk shipping/oljeservice som Frontline,
-    // Subsea 7 — har reportedCurrency satt korrekt og bevares). I praksis:
+    // merker f.eks. DNB sine NOK-tall som "USD". Standardregelen er derfor:
     //   reportedCurrency === 'USD'  -> behandle som feilmerket NOK (norsk selskap)
-    //   reportedCurrency === noe annet (f.eks. 'NOK', 'EUR') -> bruk den
+    //   reportedCurrency === noe annet (f.eks. 'EUR') -> bruk den
     //   mangler                     -> NOK
-    // Selskaper som RIKTIG rapporterer i USD vil dermed vises som NOK her — det er
-    // en bevisst avveining fordi det store flertallet av .OL er NOK, og DNB-typen
-    // feilen er langt vanligere og mer synlig enn omvendt.
+    //
+    // UNNTAK — selskaper som FAKTISK fører regnskap i USD: For disse er FMP sin
+    // "USD" KORREKT, og vi skal IKKE tvinge den til NOK. Lista under inneholder kun
+    // tickere jeg er trygg på historisk har rapportert i USD (typisk shipping og
+    // oljeservice). Den er bevisst KONSERVATIV og IKKE komplett — utvid den når du
+    // har verifisert flere mot selskapenes egne rapporter. Ticker uten .OL-suffiks.
+    const USD_REPORTERS = new Set([
+      'FRO',    // Frontline
+      'SUBC',   // Subsea 7
+      'GOGL',   // Golden Ocean
+      'FLNG',   // FLEX LNG
+      'SNI',    // Stolt-Nielsen
+      'BWLPG',  // BW LPG
+      'BWO',    // BW Offshore
+      'BWE',    // BW Energy
+      'HAUTO',  // Höegh Autoliners
+      'OET',    // Okeanis Eco Tankers
+      'COOL',   // Cool Company
+      'HSHP',   // Himalaya Shipping
+      '2020',   // 2020 Bulkers
+      'OKEA',   // (fjern hvis NOK — usikker; se kommentar)
+    ]);
+    // NB: OKEA er tatt med fordi mange E&P-selskaper rapporterer i USD, men jeg er
+    // IKKE 100% sikker på akkurat dette — fjern fra lista hvis OKEA viser feil USD.
+
+    const upperTicker = ticker.toUpperCase();
     const rawCurrency = latest.reportedCurrency || null;
-    const reportCurrency = (!rawCurrency || rawCurrency === 'USD') ? 'NOK' : rawCurrency;
+    let reportCurrency;
+    if (USD_REPORTERS.has(upperTicker)) {
+      // Kjent USD-rapportør: stol på FMP sin USD (eller fall til USD hvis tom).
+      reportCurrency = rawCurrency || 'USD';
+    } else {
+      // Alle andre .OL: NOK med mindre FMP eksplisitt sier noe annet enn USD.
+      reportCurrency = (!rawCurrency || rawCurrency === 'USD') ? 'NOK' : rawCurrency;
+    }
 
     // Hjelpefunksjon — bruker regnskapsvalutaen vi utledet over som standard.
     function fmtB(val, currency = reportCurrency) {
