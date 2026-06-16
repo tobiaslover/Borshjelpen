@@ -56,6 +56,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://borshjelpen.no/artikler/hvordan-lese-kvartalsrapport.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://borshjelpen.no/artikler/hva-er-pe-tall.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
