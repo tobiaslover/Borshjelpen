@@ -368,9 +368,6 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
 function fmt(val) { return (val === null || val === undefined) ? '—' : val; }
 let chatHistory = [];
 let currentStockContext = null;
-// Populære aksjer er åpne uten innlogging (smakebit + SEO-landingssider).
-var POPULAR_TICKERS = ['EQNR','DNB','AKRBP','TEL','MOWI','YAR'];
-function isPopular(t){ return POPULAR_TICKERS.indexOf((t||'').toUpperCase().trim()) !== -1; }
 
 function showLoading() {
   document.getElementById('result').innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Henter data...</p></div>';
@@ -412,26 +409,12 @@ function showSkeleton() {
 }
 
 async function search(ticker) {
-  ticker = ticker.toUpperCase().trim();
-  // Populære aksjer er åpne uten innlogging. Øvrige aksjer krever konto.
-  if (window._sb && !isPopular(ticker)) {
+  if (window._sb) {
     var sess = (await window._sb.auth.getSession()).data.session;
     if (!sess) { showLoginModal(); return; }
   }
+  ticker = ticker.toUpperCase().trim();
   document.getElementById('searchInput').value = ticker;
-
-  // SEO: når en aksje vises via ren URL (/aksjer/<slug>), oppdater canonical + tittel
-  // dynamisk slik at hver aksjeside har sin egen kanoniske adresse og sidetittel.
-  (function(){
-    var slugByTicker = { EQNR:'equinor', DNB:'dnb', AKRBP:'aker-bp', TEL:'telenor', MOWI:'mowi', YAR:'yar' };
-    var slug = slugByTicker[ticker];
-    if (slug) {
-      var canon = document.querySelector('link[rel="canonical"]');
-      if (canon) canon.setAttribute('href', 'https://borshjelpen.no/aksjer/' + slug);
-      var ogu = document.querySelector('meta[property="og:url"]');
-      if (ogu) ogu.setAttribute('content', 'https://borshjelpen.no/aksjer/' + slug);
-    }
-  })();
 
   // Sjekk cache først
   var cached = getCached(ticker);
@@ -813,25 +796,21 @@ async function logActivity(type, ticker, name) {
 
 async function generateAI(s) {
   var sb = window._sb;
-  var sess = sb ? (await sb.auth.getSession()).data.session : null;
-  var plan = 'free';
-  if (!sess) {
-    // Ikke innlogget: AI-analyse er åpen KUN for populære aksjer.
-    if (!isPopular(s.ticker)) { showLoginModal(); return; }
-  } else {
-    plan = await getUserPlan(sb);
-    var limits = PLANS[plan] || PLANS.free;
-    if (limits.aiAnalysis > 0) {
-      var used = await getTodayCount(sb, 'search');
-      if (used >= limits.aiAnalysis) {
-        var sec = document.getElementById('ai-section');
-        if (sec) sec.innerHTML = '<div style="padding:1.5rem;background:#fff8f0;border-radius:12px;text-align:center;margin-bottom:1rem;"><div style="font-size:24px;margin-bottom:8px;">🔒</div><div style="font-weight:500;margin-bottom:6px;">Du har brukt ' + limits.aiAnalysis + ' AI-analyser i dag</div><div style="font-size:13px;color:#888;margin-bottom:1rem;">Oppgrader for ubegrenset tilgang</div><button onclick="location.href=\'/priser.html\'" style="padding:10px 20px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;">Se abonnementer →</button></div>';
-        return;
-      }
+  if (!sb) { showLoginModal(); return; }
+  var sess = (await sb.auth.getSession()).data.session;
+  if (!sess) { showLoginModal(); return; }
+  var plan = await getUserPlan(sb);
+  var limits = PLANS[plan] || PLANS.free;
+  if (limits.aiAnalysis > 0) {
+    var used = await getTodayCount(sb, 'search');
+    if (used >= limits.aiAnalysis) {
+      var sec = document.getElementById('ai-section');
+      if (sec) sec.innerHTML = '<div style="padding:1.5rem;background:#fff8f0;border-radius:12px;text-align:center;margin-bottom:1rem;"><div style="font-size:24px;margin-bottom:8px;">🔒</div><div style="font-weight:500;margin-bottom:6px;">Du har brukt ' + limits.aiAnalysis + ' AI-analyser i dag</div><div style="font-size:13px;color:#888;margin-bottom:1rem;">Oppgrader for ubegrenset tilgang</div><button onclick="location.href=\'/priser.html\'" style="padding:10px 20px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:13px;font-weight:500;cursor:pointer;">Se abonnementer →</button></div>';
+      return;
     }
   }
   try {
-    var token = sess ? (sess.access_token || '') : '';
+    var token = (await sb.auth.getSession()).data.session?.access_token || '';
     var stockWithLabel = Object.assign({}, s, {marketLabel: getMarketLabel()});
     var res = await fetch('/api/summary', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify(stockWithLabel)});
     var ai = await res.json();
@@ -965,7 +944,7 @@ async function loadQuarterlyReport(s) {
       ['EBIT', qData.ebit, qData.ebitChange],
       ['Nettoresultat', qData.netIncome, qData.netIncomeChange],
     ];
-    if (qData.eps) rows.push(['EPS', qData.eps + ' USD', qData.epsSurprise ? 'vs est: ' + qData.epsEstimated + ' (' + qData.epsSurprise + ')' : null]);
+    if (qData.eps) rows.push(['EPS', qData.eps + ' ' + (qData.currency || 'NOK'), qData.epsSurprise ? 'vs est: ' + qData.epsEstimated + ' (' + qData.epsSurprise + ')' : null]);
     if (qData.grossMargin) rows.push(['Bruttomargin', qData.grossMargin, null]);
     if (qData.operatingMargin) rows.push(['Driftsmargin', qData.operatingMargin, null]);
     if (qData.freeCashFlow) rows.push(['Fri kontantstrøm', qData.freeCashFlow, null]);
@@ -1413,8 +1392,6 @@ function getWatchlistLimit() {
 
 async function toggleWatchlist(s) {
   if (!s) return;
-  var wlSess = window._sb ? (await window._sb.auth.getSession()).data.session : null;
-  if (!wlSess) { showLoginModal(); return; }
   var list = await getWatchlist();
   var limit = getWatchlistLimit();
   var exists = list.find(function(w) { return w.ticker === s.ticker; });
@@ -1726,27 +1703,10 @@ window._authReady = (async function checkAuth() {
   } catch(e) {}
 })();
 
-// Rene URL-er: /aksjer/equinor -> EQNR. Slug-mapping for de åpne aksjene.
-var SLUG_TO_TICKER = { equinor:'EQNR', dnb:'DNB', 'aker-bp':'AKRBP', akerbp:'AKRBP', telenor:'TEL', mowi:'MOWI', yara:'YAR' };
-
-// Leser ticker fra enten ?ticker=EQNR eller stien /aksjer/<slug>.
-function getTickerFromUrl() {
-  var qp = new URLSearchParams(window.location.search).get('ticker');
-  if (qp) return qp.toUpperCase().trim();
-  var m = window.location.pathname.match(/\/aksjer\/([^\/?#]+)/i);
-  if (m && m[1]) {
-    var slug = decodeURIComponent(m[1]).toLowerCase();
-    if (SLUG_TO_TICKER[slug]) return SLUG_TO_TICKER[slug];
-    // Ukjent slug: bruk den rått som ticker (f.eks. /aksjer/SUBC)
-    return slug.toUpperCase();
-  }
-  return null;
-}
-
 // Kjør auth-avhengige handlinger først når Supabase faktisk er klar (ingen gjetting på timing)
 window._authReady.then(function() {
   initPortfolio();
-  var urlTicker = getTickerFromUrl();
+  var urlTicker = new URLSearchParams(window.location.search).get('ticker');
   if (urlTicker) search(urlTicker);
 });
 
