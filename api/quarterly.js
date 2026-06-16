@@ -63,6 +63,7 @@ export default async function handler(req, res) {
     // oljeservice). Den er bevisst KONSERVATIV og IKKE komplett — utvid den når du
     // har verifisert flere mot selskapenes egne rapporter. Ticker uten .OL-suffiks.
     const USD_REPORTERS = new Set([
+      // Shipping / tank (USD er bransjestandard)
       'FRO',    // Frontline
       'SUBC',   // Subsea 7
       'GOGL',   // Golden Ocean
@@ -76,10 +77,14 @@ export default async function handler(req, res) {
       'COOL',   // Cool Company
       'HSHP',   // Himalaya Shipping
       '2020',   // 2020 Bulkers
-      'OKEA',   // (fjern hvis NOK — usikker; se kommentar)
+      // Energi / E&P (rapporterer i USD)
+      'EQNR',   // Equinor — bekreftet USD
+      'OKEA',   // OKEA — bekreftet USD
     ]);
-    // NB: OKEA er tatt med fordi mange E&P-selskaper rapporterer i USD, men jeg er
-    // IKKE 100% sikker på akkurat dette — fjern fra lista hvis OKEA viser feil USD.
+    // Lista er bevisst KONSERVATIV og IKKE komplett — utvid når du har verifisert
+    // flere mot selskapenes egne rapporter. Aktuelle kandidater å sjekke senere:
+    // VAR (Vår Energi), AKRBP (Aker BP), DNO, BNOR (BlueNord), PEN (Panoro) — flere
+    // E&P-selskaper rapporterer i USD, men ikke lagt inn uten bekreftelse.
 
     const upperTicker = ticker.toUpperCase();
     const rawCurrency = latest.reportedCurrency || null;
