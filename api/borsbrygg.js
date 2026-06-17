@@ -1,26 +1,58 @@
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
+// Seriøse, redaksjonelle finanskilder vi tillater i nyhetsdigesten. Alt annet
+// (YouTube, blogger, forum, innholdsfarmer, ukjente domener) kastes FØR det når
+// AI-en. Hviteliste er tryggere enn svarteliste: ukjente kilder avvises som
+// standard. Matches mot n.site / n.url (domene) og n.publisher, case-insensitivt.
+const TRUSTED_NEWS_SOURCES = [
+  'reuters.com', 'bloomberg.com', 'ft.com', 'wsj.com', 'cnbc.com',
+  'marketwatch.com', 'forbes.com', 'businessinsider.com', 'apnews.com',
+  'theguardian.com', 'economist.com', 'barrons.com', 'fortune.com',
+  'investing.com', 'seekingalpha.com', 'morningstar.com', 'nasdaq.com',
+  'finance.yahoo.com', 'yahoo.com', 'spglobal.com', 'kitco.com',
+  'oilprice.com', 'tradingeconomics.com', 'zacks.com', 'benzinga.com',
+  // Norske/nordiske redaksjonelle finanskilder (dersom de dukker opp i feeden)
+  'e24.no', 'dn.no', 'finansavisen.no', 'nrk.no', 'hegnar.no',
+  'kapital.no', 'borsen.dk', 'di.se', 'bloomberg.net'
+];
+
+// Domener vi ALDRI tillater, selv om noe skulle matche løst over. Eksplisitt
+// blokk av video-/sosiale/UGC-plattformer som ikke er redaksjonelle nyhetskilder.
+const BLOCKED_NEWS_SOURCES = [
+  'youtube.com', 'youtu.be', 'reddit.com', 'twitter.com', 'x.com',
+  'facebook.com', 'instagram.com', 'tiktok.com', 'medium.com',
+  'substack.com', 'blogspot.', 'wordpress.', 'stocktwits.com',
+  'discord', 'telegram'
+];
+
+// Avgjør om en nyhet kommer fra en betrodd kilde. Sjekker både oppgitt
+// publisher/site og selve lenken (domenet), siden FMP varierer hvilket felt
+// som er satt. Blokkliste vinner alltid over hviteliste.
+function isTrustedSource(n) {
+  const hay = [
+    (n && n.site) || '',
+    (n && n.publisher) || '',
+    (n && n.url) || '',
+    (n && n.link) || ''
+  ].join(' ').toLowerCase();
+
+  if (!hay.trim()) return false; // ingen kilde oppgitt -> ikke til å stole på
+  if (BLOCKED_NEWS_SOURCES.some(b => hay.includes(b))) return false;
+  return TRUSTED_NEWS_SOURCES.some(t => hay.includes(t));
+}
+
 /**
  * Henter ekte MAKRO-/markedsnyheter server-side og bygger en kompakt digest.
  * (FMP dekker ikke norske selskapsnyheter, så vi bruker kun den generelle feeden.)
  * Digesten sendes KUN til AI-en som kontekst — den returneres aldri til klienten.
  * Feiler kilden, returneres tom streng, og prompten ber AI-en hoppe over nyheter
- * i stedet for å dikte.
+ * i stedet for å dikte. KUN nyheter fra betrodde kilder slipper gjennom.
  */
 async function fetchNewsDigest() {
   const key = process.env.FMP_API_KEY;
   const items = [];
 
-  // Makro/generelle markedsnyheter fra FMP (lisensiert — du betaler for denne).
-  // NB: FMP har IKKE selskapsnyheter for norske aksjer, så vi henter den generelle
-  // feeden (olje, renter, jobbtall, globalt risikohumør — det som faktisk driver
-  // Oslo Børs). Norske selskapsnyheter krever lisens fra Oslo Børs/Euronext eller
-  // en betalt norsk leverandør (se notater).
-
-  // Trekk ut en array fra ulike mulige FMP-svarformer (ren array, eller pakket
-  // inn i content/news/data). Da blir vi ikke stående med tom liste bare fordi
-  // FMP pakker svaret annerledes enn forventet.
   function asArray(d) {
     if (Array.isArray(d)) return d;
     if (d && Array.isArray(d.content)) return d.content;
@@ -29,10 +61,9 @@ async function fetchNewsDigest() {
     return [];
   }
 
-  // Prøv flere endepunkter i rekkefølge; bruk det første som faktisk gir noe.
   const endpoints = [
-    `https://financialmodelingprep.com/stable/news/general-latest?limit=20&apikey=${key}`,
-    `https://financialmodelingprep.com/stable/news/stock-latest?limit=20&apikey=${key}`
+    `https://financialmodelingprep.com/stable/news/general-latest?limit=50&apikey=${key}`,
+    `https://financialmodelingprep.com/stable/news/stock-latest?limit=50&apikey=${key}`
   ];
 
   for (const url of endpoints) {
@@ -40,7 +71,6 @@ async function fetchNewsDigest() {
       const res = await fetch(url);
       const body = res.ok ? await res.json() : null;
       const arr = asArray(body);
-      // Diagnostikk i Vercel Logs: hvilket endepunkt, HTTP-status og antall treff.
       console.log('BORSBRYGG_NEWS', url.split('/').pop().split('?')[0], 'status', res.status, 'count', arr.length);
       if (arr.length) { items.push(...arr); break; }
     } catch (e) {
@@ -50,12 +80,17 @@ async function fetchNewsDigest() {
 
   if (!items.length) return '';
 
-  // Dedupliser på tittel, sorter nyeste først, kutt til ~25 og trim teksten.
+  // KILDEFILTER: kast alt som ikke kommer fra en betrodd, redaksjonell kilde.
+  const trusted = items.filter(isTrustedSource);
+  console.log('BORSBRYGG_NEWS_FILTER', 'rå', items.length, 'betrodde', trusted.length);
+  if (!trusted.length) return ''; // ingen seriøse kilder -> hopp over nyheter helt
+
+  // Dedupliser på tittel, sorter nyeste først, kutt til ~20 og trim teksten.
   const seen = new Set();
-  const digest = items
+  const digest = trusted
     .filter(n => n && n.title && !seen.has(n.title) && seen.add(n.title))
     .sort((a, b) => new Date(b.publishedDate || b.date || 0) - new Date(a.publishedDate || a.date || 0))
-    .slice(0, 25)
+    .slice(0, 20)
     .map(n => {
       const sym = n.symbol || 'marked';
       const src = n.site || n.publisher || 'ukjent kilde';
@@ -69,10 +104,6 @@ async function fetchNewsDigest() {
 }
 
 // Bygger et FAST øyeblikksbilde av vinnere/tapere som lagres SAMMEN med utgaven.
-// Da kan borsbrygg.html vise det uendret hele dagen, i stedet for å hente
-// /api/movers live (som bytter fra gårsdagens slutt til dagens intradag når
-// børsen åpner). Foretrekker øyeblikksbildet cronen sender; faller ellers
-// tilbake til ett serverkall mot /api/movers ved generering.
 async function buildMoversSnapshot(fromBody) {
   const pick = s => ({ ticker: s.ticker, name: s.name, changePct: s.changePct, up: s.up });
   if (fromBody && Array.isArray(fromBody.winners) && Array.isArray(fromBody.losers)
@@ -84,7 +115,7 @@ async function buildMoversSnapshot(fromBody) {
     };
   }
   try {
-    const data = await fetch('https://borshjelpen.no/api/movers').then(r => r.json());
+    const data = await fetch('https://borshjelpen.no/api/movers?scope=all').then(r => r.json());
     const all = Array.isArray(data && data.all) ? data.all : [];
     const gainers = all.filter(s => s.changePctRaw > 0);
     const fallers = all.filter(s => s.changePctRaw < 0);
@@ -99,13 +130,10 @@ async function buildMoversSnapshot(fromBody) {
 }
 
 // Bygger markedskonteksten SERVER-SIDE fra movers, slik at fortegnet ALLTID er
-// korrekt (via changePctRaw) uansett hvem som trigger genereringen. Front-endens
-// egen stockSummary setter fortegn med parseFloat(changePct) >= 0 og mister minus
-// på fallende aksjer — da blir "−4,60%" til "+4,60%" og AI-en skriver «økning».
-// Denne erstatter den, og gir samtidig alle 25 OBX + indeks/bredde (mer variasjon).
+// korrekt (via changePctRaw) uansett hvem som trigger genereringen.
 async function buildMarketContext() {
   try {
-    const movers = await fetch('https://borshjelpen.no/api/movers').then(r => r.json());
+    const movers = await fetch('https://borshjelpen.no/api/movers?scope=all').then(r => r.json());
     const all = movers && Array.isArray(movers.all) ? movers.all : [];
     if (!all.length) return { ok: false };
 
@@ -122,14 +150,14 @@ async function buildMarketContext() {
     const indexLine = hasIndexData
       ? `INDEKS (FAKTISK indeksdata fra FMP): ${idxName} ${idx.price}, ${idx.up ? '+' : '-'}${idx.changePct}%. Dette er ekte indeksdata — du KAN oppgi denne samlede børsretningen.`
       : `INDEKS: Ingen offisiell OSEBX/OBX-indeksdata er tilgjengelig i dag. Du skal derfor IKKE oppgi en samlet børsretning eller noe indekstall ("Oslo Børs steg/falt X%"). Beskriv i stedet konkret hvilke av de største aksjene som steg og hvilke som falt.`;
-    const breadthLine = `Bredde blant de 25 største OBX-aksjene: ${gainers.length} steg, ${fallers.length} falt${flat.length ? `, ${flat.length} uendret` : ''}. (Dette beskriver utvalget av de største — det er IKKE det samme som hele hovedindeksens retning.)`;
+    const breadthLine = `Bredde blant ${all.length} aksjer på Oslo Børs: ${gainers.length} steg, ${fallers.length} falt${flat.length ? `, ${flat.length} uendret` : ''}. (Dette beskriver bredden i utvalget — det er IKKE det samme som hele den markedsvekt-justerte hovedindeksens retning.)`;
 
     const parts = [
       indexLine,
       breadthLine,
       topGainers.length ? `Størst oppgang i går: ${topGainers.map(fmt).join('; ')}.` : null,
       topFallers.length ? `Størst nedgang i går: ${topFallers.map(fmt).join('; ')}.` : null,
-      `Alle 25 OBX-aksjer (sortert størst opp -> størst ned): ${all.map(fmt).join('; ')}.`
+      `De største bevegelsene på Oslo Børs (sortert størst opp -> størst ned, topp 40): ${all.slice(0, 40).map(fmt).join('; ')}.`
     ].filter(Boolean);
 
     const pick = s => ({ ticker: s.ticker, name: s.name, changePct: s.changePct, up: s.up });
@@ -144,6 +172,70 @@ async function buildMarketContext() {
     };
   } catch (e) {
     return { ok: false };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// SPRÅKKORREKTUR
+// ---------------------------------------------------------------------------
+// 1) Harde regler: spesifikke kjente feil rettes deterministisk, uansett hva
+//    AI-en gjør. Disse er garantert fanget. Utvid lista når du ser nye feil.
+const HARD_FIXES = [
+  [/\bp(å|aa)\s+den\s+annen\s+side\b/gi, 'på den andre siden'],
+  [/\bp(å|aa)\s+den\s+ene\s+side\b/gi, 'på den ene siden'],
+];
+
+function applyHardFixes(str) {
+  if (typeof str !== 'string') return str;
+  let out = str;
+  for (const [re, rep] of HARD_FIXES) out = out.replace(re, rep);
+  return out;
+}
+
+// Går rekursivt gjennom alle strenger i utgaven og bruker de harde reglene.
+function hardFixDeep(obj) {
+  if (obj == null) return obj;
+  if (typeof obj === 'string') return applyHardFixes(obj);
+  if (Array.isArray(obj)) return obj.map(hardFixDeep);
+  if (typeof obj === 'object') {
+    const out = {};
+    for (const k of Object.keys(obj)) out[k] = hardFixDeep(obj[k]);
+    return out;
+  }
+  return obj;
+}
+
+// 2) AI-korrektur: et eget, billig kall som KUN retter språk/grammatikk uten å
+//    endre innhold, tall, struktur eller mening. Returnerer korrigert objekt
+//    eller null ved feil (da beholdes originalen).
+async function proofread(openai, aiObj) {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      max_tokens: 2800,
+      temperature: 0,
+      response_format: { type: 'json_object' },
+      messages: [
+        {
+          role: 'system',
+          content: `Du er en norsk korrekturleser. Du får et JSON-objekt med en børsoppsummering på norsk bokmål. Din ENESTE oppgave er å rette språk: stavefeil, grammatikk, tegnsetting, ordvalg og unaturlige/gammelmodige formuleringer, slik at teksten blir korrekt, moderne og flytende norsk bokmål.
+
+STRENGE REGLER:
+- IKKE endre tall, prosenter, tickere, selskapsnavn, datoer eller kilder.
+- IKKE endre meningen, strukturen eller hvilke nøkler/felter som finnes.
+- IKKE legg til eller fjern informasjon. IKKE finn på noe.
+- Behold nøyaktig samme JSON-struktur og de samme nøklene (ASCII-nøkler).
+- Rett unaturlige uttrykk til naturlig norsk (f.eks. "på den annen side" -> "på den andre siden").
+- Returner KUN det korrigerte JSON-objektet, ingenting annet.`
+        },
+        { role: 'user', content: JSON.stringify(aiObj) }
+      ]
+    });
+    const parsed = JSON.parse(completion.choices[0].message.content);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch (e) {
+    console.error('BORSBRYGG_PROOFREAD feil:', e.message);
+    return null;
   }
 }
 
@@ -175,16 +267,11 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).end();
 
-  // Auth-sjekk på POST
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Ikke autentisert' });
   }
   const token = authHeader.replace('Bearer ', '');
-  // Internt cron-kall autentiserer med CRON_SECRET — ikke en Supabase-bruker-token.
-  // Uten dette returnerte cronens POST 401, og utgaven ble i stedet generert av
-  // første innloggede besøk (med front-endens summary, som mister fortegnet på
-  // fallende aksjer). Slipp cronen gjennom; valider Supabase-token for alle andre.
   const isCron = !!process.env.CRON_SECRET && token === process.env.CRON_SECRET;
   if (!isCron) {
     const { data: { user }, error: authError } = await sb.auth.getUser(token);
@@ -193,14 +280,9 @@ export default async function handler(req, res) {
 
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
 
-  // Ukedag i Oslo-tid: 0=søndag, 1=mandag ... 6=lørdag
   const osloDow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Oslo' })).getDay();
-  // Børsbrygg oppsummerer FORRIGE handelsdag, publisert morgenen etter.
-  // Ny utgave lages kun når gårsdagen var en handelsdag (man–fre):
-  //   tirsdag(2)–lørdag(6) = ja  |  søndag(0) og mandag(1) = nei
   const isGenerationDay = (osloDow >= 2 && osloDow <= 6);
 
-  // Returnér siste eksisterende utgave (når det ikke skal lages ny, f.eks. søn/man)
   async function returnLatest() {
     try {
       const { data: latest } = await sb
@@ -216,7 +298,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ error: 'Ingen utgave tilgjengelig ennå.' });
   }
 
-  // Sjekk cache (dagens utgave finnes allerede)
   try {
     const { data: existing } = await sb
       .from('borsbrygg_editions')
@@ -228,17 +309,12 @@ export default async function handler(req, res) {
     }
   } catch (e) {}
 
-  // Ingen utgave for i dag ennå.
   if (!isGenerationDay) {
-    // Søndag/mandag: ikke generer — vis siste eksisterende utgave (fredagens, via lørdag).
     return await returnLatest();
   }
 
   let { stockSummary, hasIndexData, moversSnapshot } = req.body || {};
 
-  // Bygg konteksten server-side fra movers (korrekt fortegn + alle 25 + indeks/bredde).
-  // Dette overstyrer en ev. summary fra front-end. Faller tilbake til body kun hvis
-  // movers ikke svarer.
   const ctx = await buildMarketContext();
   if (ctx.ok) {
     stockSummary = ctx.stockSummary;
@@ -247,15 +323,10 @@ export default async function handler(req, res) {
   }
 
   if (!stockSummary) {
-    // Mangler kursdata — fall tilbake til siste utgave i stedet for å feile.
     return await returnLatest();
   }
-  // hasIndexData = true KUN når vi faktisk fikk ekte OSEBX/OBX-data fra movers.
-  // Mangler feltet (eller er false), behandler vi det som "ingen indeksdata" —
-  // da skal utgaven ALDRI påstå en samlet børsretning (backstop nedenfor).
   const indexDataPresent = hasIndexData === true;
 
-  // Hent ekte nyheter som kontekst (kun til AI — vises aldri offentlig)
   const newsDigest = await fetchNewsDigest();
 
   try {
@@ -264,6 +335,8 @@ export default async function handler(req, res) {
         {
           role: 'system',
           content: `Du er Børshjelpen sin daglige børskommentator — du skriver som en engasjert, ærlig venn som kan finans godt. Tonen er varm, direkte og forklarende — som en god morgenavis skrevet av noen som faktisk bryr seg om at leseren forstår. Ikke kald, ikke robotaktig. Bruk konkrete tall og eksempler. Forklar "hvorfor" bak tallene, ikke bare hva som skjedde.
+
+SPRÅK (viktig): Skriv korrekt, moderne norsk bokmål. Unngå gammelmodige eller unaturlige formuleringer (skriv f.eks. "på den andre siden", ALDRI "på den annen side"). Riktig tegnsetting og rettskriving er et krav. Les gjennom og rett feil før du svarer.
 
 VIKTIG OM FAKTA — IKKE DIKT:
 Nederst i brukermeldingen får du (1) faktisk kursdata og ofte (2) en liste med FAKTISKE NYHETER fra siste døgn.
@@ -335,7 +408,6 @@ JSON-struktur (bruk eksakt disse nøklene):
         }
       ];
 
-    // Genererer én utgave og parser JSON. Returnerer objekt eller null ved feil.
     async function generate(extraMessages) {
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
@@ -351,13 +423,7 @@ JSON-struktur (bruk eksakt disse nøklene):
       }
     }
 
-    // DETERMINISTISK GUARDRAIL-FILTER:
-    // Skanner all generert tekst for formuleringer som kan leses som
-    // investeringsråd. Slår filteret ut, blir IKKE utgaven publisert som den er.
-    // (Backup til prompt-instruksen — prompten alene garanterer ikke at modellen
-    // aldri formulerer noe råd-aktig.)
     const ADVICE_PATTERNS = [
-      // --- Direkte kjøps-/salgssignaler ---
       /\bbør\s+(du\s+)?(kjøpe|selge|vurdere\s+å\s+kjøpe|vurdere\s+å\s+selge)/i,
       /\b(kjøp|selg)\s+(nå|denne|aksjen)/i,
       /\b(anbefal|anbefaler|anbefales|anbefaling)/i,
@@ -369,8 +435,6 @@ JSON-struktur (bruk eksakt disse nøklene):
       /\b(tiden\s+for\s+å\s+(kjøpe|selge|gå\s+inn))/i,
       /\b(verdt\s+å\s+kjøpe|verdt\s+et\s+kjøp)\b/i,
       /\blast\s+opp\b.*\baksj/i,
-
-      // --- Direkte oppfordringer ---
       /\b(du|man)\s+bør\b/i,
       /\bdet\s+lønner\s+seg\b/i,
       /\b(smart|lurt)\s+å\s/i,
@@ -383,8 +447,6 @@ JSON-struktur (bruk eksakt disse nøklene):
       /\bsikre\s+deg\b/i,
       /\bfå\s+med\s+deg\b/i,
       /\bta\s+rygg\b/i,
-
-      // --- Verdivurderinger som antyder handling ---
       /\b(underpriset|overpriset|undervurdert|overvurdert)\b/i,
       /\battraktiv(t)?\s+(prising|nivå|priset|inngang)/i,
       /\bgunstig\s+(inngang|nivå|kjøp|priset)/i,
@@ -395,8 +457,6 @@ JSON-struktur (bruk eksakt disse nøklene):
       /\b(oppside|nedside)\b/i,
       /\bpotensial(e|et)?\s+til\s+å\s+(stige|øke|doble)/i,
       /\bligger\s+an\s+til\s+å\s+(stige|øke|falle|synke)/i,
-
-      // --- Spådommer om fremtidig kurs ---
       /\bvil\s+(stige|falle|øke|synke)\b/i,
       /\bkommer\s+til\s+å\s+(stige|falle|øke|synke)/i,
       /\bventes\s+å\s+nå/i,
@@ -405,8 +465,6 @@ JSON-struktur (bruk eksakt disse nøklene):
       /\bser\s+lyst\s+ut\s+fremover\b/i,
       /\b(bunnen|toppen)\s+er\s+nådd/i,
       /\bklar\s+for\s+(oppgang|nedgang)\b/i,
-
-      // --- Myke føringer ---
       /\baksje\s+å\s+følge\s+med\s+på/i,
       /\b(en\s+av\s+)?favoritt/i,
       /\bspennende\s+case\b/i,
@@ -433,12 +491,6 @@ JSON-struktur (bruk eksakt disse nøklene):
       return ADVICE_PATTERNS.some(re => re.test(text));
     }
 
-    // BACKSTOP MOT OPPDIKTET BØRSRETNING:
-    // Fanger påstander om at hele børsen/hovedindeksen steg eller falt. Brukes
-    // KUN når vi ikke har ekte indeksdata (indexDataPresent === false) — da skal
-    // utgaven beskrive enkeltaksjer, ikke påstå en samlet retning vi ikke vet.
-    // Mønstrene er forankret i indeks-/børsord + retning, så vanlige per-aksje-
-    // setninger ("Equinor steg 2 %") trigger dem IKKE.
     const INDEX_DIRECTION_PATTERNS = [
       /\boslo\s*børs(en)?\b[^.]{0,60}?\b(steg|falt|stiger|faller|gikk\s+(opp|ned)|endte\s+(opp|ned|i\s+(pluss|minus))|klatret|stupte|sank|løftet\s+seg|trakk\s+(opp|ned))/i,
       /\b(osebx|obx|hovedindeksen|hovedindeks|referanseindeksen)\b[^.]{0,60}?\b(steg|falt|stiger|faller|gikk\s+(opp|ned)|endte|opp|ned|i\s+(pluss|minus)|klatret|stupte|sank)/i,
@@ -450,7 +502,6 @@ JSON-struktur (bruk eksakt disse nøklene):
       return INDEX_DIRECTION_PATTERNS.some(re => re.test(flattenText(aiObj)));
     }
 
-    // Returnerer hvilket guardrail som slo ut ('advice' | 'index'), ellers null.
     function failsGuardrails(aiObj) {
       if (containsAdvice(aiObj)) return 'advice';
       if (!indexDataPresent && claimsAggregateDirection(aiObj)) return 'index';
@@ -466,7 +517,6 @@ JSON-struktur (bruk eksakt disse nøklene):
       return res.status(500).json({ error: 'Ugyldig JSON fra AI' });
     }
 
-    // Slår et guardrail ut: prøv ÉN gang til med en målrettet, strengere instruks.
     const problem = failsGuardrails(ai);
     if (problem) {
       console.warn('BORSBRYGG_GUARDRAIL: ' + problem + ' oppdaget — prøver på nytt.');
@@ -474,16 +524,24 @@ JSON-struktur (bruk eksakt disse nøklene):
       if (retry && !failsGuardrails(retry)) {
         ai = retry;
       } else {
-        // Fortsatt problem (eller feil): IKKE publiser. Vis forrige rene utgave.
         console.warn('BORSBRYGG_GUARDRAIL: fortsatt problem etter nytt forsøk — viser siste utgave i stedet.');
         return await returnLatest();
       }
     }
 
-    // Frys vinnere/tapere inn i utgaven, så de står likt hele dagen.
+    // SPRÅKKORREKTUR (Nivå 2): kjør et eget korrektur-kall som retter språk uten
+    // å endre innhold. Verifiser at guardrails fortsatt holder etter korrektur —
+    // hvis korrekturen mot formodning skulle innføre noe råd-/indeks-aktig, eller
+    // feile, beholder vi originalen. Til slutt brukes de harde reglene uansett.
+    const proofed = await proofread(openai, ai);
+    if (proofed && !failsGuardrails(proofed)) {
+      ai = proofed;
+    }
+    // Harde regler kjøres ALLTID til slutt — garantert retting av kjente feil.
+    ai = hardFixDeep(ai);
+
     ai.movers = await buildMoversSnapshot(moversSnapshot);
 
-    // Lagre i Supabase. UNIQUE(date) garanterer maks ÉN utgave per dag.
     const { error: insErr } = await sb.from('borsbrygg_editions').insert({
       date: today,
       title: ai.tittel || ('Børsbrygg ' + today),
@@ -491,8 +549,6 @@ JSON-struktur (bruk eksakt disse nøklene):
     });
 
     if (insErr) {
-      // En annen forespørsel rakk å lage dagens utgave først (unik-konflikt på date).
-      // Hent den LAGREDE utgaven og returner DEN, så alle får nøyaktig samme innhold.
       const { data: canonical } = await sb
         .from('borsbrygg_editions')
         .select('content')
