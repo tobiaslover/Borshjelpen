@@ -47,21 +47,37 @@ export default async function handler(req, res) {
 
     const breadthLine = `Bredde blant ${all.length} aksjer på Oslo Børs: ${gainers.length} steg, ${fallers.length} falt${flat.length ? `, ${flat.length} uendret` : ''}. (Dette beskriver bredden i utvalget — det er IKKE det samme som hele den markedsvekt-justerte hovedindeksens retning.)`;
 
+    // OBX-vinnere/tapere (kjente, store selskaper) løftes eksplisitt frem.
+    const obxWin = Array.isArray(movers.winners) ? movers.winners : [];
+    const obxLos = Array.isArray(movers.losers) ? movers.losers : [];
+    const fmtSimple = s => `${s.name} (${s.ticker}): ${s.up ? '+' : '-'}${s.changePct}%`;
+    const obxLine = (obxWin.length || obxLos.length)
+      ? `STORE, KJENTE OBX-AKSJER i går — disse SKAL nevnes i oppsummeringen (minst 2 av dem): `
+        + `Opp: ${obxWin.slice(0,5).map(fmtSimple).join('; ')}. `
+        + `Ned: ${obxLos.slice(0,5).map(fmtSimple).join('; ')}.`
+      : null;
+
     const parts = [
       indexLine,
       breadthLine,
-      topGainers.length ? `Størst oppgang i går: ${topGainers.map(fmt).join('; ')}.` : null,
-      topFallers.length ? `Størst nedgang i går: ${topFallers.map(fmt).join('; ')}.` : null,
+      obxLine,
+      topGainers.length ? `Størst oppgang i går (hele børsen): ${topGainers.map(fmt).join('; ')}.` : null,
+      topFallers.length ? `Størst nedgang i går (hele børsen): ${topFallers.map(fmt).join('; ')}.` : null,
       `De største bevegelsene på Oslo Børs (sortert størst opp -> størst ned, topp 40): ${all.slice(0, 40).map(fmt).join('; ')}.`
     ].filter(Boolean);
 
     const stockSummary = parts.join('\n\n');
 
     // Øyeblikksbilde av vinnere/tapere som fryses inn i utgaven (topp 3 hver vei).
+    // Bruk movers.winners/losers — ved scope=all er disse OBX-baserte (kjente, store
+    // selskaper), identiske med oversikt-siden. Da viser Børsbrygg-kortet de samme
+    // gjenkjennelige aksjene som oversikten, ikke ukjente mikroaksjer.
     const snap = s => ({ ticker: s.ticker, name: s.name, changePct: s.changePct, up: s.up });
+    const obxWinners = Array.isArray(movers.winners) ? movers.winners : topGainers;
+    const obxLosers  = Array.isArray(movers.losers)  ? movers.losers  : topFallers;
     const moversSnapshot = {
-      winners: topGainers.slice(0, 3).map(snap),
-      losers: topFallers.slice(0, 3).map(snap)
+      winners: obxWinners.slice(0, 3).map(snap),
+      losers: obxLosers.slice(0, 3).map(snap)
     };
 
     // Trigger Børsbrygg-generering (autentiser som internt cron-kall)
