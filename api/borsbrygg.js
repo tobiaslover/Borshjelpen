@@ -152,11 +152,24 @@ async function buildMarketContext() {
       : `INDEKS: Ingen offisiell OSEBX/OBX-indeksdata er tilgjengelig i dag. Du skal derfor IKKE oppgi en samlet børsretning eller noe indekstall ("Oslo Børs steg/falt X%"). Beskriv i stedet konkret hvilke av de største aksjene som steg og hvilke som falt.`;
     const breadthLine = `Bredde blant ${all.length} aksjer på Oslo Børs: ${gainers.length} steg, ${fallers.length} falt${flat.length ? `, ${flat.length} uendret` : ''}. (Dette beskriver bredden i utvalget — det er IKKE det samme som hele den markedsvekt-justerte hovedindeksens retning.)`;
 
+    // OBX-vinnere/tapere (kjente, store selskaper) — movers.winners/losers er nå
+    // OBX-baserte ved scope=all. Disse løftes eksplisitt frem så AI-en ALLTID har
+    // gjenkjennelige selskaper å skrive om, ikke bare ukjente mikroaksjer.
+    const obxWin = Array.isArray(movers.winners) ? movers.winners : [];
+    const obxLos = Array.isArray(movers.losers) ? movers.losers : [];
+    const fmtSimple = s => `${s.name} (${s.ticker}): ${s.up ? '+' : '-'}${s.changePct}%`;
+    const obxLine = (obxWin.length || obxLos.length)
+      ? `STORE, KJENTE OBX-AKSJER i går — disse SKAL nevnes i oppsummeringen (minst 2 av dem): `
+        + `Opp: ${obxWin.slice(0,5).map(fmtSimple).join('; ')}. `
+        + `Ned: ${obxLos.slice(0,5).map(fmtSimple).join('; ')}.`
+      : null;
+
     const parts = [
       indexLine,
       breadthLine,
-      topGainers.length ? `Størst oppgang i går: ${topGainers.map(fmt).join('; ')}.` : null,
-      topFallers.length ? `Størst nedgang i går: ${topFallers.map(fmt).join('; ')}.` : null,
+      obxLine,
+      topGainers.length ? `Størst oppgang i går (hele børsen): ${topGainers.map(fmt).join('; ')}.` : null,
+      topFallers.length ? `Størst nedgang i går (hele børsen): ${topFallers.map(fmt).join('; ')}.` : null,
       `De største bevegelsene på Oslo Børs (sortert størst opp -> størst ned, topp 40): ${all.slice(0, 40).map(fmt).join('; ')}.`
     ].filter(Boolean);
 
@@ -363,7 +376,7 @@ INGEN INVESTERINGSRÅD — VIKTIG:
 JSON-struktur (bruk eksakt disse nøklene):
 {
   "tittel": "Engasjerende tittel på maks 10 ord — som en avisoverskrift, ikke en rapport",
-  "hva_skjedde": "5-7 setninger om hva som skjedde blant de største aksjene på Oslo Børs I GÅR. Gi vinnere og tapere LIKE mye plass: forklar både hvem som steg mest og hvem som falt mest, med faktiske tall. Når aksjer beveget seg i hver sin retning samme dag (f.eks. en oljeaksje opp mens en forsvars- eller teknologiaksje ned), forklar HVORFOR de divergerte — ulike sektorer reagerer på ulike drivere (oljepris, renter, kvartalstall, sektorrotasjon, gevinstsikring). Ta også med en eller to mindre opplagte bevegelser blant de største. Bruk faktiske tall fra kursdataen, og forklar HVORFOR de største bevegelsene skjedde der du har grunnlag for det. IKKE påstå en samlet børs- eller indeksretning med mindre du faktisk har fått indeksdata oppgitt.",
+  "hva_skjedde": "5-7 setninger om hva som skjedde blant de største aksjene på Oslo Børs I GÅR. VIKTIG: Du SKAL nevne minst 2 store, kjente OBX-selskaper ved navn (de står oppgitt under 'STORE, KJENTE OBX-AKSJER' i kursdataen — f.eks. Equinor, DNB, Aker BP, Norsk Hydro, Telenor, Mowi, Yara, Kongsberg). Skriv for NYBEGYNNERE: de kjenner de store selskapene, ikke ukjente mikroaksjer. Du kan gjerne også nevne en interessant liten bevegelse, men de kjente selskapene må være med. Gi vinnere og tapere LIKE mye plass: forklar både hvem som steg mest og hvem som falt mest, med faktiske tall. Når aksjer beveget seg i hver sin retning samme dag (f.eks. en oljeaksje opp mens en forsvars- eller teknologiaksje ned), forklar HVORFOR de divergerte — ulike sektorer reagerer på ulike drivere (oljepris, renter, kvartalstall, sektorrotasjon, gevinstsikring). Ta også med en eller to mindre opplagte bevegelser blant de største. Bruk faktiske tall fra kursdataen, og forklar HVORFOR de største bevegelsene skjedde der du har grunnlag for det. IKKE påstå en samlet børs- eller indeksretning med mindre du faktisk har fått indeksdata oppgitt.",
   "globale_faktorer": "2-3 setninger om globale faktorer som påvirket børsen I GÅR, basert på de oppgitte nyhetene. Hva skjedde i USA, Kina, med oljeprisen, rentene eller valutamarkedet som spilte inn?",
   "nyheter": [
     {
