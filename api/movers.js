@@ -162,14 +162,22 @@ export default async function handler(req, res) {
     // --- Aksjeutvalg: bredt (scope=all) eller hurtig (standard 25 OBX) ---
     let stocks;
     let universeSize;
+    // OBX-delmengde (kun ved scope=all): brukes til vinnere/tapere slik at de er
+    // IDENTISKE med oversikt-siden (kjente, store selskaper), mens den brede lista
+    // brukes til selve oppsummeringsteksten. Bygges fra nøyaktig samme 25 OBX-
+    // tickere som standard-movers, så de to alltid stemmer overens.
+    let obxStocks = null;
     if (scopeAll) {
+      // Hent OBX-aksjene separat (samme kilde/parsing som standard-movers).
+      const obxRaws = await Promise.all(OBX_TICKERS.map(t => fmpQuote(t + '.OL')));
+      obxStocks = OBX_TICKERS.map((t, i) => parseStock(pickOne(obxRaws[i]), t)).filter(Boolean);
+
       const nameMap = await getAllOsloSymbols();
       const symbols = Object.keys(nameMap);
       if (!symbols.length) {
         // Klarte ikke hente hele universet: fall tilbake til 25 OBX, så cronen
         // fortsatt får data (om enn smalere) i stedet for å feile helt.
-        const fallbackRaws = await Promise.all(OBX_TICKERS.map(t => fmpQuote(t + '.OL')));
-        stocks = OBX_TICKERS.map((t, i) => parseStock(pickOne(fallbackRaws[i]), t)).filter(Boolean);
+        stocks = obxStocks.slice();
         universeSize = stocks.length;
       } else {
         const raws = await fmpQuoteBatch(symbols, 25);
@@ -228,10 +236,17 @@ export default async function handler(req, res) {
       universeSize = stocks.length;
     }
 
-    // Sorter for vinnere/tapere (størst opp -> størst ned)
+    // Sorter HELE utvalget for tekst/bredde (størst opp -> størst ned)
     const sorted = [...stocks].sort((a, b) => b.changePctRaw - a.changePctRaw);
-    const winners = sorted.slice(0, 5);
-    const losers = sorted.slice(-5).reverse();
+
+    // VINNERE/TAPERE: ved scope=all bygges de fra OBX-delmengden (kjente, store
+    // selskaper) slik at de er identiske med oversikt-siden. Uten scope er stocks
+    // allerede OBX, så da brukes den direkte.
+    const moversBase = (scopeAll && obxStocks && obxStocks.length)
+      ? [...obxStocks].sort((a, b) => b.changePctRaw - a.changePctRaw)
+      : sorted;
+    const winners = moversBase.slice(0, 5);
+    const losers = moversBase.slice(-5).reverse();
 
     return res.status(200).json({
       winners,
