@@ -116,6 +116,16 @@ async function buildMoversSnapshot(fromBody) {
   }
   try {
     const data = await fetch('https://borshjelpen.no/api/movers?scope=all').then(r => r.json());
+    // Bruk de OBX-baserte winners/losers direkte (kjente selskaper, identisk med
+    // oversikt-siden). Fall tilbake til all kun hvis winners/losers mangler.
+    if (Array.isArray(data && data.winners) && Array.isArray(data.losers)
+        && (data.winners.length || data.losers.length)) {
+      return {
+        winners: data.winners.slice(0, 3).map(pick),
+        losers: data.losers.slice(0, 3).map(pick),
+        _frozen_at: new Date().toISOString()
+      };
+    }
     const all = Array.isArray(data && data.all) ? data.all : [];
     const gainers = all.filter(s => s.changePctRaw > 0);
     const fallers = all.filter(s => s.changePctRaw < 0);
@@ -179,8 +189,11 @@ async function buildMarketContext() {
       stockSummary: parts.join('\n\n'),
       hasIndexData,
       moversSnapshot: {
-        winners: topGainers.slice(0, 3).map(pick),
-        losers: topFallers.slice(0, 3).map(pick)
+        // OBX-baserte vinnere/tapere (movers.winners/losers ved scope=all) — IKKE
+        // topGainers/topFallers fra hele børsen. Da blir det frosne snapshotet de
+        // kjente OBX-selskapene, identisk med oversikt-siden.
+        winners: (Array.isArray(movers.winners) ? movers.winners : topGainers).slice(0, 3).map(pick),
+        losers: (Array.isArray(movers.losers) ? movers.losers : topFallers).slice(0, 3).map(pick)
       }
     };
   } catch (e) {
