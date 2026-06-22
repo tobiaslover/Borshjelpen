@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hva er volum? — Børshjelpen</title>
+<meta name="description" content="Volum forklart enkelt: hva tallet betyr, hvorfor det henger sammen med likviditet — og hvorfor du kan bli sittende fast i en aksje med lavt volum. For nybegynnere på Oslo Børs.">
+<meta name="keywords" content="hva er volum, volum aksjer, likviditet, likvid aksje, omsetning aksje, lavt volum, Oslo Børs nybegynner">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://borshjelpen.no/artikler/hva-er-volum.html">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+
+<!-- Open Graph -->
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://borshjelpen.no/artikler/hva-er-volum.html">
+<meta property="og:title" content="Hva er volum? — Børshjelpen">
+<meta property="og:description" content="Hva volum betyr, hvorfor det henger sammen med likviditet, og hvorfor du kan bli sittende fast i en aksje med lavt volum.">
+<meta property="og:image" content="https://borshjelpen.no/og-image.png">
+<meta property="og:locale" content="nb_NO">
+<meta property="og:site_name" content="Børshjelpen">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hva er volum? — Børshjelpen">
+<meta name="twitter:description" content="Tallet de fleste nybegynnere overser — men som forklarer mye. Forklart enkelt.">
+<meta name="twitter:image" content="https://borshjelpen.no/og-image.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid #e8e8e8; background: white; }
+.logo { font-family: 'Tenor Sans', sans-serif; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; color: #1a1a1a; }
+.logo span { color: #C8A96E; }
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #666; text-decoration: none; }
+.nav-links a:hover { color: #1B3A5C; }
+.nav-cta { background: #1B3A5C; color: white; padding: 8px 18px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 200; position: relative; }
+.hamburger-btn span { display: block; width: 22px; height: 2px; background: #1a1a1a; margin: 5px 0; border-radius: 2px; transition: 0.3s; }
+@media (max-width: 768px) { .nav-links { display: none !important; } .hamburger-btn { display: block; } }
+
+/* ARTICLE HERO */
+.article-hero { background: #1B3A5C; padding: 3rem 2rem 4rem; position: relative; overflow: hidden; }
+.article-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(200,169,110,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.article-hero-inner { max-width: 720px; margin: 0 auto; position: relative; z-index: 1; }
+.breadcrumb { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 1.5rem; }
+.breadcrumb a { color: rgba(255,255,255,0.6); text-decoration: none; }
+.breadcrumb a:hover { color: #C8A96E; }
+.article-tag { display: inline-block; font-size: 10px; color: #C8A96E; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; margin-bottom: 1rem; }
+.article-hero h1 { font-family: 'Playfair Display', serif; font-size: 40px; color: white; font-weight: 700; line-height: 1.15; margin-bottom: 1.25rem; }
+.article-hero-excerpt { font-size: 17px; color: rgba(255,255,255,0.6); line-height: 1.7; font-weight: 300; max-width: 600px; }
+.article-hero-meta { display: flex; gap: 1rem; margin-top: 1.75rem; font-size: 12px; color: rgba(255,255,255,0.35); align-items: center; }
+.article-hero-meta .level { background: rgba(200,169,110,0.18); color: #C8A96E; padding: 3px 12px; border-radius: 100px; font-weight: 500; }
+
+/* ARTICLE BODY */
+.article-body { max-width: 720px; margin: 3rem auto; padding: 0 2rem 2rem; }
+.article-body .lead { font-size: 19px; line-height: 1.7; color: #333; font-weight: 300; margin-bottom: 2rem; }
+.article-body h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #1B3A5C; margin: 2.5rem 0 1rem; line-height: 1.25; }
+.article-body p { font-size: 16px; line-height: 1.8; color: #2a2a2a; margin-bottom: 1.25rem; font-weight: 400; }
+.article-body strong { font-weight: 500; color: #1B3A5C; }
+.article-body .formula {
+  background: #f8f7f4; border-left: 3px solid #C8A96E;
+  padding: 1rem 1.5rem; border-radius: 0 10px 10px 0;
+  font-size: 16px; color: #1B3A5C; margin: 1.5rem 0; line-height: 1.6;
+}
+.article-body .formula strong { font-weight: 500; }
+
+/* CALLOUT */
+.callout {
+  background: #1B3A5C; border-radius: 16px;
+  padding: 1.75rem 2rem; margin: 2.5rem 0;
+  position: relative; overflow: hidden;
+}
+.callout::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 100% 0%, rgba(200,169,110,0.1) 0%, transparent 55%);
+  pointer-events: none;
+}
+.callout-label { font-size: 10px; color: #C8A96E; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; margin-bottom: 0.75rem; position: relative; }
+.callout p { font-size: 16px; color: rgba(255,255,255,0.85); line-height: 1.7; font-weight: 300; margin: 0; position: relative; }
+
+/* EXAMPLE BOX */
+.example-box {
+  background: #f8f7f4; border: 1px solid #e8e8e8;
+  border-radius: 16px; padding: 1.75rem 2rem; margin: 2rem 0;
+}
+.example-box .ex-label { font-size: 10px; color: #C8A96E; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; margin-bottom: 1rem; }
+.example-box p { font-size: 15px; margin-bottom: 0.75rem; }
+.example-box p:last-child { margin-bottom: 0; }
+
+/* SUMMARY */
+.summary-box {
+  border: 1.5px solid #EEE8DA; background: #fdfcf9;
+  border-radius: 16px; padding: 1.75rem 2rem; margin: 2.5rem 0 1rem;
+}
+.summary-box h3 { font-family: 'Playfair Display', serif; font-size: 19px; color: #1B3A5C; margin-bottom: 0.75rem; }
+.summary-box p { font-size: 15px; line-height: 1.75; color: #444; margin: 0; }
+
+/* DISCLAIMER */
+.disclaimer {
+  font-size: 12px; color: #999; line-height: 1.6;
+  border-top: 1px solid #f0f0f0; padding-top: 1.5rem; margin-top: 2.5rem;
+  font-style: italic;
+}
+
+/* RELATED / NEXT */
+.next-wrap { max-width: 720px; margin: 0 auto 3rem; padding: 0 2rem; }
+.next-label { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+.next-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.next-card {
+  background: white; border: 1px solid #e8e8e8; border-radius: 14px;
+  padding: 1.25rem 1.5rem; text-decoration: none; color: inherit;
+  transition: all 0.2s; display: flex; flex-direction: column; gap: 6px;
+}
+.next-card:hover { border-color: #1B3A5C; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
+.next-card .nc-tag { font-size: 10px; color: #C8A96E; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; }
+.next-card .nc-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #1B3A5C; line-height: 1.3; }
+
+/* NEWSLETTER CTA */
+.nl-cta { background: #f8f7f4; border-top: 1px solid #e8e8e8; padding: 3rem 2rem; text-align: center; }
+.nl-cta-inner { max-width: 500px; margin: 0 auto; }
+.nl-cta h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; color: #1B3A5C; }
+.nl-cta p { font-size: 14px; color: #888; margin-bottom: 1.5rem; }
+.nl-cta-btn { background: #1B3A5C; color: white; padding: 12px 28px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
+
+@media (max-width: 600px) {
+  .article-hero { padding: 2rem 1.25rem 3rem; }
+  .article-hero h1 { font-size: 30px; }
+  .article-hero-excerpt { font-size: 15px; }
+  .article-body { padding: 0 1.25rem 2rem; margin-top: 2rem; }
+  .article-body h2 { font-size: 22px; }
+  .article-body .lead { font-size: 17px; }
+  .next-wrap { padding: 0 1.25rem; }
+  .next-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/oversikt.html" class="logo">Børs<span>hjelpen</span></a>
+  <div class="nav-links">
+    <a href="/borshjelpen.html" id="navHjem">Hjem</a>
+    <a href="/oversikt.html" id="navOversikt" style="display:none;">Oversikt</a>
+    <a href="/aksjer.html">Aksjer</a>
+    <a href="/laer.html">Aksjeguiden</a>
+    <a href="/borsbrygg.html">Børsbrygg</a>
+    <a href="/kontakt.html">Kontakt</a>
+    <a href="/om.html">Om oss</a>
+    <div id="navAuth" style="display:flex;gap:8px;align-items:center;">
+      <button onclick="location.href='/auth.html'" style="font-size:13px;padding:6px 14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" class="nav-cta">Registrer deg</button>
+    </div>
+    <div id="navUser" style="display:none;align-items:center;gap:8px;">
+      <div onclick="location.href='/profil.html'" style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;border:1px solid #e8e8e8;cursor:pointer;">
+        <div id="navAv" style="width:28px;height:28px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:11px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+        <span id="navName" style="font-size:13px;font-weight:500;color:#1a1a1a;">Min side</span>
+      </div>
+    </div>
+  </div>
+  <button class="hamburger-btn" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
+</nav>
+
+<div id="mobileMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99999;flex-direction:column;padding:1.5rem 2rem;overflow-y:auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;">
+    <a href="/borshjelpen.html" style="font-family:'Tenor Sans',sans-serif;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;color:#1a1a1a;text-decoration:none;">Børs<span style="color:#C8A96E;">hjelpen</span></a>
+    <button onclick="closeMobileMenu()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;padding:4px;">✕</button>
+  </div>
+  <div style="display:flex;flex-direction:column;flex:1;">
+    <a href="/borshjelpen.html" id="mobileHjem" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">🏠</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Hjem</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/oversikt.html" id="mobileOversikt" onclick="closeMobileMenu()" style="display:none;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📊</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Oversikt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/aksjer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📈</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjer</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/laer.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">📚</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Aksjeguiden</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/borsbrygg.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">☕</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Børsbrygg</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/kontakt.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">✉️</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Kontakt</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/om.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">💡</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Om oss</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+    <a href="/priser.html" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#1B3A5C;"><span style="font-size:20px;width:32px;text-align:center;">⭐</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Priser</span><span style="margin-left:auto;color:#C8A96E;font-size:18px;">→</span></a>
+  </div>
+  <div style="padding-top:1.5rem;">
+    <div id="mobileMenuUser" style="display:none;align-items:center;gap:12px;padding:12px 16px;background:#f8f7f4;border-radius:12px;cursor:pointer;margin-bottom:8px;" onclick="location.href='/profil.html'">
+      <div id="mobileMenuAv" style="width:40px;height:40px;border-radius:50%;background:#1B3A5C;display:flex;align-items:center;justify-content:center;font-size:14px;color:#C8A96E;font-weight:500;font-family:'Tenor Sans',sans-serif;">?</div>
+      <span id="mobileMenuName" style="font-size:15px;font-weight:500;">Min side</span>
+    </div>
+    <div id="mobileMenuAuth">
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:14px;border-radius:100px;border:1px solid #e8e8e8;background:none;color:#666;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;">Logg inn</button>
+      <button onclick="location.href='/auth.html'" style="width:100%;padding:14px;border-radius:100px;border:none;background:#1B3A5C;color:white;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Registrer deg gratis</button>
+    </div>
+  </div>
+</div>
+
+<!-- ARTICLE HERO -->
+<div class="article-hero">
+  <div class="article-hero-inner">
+    <div class="breadcrumb"><a href="/laer.html">Aksjeguiden</a> &nbsp;/&nbsp; Begreper</div>
+    <span class="article-tag">Begreper</span>
+    <h1>Hva er volum?</h1>
+    <p class="article-hero-excerpt">Tallet de fleste nybegynnere overser — men som forklarer hvor lett det faktisk er å kjøpe og selge en aksje.</p>
+    <div class="article-hero-meta">
+      <span>⏱ 4 min</span>
+      <span>·</span>
+      <span class="level">Nybegynner</span>
+    </div>
+  </div>
+</div>
+
+<!-- ARTICLE BODY -->
+<article class="article-body">
+
+  <div class="summary-box">
+    <h3>Kort oppsummert</h3>
+    <p>Volum er antallet aksjer som kjøpes og selges i en aksje i løpet av en handelsdag. Høyt volum betyr at mange handler aksjen, lavt volum at få gjør det. Volum henger tett sammen med likviditet — hvor lett du kommer inn og ut av aksjen. I en aksje med svært lavt volum kan du bli «sittende fast» fordi det ikke finnes nok kjøpere når du vil selge. Plutselig høyt volum er ofte et tegn på at noe har skjedd.</p>
+  </div>
+
+  <p class="lead">De fleste nybegynnere ser på kursen og glemmer volumet. Men volum forteller deg noe kursen ikke gjør: hvor lett det faktisk er å kjøpe og selge en aksje. Det er et enkelt tall, men det avslører mye om hvor forutsigbar en aksje er å handle. Her er hva det betyr.</p>
+
+  <h2>Hva er volum?</h2>
+  <p>Volum er antallet aksjer som kjøpes og selges i en bestemt aksje i løpet av en handelsdag. Hver gang noen kjøper og noen selger, teller handelen med i dagens volum. Det er rett og slett et mål på hvor mye aktivitet det er i aksjen.</p>
+  <p>Tenk på det som et mål på oppmerksomhet: et høyt volum betyr at mange er interessert i aksjen akkurat nå, mens et lavt volum betyr at få bryr seg om den for øyeblikket.</p>
+
+  <h2>Hva er forskjellen på høyt og lavt volum?</h2>
+  <p>Høyt volum betyr at mange handler aksjen — det er mye kjøp og salg gjennom dagen. Lavt volum betyr at få handler den, og at det kan gå lange perioder uten at noe særlig skjer.</p>
+  <p>Ingen av delene er «bra» eller «dårlig» i seg selv, men de forteller deg noe viktig om hvor lett aksjen er å handle, og hvor forutsigbar prisen er når du faktisk vil kjøpe eller selge.</p>
+
+  <h2>Hvorfor betyr volum noe?</h2>
+  <p>For å kjøpe en aksje må det finnes noen som vil selge — og for å selge må det finnes noen som vil kjøpe. Du trenger alltid noen på den andre siden av handelen. Volum gir deg en pekepinn på hvor lett det er å finne den motparten.</p>
+  <p>Er volumet høyt, er det som regel noen klare til å handle med deg når som helst i åpningstiden. Er volumet lavt, kan du måtte vente — eller godta en dårligere pris for å få handelen gjennomført.</p>
+
+  <h2>Hva har volum med likviditet å gjøre?</h2>
+  <p>En aksje med høyt volum kalles likvid. Det betyr at du som regel kommer lett inn og ut — du får kjøpt og solgt raskt, og til en pris nær den du ser på skjermen. Lavt volum betyr lavere likviditet, og da kan det være vanskeligere å handle til ønsket pris.</p>
+  <p>Likviditet er altså den praktiske konsekvensen av volum: jo mer som handles, jo smidigere går dine egne handler.</p>
+
+  <h2>Hva er den skjulte fellen?</h2>
+  <p>Her er det viktigste poenget for en nybegynner. I en aksje med svært lavt volum kan du bli «sittende fast». Det kan ta tid å finne noen som vil kjøpe når du ønsker å selge — og i verste fall må du sette ned prisen betydelig for å bli kvitt aksjene i det hele tatt.</p>
+
+  <div class="callout">
+    <div class="callout-label">Verdt å huske</div>
+    <p>En aksje kan se fristende ut på papiret, men hvis nesten ingen handler den, risikerer du å ikke komme deg ut når du vil. Sjekk derfor volumet før du kjøper — ikke bare kursen.</p>
+  </div>
+
+  <h2>Hvorfor handles store og små selskaper så ulikt?</h2>
+  <p>Store, kjente selskaper som Equinor og DNB handles tungt hver eneste dag — det er alltid mange kjøpere og selgere til stede. Et lite selskap kan derimot ha dager der nesten ingenting skjer, og der en enkelt handel utgjør en stor del av dagens volum.</p>
+  <p>Det er en av grunnene til at små aksjer ofte svinger mer: når volumet er lavt, skal det lite til før en enkelt handel flytter kursen merkbart.</p>
+
+  <h2>Kan volum være et signal?</h2>
+  <p>Ja. Plutselig høyt volum i en aksje som vanligvis er rolig, er ofte et tegn på at noe har skjedd — en nyhet, en kvartalsrapport eller annen viktig informasjon. Mange øyne er rettet mot aksjen akkurat da.</p>
+  <p>Volum forteller deg ikke hva som har skjedd eller hvilken vei det bærer, men det kan være et hint om at det er verdt å undersøke nærmere hvorfor aktiviteten plutselig økte.</p>
+
+  <p class="disclaimer">Innholdet er kun ment som generell informasjon og opplæring, og utgjør ikke investeringsråd eller en anbefaling om kjøp eller salg av verdipapirer.</p>
+
+</article>
+
+<!-- NEXT / RELATED -->
+<div class="next-wrap">
+  <div class="next-label">Les videre</div>
+  <div class="next-grid">
+    <a href="/artikler/hva-er-volatilitet.html" class="next-card">
+      <span class="nc-tag">Begreper</span>
+      <span class="nc-title">Hva er volatilitet?</span>
+    </a>
+    <a href="/artikler/hva-er-renters-rente.html" class="next-card">
+      <span class="nc-tag">Begreper</span>
+      <span class="nc-title">Hva er renters rente?</span>
+    </a>
+  </div>
+</div>
+
+<div class="nl-cta">
+  <div class="nl-cta-inner">
+    <h2>Se volum og aktivitet på Oslo Børs</h2>
+    <p>Søk opp en aksje og se kurs, volum og nøkkeltall — gratis.</p>
+    <a href="/aksjer.html" class="nl-cta-btn">Søk opp en aksje →</a>
+  </div>
+</div>
+
+<script>
+(async function checkAuth() {
+  try {
+    var sb = supabase.createClient(
+      'https://twckvtwzyadevqbyehnu.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Y2t2dHd6eWFkZXZxYnllaG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTYwNTIsImV4cCI6MjA5NTUzMjA1Mn0.rDXcB_E-UcttfvEcJBTUGl-ZDyclHHlXnKnp5lOZI4c'
+    );
+    var sess = (await sb.auth.getSession()).data.session;
+    if (sess) {
+      var name = (sess.user.user_metadata && sess.user.user_metadata.full_name) || sess.user.email.split('@')[0];
+      var initials = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      document.getElementById('navAuth').style.display = 'none';
+      document.getElementById('navUser').style.display = 'flex';
+      if(document.getElementById('navOversikt')) document.getElementById('navOversikt').style.display = 'block';
+      if(document.getElementById('mobileOversikt')) document.getElementById('mobileOversikt').style.display = 'flex';
+      if(document.getElementById('navHjem')) document.getElementById('navHjem').style.display = 'none';
+      if(document.getElementById('mobileHjem')) document.getElementById('mobileHjem').style.display = 'none';
+      document.getElementById('navAv').textContent = initials;
+      document.getElementById('navName').textContent = name.split(' ')[0];
+      if(document.getElementById('mobileMenuAv')){document.getElementById('mobileMenuAv').textContent=initials;document.getElementById('mobileMenuName').textContent=name.split(' ')[0];document.getElementById('mobileMenuUser').style.display='flex';document.getElementById('mobileMenuAuth').style.display='none';}
+    }
+  } catch(e) {}
+})();
+</script>
+<script>
+function openMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeMobileMenu() { var m = document.getElementById('mobileMenu'); m.style.display = 'none'; document.body.style.overflow = ''; }
+</script>
+</body>
+</html>
